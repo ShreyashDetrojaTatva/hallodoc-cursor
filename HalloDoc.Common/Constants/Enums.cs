@@ -1,10 +1,15 @@
 namespace HalloDoc.Common.Constants
 {
-    public enum UserRole
+    public enum AccountType
     {
-        Admin,
-        Doctor,
-        Patient
+        Admin = 1,
+        Physician = 2,
+        Patient = 3
     }
-    // Add more enums as needed
+
+    public enum Status
+    {
+        Active = 1,
+        Inactive = 2
+    }
 } 

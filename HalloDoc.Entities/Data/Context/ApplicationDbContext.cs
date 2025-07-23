@@ -10,7 +10,59 @@ namespace HalloDoc.Entities.Data.Context
         {
         }
 
-        // Example DbSet, replace with real entities
         public DbSet<Ping> Pings { get; set; }
+        public DbSet<Users> Users { get; set; }
+        public DbSet<Admin> Admins { get; set; }
+        public DbSet<Physician> Physicians { get; set; }
+        public DbSet<Patient> Patients { get; set; }
+        public DbSet<Roles> Roles { get; set; }
+        public DbSet<Menus> Menus { get; set; }
+        public DbSet<RoleMenus> RoleMenus { get; set; }
+
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            base.OnModelCreating(modelBuilder);
+
+            modelBuilder.Entity<Users>(entity =>
+            {
+                entity.HasIndex(u => u.Username).IsUnique();
+                entity.HasIndex(u => u.Email).IsUnique();
+            });
+
+            modelBuilder.Entity<Admin>()
+                .HasOne(a => a.Role)
+                .WithMany()
+                .HasForeignKey(a => a.RoleId);
+
+            modelBuilder.Entity<Physician>()
+                .HasOne(p => p.Role)
+                .WithMany()
+                .HasForeignKey(p => p.RoleId);
+
+            modelBuilder.Entity<Admin>()
+                .HasOne(a => a.User)
+                .WithOne(u => u.Admin)
+                .HasForeignKey<Admin>(a => a.UserId);
+
+            modelBuilder.Entity<Physician>()
+                .HasOne(p => p.User)
+                .WithOne(u => u.Physician)
+                .HasForeignKey<Physician>(p => p.UserId);
+
+            modelBuilder.Entity<Patient>()
+                .HasOne(p => p.User)
+                .WithOne(u => u.Patient)
+                .HasForeignKey<Patient>(p => p.UserId);
+
+            modelBuilder.Entity<RoleMenus>()
+                .HasOne(rm => rm.Role)
+                .WithMany()
+                .HasForeignKey(rm => rm.RoleId);
+
+            modelBuilder.Entity<RoleMenus>()
+                .HasOne(rm => rm.Menu)
+                .WithMany()
+                .HasForeignKey(rm => rm.MenuId);
+        }
     }
 } 

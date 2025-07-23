@@ -1,0 +1,48 @@
+using System;
+using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
+using HalloDoc.Common.Constants;
+using HalloDoc.Entities.Data.Entities;
+
+namespace HalloDoc.Entities.Data.Entities
+{
+    public class Users
+    {
+        [Key]
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
+        public int UserId { get; set; }
+
+        [Required]
+        [MaxLength(100)]
+        public string Username { get; set; } = null!;
+
+        [Required]
+        public string PasswordHash { get; set; } = null!;
+
+        [Required]
+        [MaxLength(255)]
+        public string Email { get; set; } = null!;
+
+        [MaxLength(20)]
+        public string? PhoneNumber { get; set; }
+
+        [Required]
+        public int AccountType { get; set; }
+
+        public bool IsActive { get; set; } = true;
+
+        public DateTime? LastLoginAt { get; set; }
+
+        [Column(TypeName = "timestamp without time zone")]
+        public DateTime CreatedAt { get; set; }
+        [Column(TypeName = "timestamp without time zone")]
+        public DateTime? UpdatedAt { get; set; }
+        public int? CreatedBy { get; set; }
+        public int? UpdatedBy { get; set; }
+        public bool IsDeleted { get; set; } = false;
+
+        public virtual Admin? Admin { get; set; }
+        public virtual Physician? Physician { get; set; }
+        public virtual Patient? Patient { get; set; }
+    }
+} 
