@@ -2,14 +2,26 @@ using Serilog;
 using HalloDoc.Entities.Data.Context;
 using HalloDoc.Repositories.Repositories.PingRepository;
 using HalloDoc.Services.Services.PingService;
+using HalloDoc.Common.Constants;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
+var env = builder.Environment;
+
+// Build configuration as described
+var configBuilder = new ConfigurationBuilder()
+    .SetBasePath(env.ContentRootPath)
+    .AddJsonFile("appsettings.json", optional: true, reloadOnChange: true)
+    .AddJsonFile($"appsettings.{env.EnvironmentName}.json", optional: true)
+    .AddEnvironmentVariables();
+
+var Configuration = configBuilder.Build();
+ConfigItems.Configuration = Configuration;
 
 // Add Serilog
 builder.Host.UseSerilog((ctx, lc) => lc
     .WriteTo.Console()
-    .ReadFrom.Configuration(ctx.Configuration));
+    .ReadFrom.Configuration(Configuration));
 
 // Add CORS for Angular
 var corsPolicy = "AllowAngular";
@@ -26,7 +38,7 @@ builder.Services.AddCors(options =>
 
 // Add DbContext with PostgreSQL
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
-    options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
+    options.UseNpgsql(ConfigItems.ConnectionString));
 
 // Register repositories and services
 builder.Services.AddScoped<IPingRepository, PingRepository>();
@@ -42,7 +54,7 @@ builder.Services.AddSwaggerGen();
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment())
+if (ConfigItems.IsDevelopmentMode)
 {
     app.UseSwagger();
     app.UseSwaggerUI();

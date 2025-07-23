@@ -22,6 +22,7 @@
     <ProjectReference Include="..\HalloDoc.Services\HalloDoc.Services.csproj" />
     <ProjectReference Include="..\HalloDoc.Repositories\HalloDoc.Repositories.csproj" />
     <ProjectReference Include="..\HalloDoc.Entities\HalloDoc.Entities.csproj" />
+    <ProjectReference Include="..\HalloDoc.Common\HalloDoc.Common.csproj" />
   </ItemGroup>
 
 </Project>

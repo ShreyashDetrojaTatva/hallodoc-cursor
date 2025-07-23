@@ -2,6 +2,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\HalloDoc.Entities\HalloDoc.Entities.csproj" />
+    <ProjectReference Include="..\HalloDoc.Common\HalloDoc.Common.csproj" />
   </ItemGroup>
 
   <ItemGroup>
