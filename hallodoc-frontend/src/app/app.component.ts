@@ -10,4 +10,8 @@ import { Router, RouterOutlet } from '@angular/router';
 })
 export class AppComponent {
   constructor(private router: Router) {}
+
+  get isRootRoute() {
+    return this.router.url === '/';
+  }
 }

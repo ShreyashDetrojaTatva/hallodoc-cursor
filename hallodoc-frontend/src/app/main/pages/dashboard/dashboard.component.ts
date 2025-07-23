@@ -3,7 +3,7 @@ import { HttpClient, HttpClientModule } from '@angular/common/http';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
 import { MatTableModule } from '@angular/material/table';
-import { SampleButtonComponent } from '../../shared/sample-button.component';
+import { SampleButtonComponent } from '../../../core/components/shared/sample-button.component';
 
 @Component({
   selector: 'app-dashboard',
