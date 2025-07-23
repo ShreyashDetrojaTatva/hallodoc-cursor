@@ -15,5 +15,10 @@ namespace HalloDoc.Common.Constants
         public static string SmtpPass => Configuration["Email:SmtpPass"] ?? "";
         public static string SmtpFrom => Configuration["Email:SmtpFrom"] ?? "";
         #endregion
+
+        #region JWT Configuration
+        public static string JwtSecret => Configuration["Jwt:Secret"] ?? throw new Exception("JWT secret not configured");
+        public static int JwtExpiryInMinutes => int.TryParse(Configuration["Jwt:ExpiryInMinutes"], out var minutes) ? minutes : 60;
+        #endregion
     }
 } 

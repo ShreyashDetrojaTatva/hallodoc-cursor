@@ -4,6 +4,12 @@ using HalloDoc.Repositories.Repositories.PingRepository;
 using HalloDoc.Services.Services.PingService;
 using HalloDoc.Common.Constants;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;
+using System.Text;
+using HalloDoc.Services.Services;
+using HalloDoc.Repositories.Repositories;
+using HalloDoc.Repositories.Repositories.AuthRepository;
 
 var builder = WebApplication.CreateBuilder(args);
 var env = builder.Environment;
@@ -43,6 +49,27 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
 // Register repositories and services
 builder.Services.AddScoped<IPingRepository, PingRepository>();
 builder.Services.AddScoped<IPingService, PingService>();
+builder.Services.AddScoped<IAuthService, AuthService>();
+builder.Services.AddScoped<IAuthRepository, AuthRepository>();
+
+// Add JWT authentication
+builder.Services.AddAuthentication(options =>
+{
+    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+})
+.AddJwtBearer(options =>
+{
+    options.TokenValidationParameters = new TokenValidationParameters
+    {
+        ValidateIssuer = false,
+        ValidateAudience = false,
+        ValidateLifetime = true,
+        ValidateIssuerSigningKey = true,
+        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(ConfigItems.JwtSecret)),
+        ClockSkew = TimeSpan.Zero
+    };
+});
 
 // Add controllers
 builder.Services.AddControllers();
@@ -63,6 +90,9 @@ if (ConfigItems.IsDevelopmentMode)
 app.UseCors(corsPolicy);
 
 app.UseHttpsRedirection();
+
+app.UseAuthentication();
+app.UseAuthorization();
 
 app.MapControllers();
 
