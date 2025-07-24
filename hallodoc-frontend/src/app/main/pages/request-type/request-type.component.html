@@ -1,0 +1,15 @@
+<div class="request-type-root">
+  <div class="request-type-header">
+    <img src="assets/media/common/hallodoc-logo.svg" alt="HalloDoc" class="logo" />
+  </div>
+  <div class="request-type-content">
+    <h1>I am a...</h1>
+    <div class="request-type-actions">
+      <button mat-raised-button class="type-btn patient" (click)="selectType('patient')">PATIENT</button>
+      <button mat-raised-button class="type-btn family" (click)="selectType('family')">FAMILY/FRIEND</button>
+      <button mat-raised-button class="type-btn concierge" (click)="selectType('concierge')">CONCIERGE</button>
+      <button mat-raised-button class="type-btn business" (click)="selectType('business')">BUSINESS PARTNERS</button>
+    </div>
+    <button mat-stroked-button color="primary" class="back-btn" (click)="goBack()"><mat-icon>arrow_back</mat-icon> Back</button>
+  </div>
+</div> 

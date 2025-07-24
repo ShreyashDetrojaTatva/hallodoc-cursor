@@ -1,0 +1,90 @@
+.landing-root {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background: #fcfdff;
+  position: relative;
+}
+.landing-header {
+  margin-bottom: 2.5rem;
+  .logo {
+    width: 220px;
+    display: block;
+    margin: 0 auto;
+  }
+}
+.landing-actions-bg {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -40%);
+  z-index: 1;
+  width: 500px;
+  height: 350px;
+  pointer-events: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0.5;
+  img {
+    width: 100%;
+    height: auto;
+    filter: blur(8px);
+    border-radius: 24px;
+    object-fit: cover;
+  }
+  @media (max-width: 600px) {
+    width: 90vw;
+    height: 180px;
+    top: 56%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    img {
+      filter: blur(4px);
+    }
+  }
+}
+.landing-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  width: 100%;
+  max-width: 400px;
+  z-index: 2;
+  position: relative;
+}
+.landing-btn {
+  font-size: 1.3rem;
+  font-weight: 600;
+  padding: 1.1rem 0;
+  border-radius: 10px;
+  box-shadow: 0 2px 12px rgba(25, 118, 210, 0.08);
+  color: #fff !important;
+  background: #1a237e !important; /* dark blue */
+  transition: background 0.2s;
+  border: none;
+}
+.landing-btn:hover {
+  background: #0d1333 !important;
+}
+.landing-btn + .landing-btn {
+  background: #263238 !important; /* dark gray */
+  color: #fff !important;
+}
+.landing-btn + .landing-btn:hover {
+  background: #11171a !important;
+}
+@media (max-width: 600px) {
+  .landing-header .logo {
+    width: 150px;
+  }
+  .landing-actions {
+    max-width: 90vw;
+  }
+  .landing-btn {
+    font-size: 1rem;
+    padding: 0.8rem 0;
+  }
+} 

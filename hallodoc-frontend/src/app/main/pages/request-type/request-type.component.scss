@@ -1,0 +1,68 @@
+.request-type-root {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background: #fcfdff;
+}
+.request-type-header {
+  margin-top: 1.5rem;
+  .logo {
+    width: 180px;
+    display: block;
+    margin: 0 auto;
+  }
+}
+.request-type-content {
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  max-width: 480px;
+  padding: 2rem 1rem 1rem 1rem;
+}
+.request-type-content h1 {
+  font-size: 2.3rem;
+  font-weight: 700;
+  margin-bottom: 2.2rem;
+  text-align: center;
+}
+.request-type-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 1.3rem;
+  width: 100%;
+}
+.type-btn {
+  font-size: 1.2rem;
+  font-weight: 600;
+  padding: 1.1rem 0;
+  border-radius: 10px;
+  box-shadow: 0 2px 12px rgba(25, 118, 210, 0.08);
+  &.patient { background: #e7eafd; color: #3a3a5a; }
+  &.family { background: #e0f6ff; color: #1e88e5; }
+  &.concierge { background: #eafbe7; color: #388e3c; }
+  &.business { background: #fde7f3; color: #d81b60; }
+}
+.back-btn {
+  margin-top: 2.5rem;
+  align-self: flex-end;
+  font-size: 1rem;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+}
+@media (max-width: 600px) {
+  .request-type-header .logo {
+    width: 120px;
+  }
+  .request-type-content {
+    max-width: 98vw;
+    padding: 1.2rem 0.2rem 0.5rem 0.2rem;
+  }
+  .type-btn {
+    font-size: 1rem;
+    padding: 0.8rem 0;
+  }
+} 
