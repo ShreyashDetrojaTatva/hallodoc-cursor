@@ -1,0 +1,129 @@
+### 1. Project Overview
+- Name: HalloDoc
+- Purpose: Medical assistance platform where patients can request doctors for themselves or others.
+- Request Types: Patient, Family, Concierge, Business
+- Key Feature: Dynamic request lifecycle management (multiple states) handled differently by Admin and Physician.
+- Authentication: Custom JWT-based login (no ASP.NET Identity).
+
+---
+
+### 2. Roles & Access
+- **Admin**:
+  - Manage requests (assign, cancel, transfer, etc.)
+  - Manage physicians
+  - Manage schedules/shifts
+  - Manage vendors (CRUD)
+  - Manage roles and page access
+  - View/search patient records
+- **Physician**:
+  - Handle assigned requests
+  - Send agreement emails
+  - Update request statuses (accept, return, conclude)
+  - Create doctor notes, orders, encounter forms
+  - Manage own schedules/shifts
+- **Patient**:
+  - Create requests
+  - View previous requests
+  - Accept/deny agreement emails
+
+---
+
+### 3. Request Lifecycle & Actions
+
+#### 3.1 Admin Dashboard States
+
+| State      | Actions Available                                                                 |
+|------------|-----------------------------------------------------------------------------------|
+| **New**    | Assign request, Cancel request, View details, Block user                          |
+| **Pending**| View uploads, View case, Add notes, Transfer request, Clear request, Send agreement email |
+| **Active** | View case, Upload documents, Add notes, Create orders, Add doctor note, Fill encounter form |
+| **Conclude** | View case, Upload documents, Add notes, Create orders, Add doctor note, Fill encounter form |
+| **To-Close** | Cancel request, Revert to new, View case, Upload documents, Add notes, Create doctor note, Create order, Fill encounter form |
+| **Unpaid** | View case, Upload documents, Add notes                                            |
+
+#### 3.2 Physician Dashboard States
+
+| State      | Actions Available                                                         |
+|------------|---------------------------------------------------------------------------|
+| **New**    | View uploads, View case, Add notes, Accept case                           |
+| **Pending**| Send agreement email, View uploads, View case, Add notes, Return case     |
+| **Active** | View uploads, View case, Add notes, Create orders, Add doctor note, Fill encounter form, Select type of care |
+| **Conclude** | Conclude care, View uploads, View case, Add notes, Create order, Add doctor note, Fill encounter form |
+
+---
+
+### 4. Core Features
+- Request management with lifecycle
+- Role-based menus and permissions
+- Profile management (all roles)
+- Physician scheduling
+- Vendor management
+- Account and role management
+- Search and reporting
+- Reset password
+
+---
+
+### 5. Architecture
+- **Frontend (Angular 18)**:
+  - `core` for shared components/services
+  - `main` for feature pages
+  - Angular Material for UI
+  - AuthGuard + JWT interceptor
+- **Backend (.NET Core)**:
+  - Controllers → Services → Repositories → Entities
+  - DTOs and Mappers for data transfer
+  - BaseRepository for generic CRUD
+  - Custom JWT auth
+
+---
+
+### 6. Development Phases
+1. **Project Bootstrapping**
+   - Setup Angular + .NET projects with clean folder structure
+   - Configure EF Core (PostgreSQL) and JWT
+2. **Schema & Models**
+   - Users, Roles, Menus, RoleMenus
+   - Admin, Physician, Patient entities
+   - Requests + supporting tables (later phases)
+3. **Auth & Login**
+   - Implement JWT login
+   - Build login page (Angular Material)
+   - Route protection
+4. **Request Flow**
+   - Request creation (patients)
+   - Request lifecycle management (admin/physician)
+   - Dashboard grouping by status
+5. **Feature Expansion**
+   - Scheduling, vendors, search, reporting
+   - Profile management, reset password
+6. **UI Polish & Role-Based Menu**
+   - Add dynamic menus per role
+   - Add mobile responsiveness and theming
+
+---
+
+### 7. Coding Standards
+- **Backend:**
+  - Services never call DbContext directly, only via Repositories
+  - Mappers in dedicated folder
+  - DTOs for all API responses
+- **Frontend:**
+  - Feature-wise folder structure (`core`, `main`)
+  - Angular Material components
+  - Use Reactive Forms and Observables
+  - Auth via interceptor + guard
+- **Common:**
+  - Consistent naming (PascalCase for classes, camelCase for variables)
+  - Soft delete via `IsDeleted`
+  - Status + IsActive flags where applicable
+
+---
+
+### 8. Execution Plan
+- Keep this file updated as features are implemented
+- Each new feature must update:
+  - Entities
+  - APIs
+  - Angular pages/components
+- Use this plan to realign if Cursor forgets context 

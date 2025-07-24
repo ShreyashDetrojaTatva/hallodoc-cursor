@@ -1,0 +1,97 @@
+.login-root {
+  display: flex;
+  min-height: 100vh;
+  background: #f6fbfd;
+
+  .login-illustration {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: none;
+    img {
+      max-width: 90%;
+      max-height: 80vh;
+    }
+    @media (max-width: 900px) {
+      display: none;
+    }
+  }
+
+  .login-content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 0 3rem;
+    min-width: 320px;
+    max-width: 600px;
+    margin: auto;
+    @media (max-width: 900px) {
+      max-width: 100vw;
+      min-width: 0;
+      padding: 2rem 1rem;
+    }
+  }
+
+  .login-header {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-bottom: 2rem;
+    .logo {
+      width: 120px;
+      margin-bottom: 1rem;
+    }
+    h2 {
+      font-size: 1.6rem;
+      font-weight: 600;
+      margin: 0;
+      color: #222;
+    }
+  }
+
+  form {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 1.2rem;
+    .full-width {
+      width: 100%;
+    }
+    .login-btn {
+      width: 100%;
+      margin-top: 0.5rem;
+      font-weight: 600;
+      font-size: 1.1rem;
+      padding: 0.8rem 0;
+    }
+    .error-message {
+      color: #e53935;
+      font-size: 0.98rem;
+      margin-bottom: -0.5rem;
+      text-align: center;
+    }
+  }
+
+  .forgot-link {
+    margin-top: 1.2rem;
+    text-align: center;
+    a {
+      color: #00b6f3;
+      text-decoration: none;
+      font-size: 1rem;
+      &:hover {
+        text-decoration: underline;
+      }
+    }
+  }
+
+  @media (max-width: 900px) {
+    flex-direction: column;
+    .login-content {
+      margin: 0 auto;
+    }
+  }
+} 

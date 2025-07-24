@@ -1,4 +1,13 @@
 <mat-card>
+  <div style="display: flex; justify-content: space-between; align-items: center;">
+    @if(user) {
+      <div style="font-size: 1rem; color: #333;">
+        <strong>User:</strong> {{ user.username || user.email }}<br>
+        <strong>Account Type:</strong> {{ user.accountType }}
+      </div>
+    }
+    <button mat-stroked-button color="warn" (click)="logout()">Logout</button>
+  </div>
   <h2>Dashboard</h2>
   <button mat-raised-button color="primary" (click)="pingApi()">Get Ping Message</button>
   <app-sample-button label="Sample Shared Button"></app-sample-button>

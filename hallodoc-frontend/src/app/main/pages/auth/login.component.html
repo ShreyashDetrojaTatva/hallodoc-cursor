@@ -1,0 +1,30 @@
+<div class="login-root">
+  <div class="login-illustration">
+    <img src="./assets/media/auth/login-banner.png" alt="Doctor Illustration" />
+  </div>
+  <div class="login-content">
+    <div class="login-header">
+      <img src="./assets/media/common/hallodoc-logo.svg" alt="HalloDoc" class="logo" />
+      <h2>Login To Your Account</h2>
+    </div>
+    <form [formGroup]="loginForm" (ngSubmit)="onSubmit()">
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>Username</mat-label>
+        <mat-icon matPrefix>person</mat-icon>
+        <input matInput formControlName="usernameOrEmail" autocomplete="username" />
+      </mat-form-field>
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>Password</mat-label>
+        <mat-icon matPrefix>lock</mat-icon>
+        <input matInput type="password" formControlName="password" autocomplete="current-password" />
+      </mat-form-field>
+      <div class="error-message" *ngIf="error()">{{ error() }}</div>
+      <button mat-raised-button color="primary" class="login-btn" [disabled]="loginForm.invalid || loading()" type="submit">
+        {{ loading() ? 'Logging in...' : 'Log In' }}
+      </button>
+    </form>
+    <div class="forgot-link">
+      <a href="#">Forgot Password?</a>
+    </div>
+  </div>
+</div> 

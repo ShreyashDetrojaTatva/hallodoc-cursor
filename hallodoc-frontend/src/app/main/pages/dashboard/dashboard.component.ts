@@ -4,6 +4,8 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
 import { MatTableModule } from '@angular/material/table';
 import { SampleButtonComponent } from '../../../core/components/shared/sample-button.component';
+import { AuthService } from '../../services/auth/auth.service';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-dashboard',
@@ -16,8 +18,18 @@ export class DashboardComponent {
   pingMessage = '';
   displayedColumns: string[] = ['id', 'message'];
   dataSource: any[] = [];
+  user: any = null;
 
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient, private authService: AuthService, private router: Router) {}
+
+  ngOnInit() {
+    this.user = this.authService.getCurrentUser();
+  }
+
+  logout() {
+    this.authService.logout();
+    this.router.navigate(['/login']);
+  }
 
   pingApi() {
     this.http.get('/api/ping/first', { responseType: 'text' }).subscribe(result => {
