@@ -56,20 +56,29 @@ form {
   display: flex;
   align-items: center;
   gap: 1rem;
-  margin-bottom: 1.2rem;
+}
+input[type="file"] {
+  display: none;
 }
 .file-label {
   flex: 1;
-  background: #f5f7fa;
-  border-radius: 6px;
-  padding: 0.7rem 1rem;
+  background: #f5f6fa;
   border: 1px solid #e0e0e0;
+  border-radius: 6px;
+  padding: 0.75rem 1rem;
   color: #888;
   font-size: 1rem;
   cursor: pointer;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+  transition: border 0.2s;
+  min-height: 40px;
+  display: flex;
+  align-items: center;
+}
+button[mat-raised-button] {
+  min-width: 120px;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
 }
 .action-row {
   display: flex;

@@ -31,6 +31,7 @@ namespace HalloDoc.Entities.Data.Entities
 
         public bool IsActive { get; set; } = true;
 
+        [Column(TypeName = "timestamp without time zone")]
         public DateTime? LastLoginAt { get; set; }
 
         [Column(TypeName = "timestamp without time zone")]

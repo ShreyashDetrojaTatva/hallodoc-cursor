@@ -21,7 +21,7 @@ namespace HalloDoc.Repositories.Mappers
                 PropertyName = dto.PropertyName,
                 CaseNumber = dto.CaseNumber,
                 PatientId = dto.PatientId,
-                CreatedAt = DateTime.UtcNow,
+                CreatedAt = DateTime.Now,
                 RequestStatus = (int)RequestStatus.New // Default to New
             };
         }

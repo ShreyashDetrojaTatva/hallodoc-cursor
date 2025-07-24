@@ -30,6 +30,7 @@ import { RequestService } from '../../../services/request/request.service';
 export class FamilyRequestFormComponent {
   form: FormGroup;
   fileName: string = '';
+  files: File[] = [];
   constructor(private fb: FormBuilder, private router: Router, private requestService: RequestService) {
     this.form = this.fb.group({
       famFirstName: ['', Validators.required],
@@ -53,11 +54,10 @@ export class FamilyRequestFormComponent {
   }
 
   onFileChange(event: any) {
-    const file = event.target.files[0];
-    if (file) {
-      this.fileName = file.name;
-      this.form.patchValue({ file });
-    }
+    const selectedFiles = Array.from(event.target.files) as File[];
+    this.files = selectedFiles;
+    this.fileName = selectedFiles.map(f => f.name).join(', ');
+    this.form.patchValue({ file: selectedFiles });
   }
 
   goBack() {
@@ -66,7 +66,9 @@ export class FamilyRequestFormComponent {
 
   onSubmit() {
     if (this.form.valid) {
-      this.requestService.createRequest({
+      const dobValue = this.form.value.dob;
+      const dobIso = dobValue instanceof Date ? dobValue.toISOString().split('T')[0] : dobValue;
+      const data = {
         requestType: 2, // Family
         requestorType: 2, // Family
         requestorFirstName: this.form.value.famFirstName,
@@ -76,7 +78,7 @@ export class FamilyRequestFormComponent {
         relationWithPatient: this.form.value.famRelation,
         firstName: this.form.value.firstName,
         lastName: this.form.value.lastName,
-        dob: this.form.value.dob,
+        dob: dobIso,
         email: this.form.value.email,
         phone: this.form.value.phone,
         street: this.form.value.street,
@@ -84,8 +86,10 @@ export class FamilyRequestFormComponent {
         state: this.form.value.state,
         zipCode: this.form.value.zipCode,
         roomNo: this.form.value.roomNo,
-        symptoms: this.form.value.symptoms
-      }).subscribe({
+        symptoms: this.form.value.symptoms,
+        files: this.files
+      };
+      this.requestService.createRequest(data).subscribe({
         next: () => {
           alert('Request submitted successfully!');
           this.router.navigate(['/']);

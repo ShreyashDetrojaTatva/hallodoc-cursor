@@ -11,6 +11,7 @@ namespace HalloDoc.Entities.Data.Entities
 
         public int RequestType { get; set; } // enum as int
         public int RequestStatus { get; set; } // enum as int
+        [Column(TypeName = "timestamp without time zone")]
         public DateTime CreatedAt { get; set; }
         public int? CreatedBy { get; set; } // FK to Users (nullable)
 

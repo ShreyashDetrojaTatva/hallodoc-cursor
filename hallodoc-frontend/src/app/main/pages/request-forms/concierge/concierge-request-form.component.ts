@@ -30,6 +30,7 @@ import { RequestService } from '../../../services/request/request.service';
 export class ConciergeRequestFormComponent {
   form: FormGroup;
   fileName: string = '';
+  files: File[] = [];
   constructor(private fb: FormBuilder, private router: Router, private requestService: RequestService) {
     this.form = this.fb.group({
       conFirstName: ['', Validators.required],
@@ -53,11 +54,10 @@ export class ConciergeRequestFormComponent {
   }
 
   onFileChange(event: any) {
-    const file = event.target.files[0];
-    if (file) {
-      this.fileName = file.name;
-      this.form.patchValue({ file });
-    }
+    const selectedFiles = Array.from(event.target.files) as File[];
+    this.files = selectedFiles;
+    this.fileName = selectedFiles.map(f => f.name).join(', ');
+    this.form.patchValue({ file: selectedFiles });
   }
 
   goBack() {
@@ -66,7 +66,9 @@ export class ConciergeRequestFormComponent {
 
   onSubmit() {
     if (this.form.valid) {
-      this.requestService.createRequest({
+      const dobValue = this.form.value.dob;
+      const dobIso = dobValue instanceof Date ? dobValue.toISOString().split('T')[0] : dobValue;
+      const data = {
         requestType: 3, // Concierge
         requestorType: 3, // Concierge
         requestorFirstName: this.form.value.conFirstName,
@@ -77,7 +79,7 @@ export class ConciergeRequestFormComponent {
         propertyName: this.form.value.hotelName, // or another field if needed
         firstName: this.form.value.firstName,
         lastName: this.form.value.lastName,
-        dob: this.form.value.dob,
+        dob: dobIso,
         email: this.form.value.email,
         phone: this.form.value.phone,
         street: this.form.value.conStreet,
@@ -85,8 +87,10 @@ export class ConciergeRequestFormComponent {
         state: this.form.value.conState,
         zipCode: this.form.value.conZipCode,
         roomNo: this.form.value.roomNo,
-        symptoms: this.form.value.symptoms
-      }).subscribe({
+        symptoms: this.form.value.symptoms,
+        files: this.files
+      };
+      this.requestService.createRequest(data).subscribe({
         next: () => {
           alert('Request submitted successfully!');
           this.router.navigate(['/']);

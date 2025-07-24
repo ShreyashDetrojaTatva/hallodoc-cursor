@@ -16,7 +16,7 @@ namespace HalloDoc.API.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> CreateRequest([FromBody] RequestCreateDto dto)
+        public async Task<IActionResult> CreateRequest([FromForm] RequestCreateDto dto)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);

@@ -12,6 +12,7 @@ using HalloDoc.Repositories.Repositories;
 using HalloDoc.Repositories.Repositories.AuthRepository;
 using HalloDoc.Repositories.Repositories.RequestRepository;
 using HalloDoc.Services.Services.RequestService;
+using HalloDoc.Repositories.Repositories.DocumentRepository;
 
 var builder = WebApplication.CreateBuilder(args);
 var env = builder.Environment;
@@ -55,6 +56,7 @@ builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IAuthRepository, AuthRepository>();
 builder.Services.AddScoped<IRequestRepository, RequestRepository>();
 builder.Services.AddScoped<IRequestService, RequestService>();
+builder.Services.AddScoped<IDocumentRepository, DocumentRepository>();
 
 // Add JWT authentication
 builder.Services.AddAuthentication(options =>

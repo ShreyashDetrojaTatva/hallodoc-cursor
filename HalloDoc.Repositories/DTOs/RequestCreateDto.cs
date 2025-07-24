@@ -1,4 +1,6 @@
 using System;
+using System.Collections.Generic;
+using Microsoft.AspNetCore.Http;
 
 namespace HalloDoc.Repositories.DTOs
 {
@@ -29,5 +31,7 @@ namespace HalloDoc.Repositories.DTOs
         public string? RoomNo { get; set; }
         public string Symptoms { get; set; } = null!;
         public int? UserId { get; set; }
+        // File uploads
+        public List<IFormFile>? Files { get; set; }
     }
 } 

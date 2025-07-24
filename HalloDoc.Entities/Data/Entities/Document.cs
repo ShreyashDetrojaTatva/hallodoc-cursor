@@ -17,6 +17,7 @@ namespace HalloDoc.Entities.Data.Entities
         public string FileName { get; set; } = null!;
         [MaxLength(500)]
         public string FilePath { get; set; } = null!;
+        [Column(TypeName = "timestamp without time zone")]
         public DateTime UploadedAt { get; set; }
         public int? UploadedBy { get; set; } // FK to Users (nullable)
     }

@@ -56,8 +56,8 @@
       </mat-form-field>
       <h3>(Optional) Upload Photo or Document</h3>
       <div class="upload-row">
-        <input type="file" #fileInput id="file-upload" (change)="onFileChange($event)" hidden />
-        <label for="file-upload" class="file-label">{{ fileName || 'Select File' }}</label>
+        <input type="file" multiple (change)="onFileChange($event)" id="file-upload" #fileInput hidden />
+        <label for="file-upload" class="file-label mat-input-element">{{ fileName || 'Select File(s)' }}</label>
         <button mat-raised-button color="primary" type="button" (click)="fileInput.click()">
           <mat-icon>cloud_upload</mat-icon> Upload
         </button>
