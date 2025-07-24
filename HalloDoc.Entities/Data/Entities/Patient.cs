@@ -39,6 +39,8 @@ namespace HalloDoc.Entities.Data.Entities
 
         public DateTime? DOB { get; set; }
 
+        public virtual ICollection<Request>? Requests { get; set; }
+
         [Column(TypeName = "timestamp without time zone")]
         public DateTime CreatedAt { get; set; }
         [Column(TypeName = "timestamp without time zone")]

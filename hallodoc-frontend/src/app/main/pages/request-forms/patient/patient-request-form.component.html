@@ -1,0 +1,71 @@
+<div class="request-form-root">
+  <div class="card-header">
+    <button mat-stroked-button color="primary" class="back-btn" (click)="goBack()">
+      <mat-icon>arrow_back</mat-icon> Back
+    </button>
+  </div>
+  <mat-card class="request-form-card">
+    <form [formGroup]="form" (ngSubmit)="onSubmit()">
+      <h2>Patient Information</h2>
+      <mat-form-field appearance="outline" class="full-width">
+        <textarea matInput placeholder="Enter Brief Details Of Symptoms" formControlName="symptoms" rows="2"></textarea>
+      </mat-form-field>
+      <div class="row">
+        <mat-form-field appearance="outline" class="half-width">
+          <input matInput placeholder="First Name" formControlName="firstName" />
+        </mat-form-field>
+        <mat-form-field appearance="outline" class="half-width">
+          <input matInput placeholder="Last Name" formControlName="lastName" />
+        </mat-form-field>
+      </div>
+      <div class="row">
+        <mat-form-field appearance="outline" class="half-width">
+          <input matInput [matDatepicker]="picker" placeholder="Date Of Birth" formControlName="dob" />
+          <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+          <mat-datepicker #picker></mat-datepicker>
+        </mat-form-field>
+      </div>
+      <h3>Patient Contact Information</h3>
+      <div class="row">
+        <mat-form-field appearance="outline" class="half-width">
+          <input matInput placeholder="Email" formControlName="email" />
+        </mat-form-field>
+        <mat-form-field appearance="outline" class="half-width">
+          <input matInput placeholder="Phone" formControlName="phone" />
+        </mat-form-field>
+      </div>
+      <h3>Patient Location</h3>
+      <div class="row">
+        <mat-form-field appearance="outline" class="half-width">
+          <input matInput placeholder="Street" formControlName="street" />
+        </mat-form-field>
+        <mat-form-field appearance="outline" class="half-width">
+          <input matInput placeholder="City" formControlName="city" />
+        </mat-form-field>
+      </div>
+      <div class="row">
+        <mat-form-field appearance="outline" class="half-width">
+          <input matInput placeholder="State" formControlName="state" />
+        </mat-form-field>
+        <mat-form-field appearance="outline" class="half-width">
+          <input matInput placeholder="Zip Code" formControlName="zipCode" />
+        </mat-form-field>
+      </div>
+      <mat-form-field appearance="outline" class="full-width">
+        <input matInput placeholder="Room # / Suite (Optional)" formControlName="roomNo" />
+      </mat-form-field>
+      <h3>(Optional) Upload Photo or Document</h3>
+      <div class="upload-row">
+        <input type="file" #fileInput id="file-upload" (change)="onFileChange($event)" hidden />
+        <label for="file-upload" class="file-label">{{ fileName || 'Select File' }}</label>
+        <button mat-raised-button color="primary" type="button" (click)="fileInput.click()">
+          <mat-icon>cloud_upload</mat-icon> Upload
+        </button>
+      </div>
+      <div class="action-row">
+        <button mat-raised-button color="primary" type="submit" [disabled]="form.invalid">Submit</button>
+        <button mat-stroked-button color="primary" type="button" (click)="onCancel()">Cancel</button>
+      </div>
+    </form>
+  </mat-card>
+</div> 

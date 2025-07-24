@@ -1,0 +1,18 @@
+<header class="header-root">
+  <div class="header-left">
+    <a routerLink="/">
+      <img src="assets/media/common/hallodoc-logo.svg" alt="HalloDoc" class="logo" />
+    </a>
+  </div>
+  <nav class="header-center">
+    <ng-container *ngIf="menuItems && menuItems.length">
+      <a *ngFor="let item of menuItems" [routerLink]="item.route" class="nav-link">{{ item.label }}</a>
+    </ng-container>
+  </nav>
+  <div class="header-right">
+    <ng-content select="[header-actions]"></ng-content>
+    <ng-container *ngIf="user">
+      <span class="user-info">Welcome <b>{{ user.name }}</b></span>
+    </ng-container>
+  </div>
+</header> 

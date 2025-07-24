@@ -18,6 +18,9 @@ namespace HalloDoc.Entities.Data.Context
         public DbSet<Roles> Roles { get; set; }
         public DbSet<Menus> Menus { get; set; }
         public DbSet<RoleMenus> RoleMenus { get; set; }
+        public DbSet<Request> Requests { get; set; }
+        public DbSet<RequestClient> RequestClients { get; set; }
+        public DbSet<Document> Documents { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -63,6 +66,25 @@ namespace HalloDoc.Entities.Data.Context
                 .HasOne(rm => rm.Menu)
                 .WithMany()
                 .HasForeignKey(rm => rm.MenuId);
+
+            // Request/RequestClient/Document relationships
+            modelBuilder.Entity<Request>()
+                .HasOne(r => r.RequestClient)
+                .WithOne(rc => rc.Request)
+                .HasForeignKey<RequestClient>(rc => rc.RequestId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<Request>()
+                .HasMany(r => r.Documents)
+                .WithOne(d => d.Request)
+                .HasForeignKey(d => d.RequestId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<Request>()
+                .HasOne(r => r.Patient)
+                .WithMany()
+                .HasForeignKey(r => r.PatientId)
+                .OnDelete(DeleteBehavior.Restrict);
         }
     }
 } 

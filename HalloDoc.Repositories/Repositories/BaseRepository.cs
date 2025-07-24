@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
+using System.Threading.Tasks;
 
 namespace HalloDoc.Repositories.Repositories
 {
@@ -36,6 +37,16 @@ namespace HalloDoc.Repositories.Repositories
             _dbSet.Add(entity);
         }
 
+        public virtual async Task AddAsync(TEntity entity)
+        {
+            await _dbSet.AddAsync(entity);
+        }
+
+        public virtual async Task AddRangeAsync(IEnumerable<TEntity> entities)
+        {
+            await _dbSet.AddRangeAsync(entities);
+        }
+
         public virtual void Update(TEntity entity)
         {
             _dbSet.Update(entity);
@@ -44,6 +55,11 @@ namespace HalloDoc.Repositories.Repositories
         public virtual void Delete(TEntity entity)
         {
             _dbSet.Remove(entity);
+        }
+
+        public virtual async Task<int> SaveChangesAsync()
+        {
+            return await _db.SaveChangesAsync();
         }
     }
 } 

@@ -1,0 +1,17 @@
+<app-header></app-header>
+<ng-container [ngSwitch]="type">
+  <app-patient-request-form *ngSwitchCase="'patient'"></app-patient-request-form>
+  <app-family-request-form *ngSwitchCase="'family'"></app-family-request-form>
+  <app-concierge-request-form *ngSwitchCase="'concierge'"></app-concierge-request-form>
+  <app-business-request-form *ngSwitchCase="'business'"></app-business-request-form>
+  <ng-container *ngSwitchDefault>
+    <div class="placeholder-root">
+      <mat-card class="placeholder-card">
+        <h2>Request Form Placeholder</h2>
+        <p>Selected type: <strong>{{ type }}</strong></p>
+        <p>Form coming soon...</p>
+      </mat-card>
+    </div>
+  </ng-container>
+</ng-container>
+<app-footer></app-footer> 

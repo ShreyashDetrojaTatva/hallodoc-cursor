@@ -78,28 +78,42 @@
 
 ---
 
-### 6. Development Phases
-1. **Project Bootstrapping**
-   - Setup Angular + .NET projects with clean folder structure
-   - Configure EF Core (PostgreSQL) and JWT
-2. **Schema & Models**
-   - Users, Roles, Menus, RoleMenus
-   - Admin, Physician, Patient entities
-   - Requests + supporting tables (later phases)
-3. **Auth & Login**
-   - Implement JWT login
-   - Build login page (Angular Material)
-   - Route protection
-4. **Request Flow**
-   - Request creation (patients)
-   - Request lifecycle management (admin/physician)
-   - Dashboard grouping by status
-5. **Feature Expansion**
-   - Scheduling, vendors, search, reporting
-   - Profile management, reset password
-6. **UI Polish & Role-Based Menu**
-   - Add dynamic menus per role
-   - Add mobile responsiveness and theming
+### 6. Database Schema (Request Flow)
+
+#### Request Table
+- **RequestId** (PK)
+- **RequestType** (enum: Patient, Family, Concierge, Business)
+- **RequestStatus** (enum)
+- **CreatedAt** (timestamp)
+- **CreatedBy** (UserId, nullable)
+- **PatientId** (FK to Patient table, nullable)
+- **RequestorFirstName** (string)
+- **RequestorLastName** (string)
+- **RequestorEmail** (string)
+- **RequestorPhone** (string)
+- **RequestorType** (enum: Patient, Family, Concierge, Business)
+- **RelationWithPatient** (string, nullable, for Family)
+- **HotelName** (string, nullable, for Concierge)
+- **PropertyName** (string, nullable, for Business/Concierge)
+- **CaseNumber** (string, nullable, for Business)
+- ... (other common fields as needed)
+
+#### RequestClient Table
+- Stores the patient info for this request (address, contact, symptoms, etc.)
+- Always created per request, even if patient is registered (address may change per request)
+
+#### Patient Table
+- Canonical patient info, with UserId FK if patient is a user
+
+#### Type-Specific Tables (if needed)
+- For rare/complex fields not covered by generic columns, use small tables (e.g., FamilyRequestor, ConciergeRequestor, BusinessRequestor)
+
+#### Documents Table
+- Stores uploaded files per request
+
+#### Enums
+- **RequestType**: Patient, Family, Concierge, Business
+- **RequestStatus**: New, Pending, Active, Conclude, ToClose, Unpaid, etc.
 
 ---
 

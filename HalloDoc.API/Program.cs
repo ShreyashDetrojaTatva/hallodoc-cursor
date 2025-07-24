@@ -10,6 +10,8 @@ using System.Text;
 using HalloDoc.Services.Services;
 using HalloDoc.Repositories.Repositories;
 using HalloDoc.Repositories.Repositories.AuthRepository;
+using HalloDoc.Repositories.Repositories.RequestRepository;
+using HalloDoc.Services.Services.RequestService;
 
 var builder = WebApplication.CreateBuilder(args);
 var env = builder.Environment;
@@ -51,6 +53,8 @@ builder.Services.AddScoped<IPingRepository, PingRepository>();
 builder.Services.AddScoped<IPingService, PingService>();
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IAuthRepository, AuthRepository>();
+builder.Services.AddScoped<IRequestRepository, RequestRepository>();
+builder.Services.AddScoped<IRequestService, RequestService>();
 
 // Add JWT authentication
 builder.Services.AddAuthentication(options =>

@@ -1,0 +1,105 @@
+import { Component } from '@angular/core';
+import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatInputModule } from '@angular/material/input';
+import { MatButtonModule } from '@angular/material/button';
+import { MatDatepickerModule } from '@angular/material/datepicker';
+import { MatIconModule } from '@angular/material/icon';
+import { MatCardModule } from '@angular/material/card';
+import { CommonModule } from '@angular/common';
+import { ReactiveFormsModule } from '@angular/forms';
+import { Router } from '@angular/router';
+import { RequestService } from '../../../services/request/request.service';
+
+@Component({
+  selector: 'app-business-request-form',
+  standalone: true,
+  imports: [
+    CommonModule,
+    ReactiveFormsModule,
+    MatFormFieldModule,
+    MatInputModule,
+    MatButtonModule,
+    MatDatepickerModule,
+    MatIconModule,
+    MatCardModule
+  ],
+  templateUrl: './business-request-form.component.html',
+  styleUrls: ['./business-request-form.component.scss']
+})
+export class BusinessRequestFormComponent {
+  form: FormGroup;
+  fileName: string = '';
+  constructor(private fb: FormBuilder, private router: Router, private requestService: RequestService) {
+    this.form = this.fb.group({
+      busFirstName: ['', Validators.required],
+      busLastName: ['', Validators.required],
+      busPhone: ['', Validators.required],
+      busEmail: ['', [Validators.required, Validators.email]],
+      propertyName: ['', Validators.required],
+      caseNumber: [''],
+      symptoms: ['', Validators.required],
+      firstName: ['', Validators.required],
+      lastName: ['', Validators.required],
+      dob: ['', Validators.required],
+      email: ['', [Validators.required, Validators.email]],
+      phone: ['', Validators.required],
+      street: ['', Validators.required],
+      city: ['', Validators.required],
+      state: ['', Validators.required],
+      zipCode: ['', Validators.required],
+      roomNo: [''],
+      file: [null]
+    });
+  }
+
+  onFileChange(event: any) {
+    const file = event.target.files[0];
+    if (file) {
+      this.fileName = file.name;
+      this.form.patchValue({ file });
+    }
+  }
+
+  goBack() {
+    this.router.navigate(['/request-type']);
+  }
+
+  onSubmit() {
+    if (this.form.valid) {
+      this.requestService.createRequest({
+        requestType: 4, // Business
+        requestorType: 4, // Business
+        requestorFirstName: this.form.value.busFirstName,
+        requestorLastName: this.form.value.busLastName,
+        requestorEmail: this.form.value.busEmail,
+        requestorPhone: this.form.value.busPhone,
+        propertyName: this.form.value.propertyName,
+        caseNumber: this.form.value.caseNumber,
+        firstName: this.form.value.firstName,
+        lastName: this.form.value.lastName,
+        dob: this.form.value.dob,
+        email: this.form.value.email,
+        phone: this.form.value.phone,
+        street: this.form.value.street,
+        city: this.form.value.city,
+        state: this.form.value.state,
+        zipCode: this.form.value.zipCode,
+        roomNo: this.form.value.roomNo,
+        symptoms: this.form.value.symptoms
+      }).subscribe({
+        next: () => {
+          alert('Request submitted successfully!');
+          this.router.navigate(['/']);
+        },
+        error: () => {
+          alert('Failed to submit request.');
+        }
+      });
+    }
+  }
+
+  onCancel() {
+    this.router.navigate(['/']);
+  }
+} 
