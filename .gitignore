@@ -41,3 +41,6 @@ coverage/
 
 # EF Core
 Migrations/ 
+
+# Ignore uploaded documents in the API project
+/HalloDoc.API/Documents/ 
