@@ -1,0 +1,25 @@
+# Cursor Project Rules for HalloDoc
+
+- Always use the repository pattern for all database access. Do not inject DbContext directly into services.
+- Use [FromForm] for all API endpoints that accept file uploads (IFormFile or List<IFormFile>).
+- All DateTime fields in entities must use [Column(TypeName = "timestamp without time zone")] for PostgreSQL compatibility.
+- Do not use DateTime.UtcNow for timestamp without time zone columns; use DateTime.Now or ensure DateTimeKind is Local/Unspecified.
+- All navigation properties (single and collection) must be explicitly mapped in OnModelCreating using .WithMany(x => x.CollectionProperty) or .WithOne(x => x.NavigationProperty).
+- Add ICollection<T> navigation properties for all collection relationships in entities to support LINQ queries and explicit mapping.
+- Do not use .WithMany() or .WithOne() without specifying the navigation property lambda unless there is truly no navigation property.
+- Do not commit the Documents/ folder (or any runtime/uploaded files) to git; always add them to .gitignore.
+- Use FormData in the frontend for all file upload requests, and ensure date fields are sent in ISO format (YYYY-MM-DD).
+- Do not set Content-Type manually for FormData requests in Angular; let the browser set it.
+- Always keep migrations and the database schema in sync; if you see shadow properties or columns (like PatientId1), fix the model and mapping.
+- For any ambiguous or complex relationships, always document the intended mapping in code comments and .cursorrules.
+
+# Additional rules from hallodoc-rules.mdc
+- Always create virtual navigation properties for related entities.
+- For one-to-many and many-to-many relationships, define virtual ICollection<T> properties on the "one" side.
+- For one-to-one and many-to-one relationships, define a virtual reference property for the related entity.
+- Always explicitly configure these relationships in OnModelCreating using the Fluent API, including navigation properties and foreign keys.
+
+# Frontend and Workflow Rules
+- When generating new Angular components, always create separate .ts, .html, and .scss files. Never write HTML or CSS inline in the TypeScript file.
+- For frontend changes, always organize component files into logically separate folders (feature or domain-based). Do not clutter all files in a single components folder.
+- When asked to "Fix the error" or similar, immediately attempt to fix the error in code without first asking for confirmation. Only suggest in chat if explicitly requested or if the fix is ambiguous. 

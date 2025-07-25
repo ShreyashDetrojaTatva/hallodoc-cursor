@@ -34,12 +34,12 @@ namespace HalloDoc.Entities.Data.Context
 
             modelBuilder.Entity<Admin>()
                 .HasOne(a => a.Role)
-                .WithMany()
+                .WithMany(r => r.Admins)
                 .HasForeignKey(a => a.RoleId);
 
             modelBuilder.Entity<Physician>()
                 .HasOne(p => p.Role)
-                .WithMany()
+                .WithMany(r => r.Physicians)
                 .HasForeignKey(p => p.RoleId);
 
             modelBuilder.Entity<Admin>()
@@ -59,12 +59,12 @@ namespace HalloDoc.Entities.Data.Context
 
             modelBuilder.Entity<RoleMenus>()
                 .HasOne(rm => rm.Role)
-                .WithMany()
+                .WithMany(r => r.RoleMenus)
                 .HasForeignKey(rm => rm.RoleId);
 
             modelBuilder.Entity<RoleMenus>()
                 .HasOne(rm => rm.Menu)
-                .WithMany()
+                .WithMany(m => m.RoleMenus)
                 .HasForeignKey(rm => rm.MenuId);
 
             // Request/RequestClient/Document relationships
@@ -82,7 +82,7 @@ namespace HalloDoc.Entities.Data.Context
 
             modelBuilder.Entity<Request>()
                 .HasOne(r => r.Patient)
-                .WithMany()
+                .WithMany(r => r.Requests)
                 .HasForeignKey(r => r.PatientId)
                 .OnDelete(DeleteBehavior.Restrict);
         }

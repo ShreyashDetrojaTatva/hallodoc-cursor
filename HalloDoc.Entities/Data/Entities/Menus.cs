@@ -21,6 +21,8 @@ namespace HalloDoc.Entities.Data.Entities
         [Required]
         public int AccountType { get; set; }
 
+        public virtual ICollection<RoleMenus>? RoleMenus { get; set; }
+
         [Column(TypeName = "timestamp without time zone")]
         public DateTime CreatedAt { get; set; }
         [Column(TypeName = "timestamp without time zone")]

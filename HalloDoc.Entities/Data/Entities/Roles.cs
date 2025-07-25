@@ -21,5 +21,9 @@ namespace HalloDoc.Entities.Data.Entities
         public DateTime CreatedAt { get; set; }
         [Column(TypeName = "timestamp without time zone")]
         public DateTime? UpdatedAt { get; set; }
+
+        public virtual ICollection<Admin>? Admins { get; set; }
+        public virtual ICollection<Physician>? Physicians { get; set; }
+        public virtual ICollection<RoleMenus>? RoleMenus { get; set; }
     }
 } 
