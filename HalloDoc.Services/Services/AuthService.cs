@@ -13,6 +13,9 @@ using HalloDoc.Repositories.DTOs;
 using HalloDoc.Services.Helpers;
 using HalloDoc.Services.ViewModels;
 using HalloDoc.Repositories.Mappers;
+using System.Threading.Tasks;
+using System.Security.Cryptography;
+using System.Text;
 
 namespace HalloDoc.Services.Services
 {
@@ -39,6 +42,37 @@ namespace HalloDoc.Services.Services
         public string GenerateJwtToken(UserDetailsDto user)
         {
             return JwtHelper.GenerateJwtToken(user);
+        }
+
+        public async Task<string?> GenerateResetPasswordTokenAsync(string email)
+        {
+            var user = await _authRepository.GetUserByEmailAsync(email);
+            if (user == null)
+                return null;
+            
+            var resetToken = JwtHelper.GenerateResetPasswordToken(user.UserId, user.Email);
+            var resetLink = $"http://localhost:4300/reset-password?token={resetToken}";
+            return resetLink;
+        }
+
+        public async Task<bool> ResetPasswordAsync(ResetPasswordDto resetPasswordDto)
+        {
+            // Validate the reset token
+            var tokenValidation = JwtHelper.ValidateResetPasswordToken(resetPasswordDto.Token);
+            if (tokenValidation == null)
+                return false;
+
+            var (userId, email) = tokenValidation.Value;
+
+            // Verify the user exists and matches the token
+            var user = await _authRepository.GetUserByEmailAsync(email);
+            if (user == null || user.UserId != userId)
+                return false;
+
+            // TODO: Hash the new password (use common helper function if exists)            
+
+            // Update the user's password
+            return await _authRepository.UpdateUserPasswordAsync(userId, resetPasswordDto.Password);
         }
     }
 } 

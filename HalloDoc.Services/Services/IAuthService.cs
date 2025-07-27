@@ -7,5 +7,7 @@ namespace HalloDoc.Services.Services
     {
         UserDetailsDto? ValidateUser(LoginViewModel login);
         string GenerateJwtToken(UserDetailsDto user);
+        Task<string?> GenerateResetPasswordTokenAsync(string email);
+        Task<bool> ResetPasswordAsync(ResetPasswordDto resetPasswordDto);
     }
 } 

@@ -35,4 +35,18 @@ export class AuthService {
     const user = localStorage.getItem(this.USER_KEY);
     return user ? JSON.parse(user) : null;
   }
+
+  forgotPassword(email: string): Observable<any> {
+    return this.http.post(`${environment.baseUrl}/api/auth/forgot-password`, { email }).pipe(
+      tap(response => {
+        if (response && (response as any).resetLink) {
+          console.log('Reset Password Link:', (response as any).resetLink);
+        }
+      })
+    );
+  }
+
+  resetPassword(resetData: { token: string; password: string }): Observable<any> {
+    return this.http.post(`${environment.baseUrl}/api/auth/reset-password`, resetData);
+  }
 } 

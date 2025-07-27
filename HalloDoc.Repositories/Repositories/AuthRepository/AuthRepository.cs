@@ -20,5 +20,22 @@ namespace HalloDoc.Repositories.Repositories.AuthRepository
             }
             return query.FirstOrDefault();
         }
+
+        public async Task<Users?> GetUserByEmailAsync(string email)
+        {
+            return await _db.Users.FirstOrDefaultAsync(u => u.Email == email && !u.IsDeleted);
+        }
+
+        public async Task<bool> UpdateUserPasswordAsync(int userId, string newPasswordHash)
+        {
+            var user = await _db.Users.FindAsync(userId);
+            if (user == null)
+                return false;
+
+            user.PasswordHash = newPasswordHash;
+            user.UpdatedAt = DateTime.Now;
+            await _db.SaveChangesAsync();
+            return true;
+        }
     }
 } 

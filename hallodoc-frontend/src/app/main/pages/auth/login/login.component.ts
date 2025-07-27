@@ -8,7 +8,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { ReactiveFormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
-import { AuthService } from '../../services/auth/auth.service';
+import { AuthService } from '../../../services/auth/auth.service';
 
 @Component({
   selector: 'app-login',
@@ -56,5 +56,9 @@ export class LoginComponent {
 
   goBack() {
     this.router.navigate(['/']);
+  }
+
+  goToForgotPassword() {
+    this.router.navigate(['/forgot-password']);
   }
 } 
