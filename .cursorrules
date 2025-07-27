@@ -23,3 +23,90 @@
 - When generating new Angular components, always create separate .ts, .html, and .scss files. Never write HTML or CSS inline in the TypeScript file.
 - For frontend changes, always organize component files into logically separate folders (feature or domain-based). Do not clutter all files in a single components folder.
 - When asked to "Fix the error" or similar, immediately attempt to fix the error in code without first asking for confirmation. Only suggest in chat if explicitly requested or if the fix is ambiguous. 
+
+# Design System Standards
+
+## Layout Standards
+- Use 50-50 split layout for auth pages (left: illustration, right: content)
+- Maintain consistent page padding (2rem for desktop, 1rem for mobile)
+- Center-align content in containers with flex layout
+
+## Color Palette
+- Primary: #1976d2
+- Secondary: #f5f5f5
+- Background: linear-gradient(to right, rgba(255, 255, 255, 0.9), rgba(255, 255, 255, 0.9))
+- Text: #333333
+- Error: #f44336
+
+## Typography
+- Headings: 24px, 500 weight
+- Subheadings: 18px, 400 weight
+- Body text: 16px, 400 weight
+- Button text: 16px, 500 weight
+
+## Component Styling
+- Card padding: 2rem
+- Border radius: 8px
+- Input field height: 56px
+- Button height: 48px
+- Shadow: 0 2px 4px rgba(0, 0, 0, 0.1)
+
+## Auth Pages Template
+- Full-height layout (100vh)
+- Left side: Illustration (50% width)
+  - Background: #f5f5f5
+  - Image: centered, 80% width
+- Right side: Content (50% width)
+  - Centered content
+  - Logo at top
+  - White background
+  - Maximum width: 450px
+
+## Form Styling
+- Stack layout with 1.5rem gap
+- Full-width inputs
+- Error messages in red (#f44336)
+- Loading spinner: 24px diameter
+
+## Responsive Rules
+- Break to single column at 768px
+- Stack illustration above content
+- Reduce padding to 1rem
+- Adjust image size to 60% width
+
+## Image Assets
+- Store in src/assets/media/[feature]
+- Maintain aspect ratios
+
+## Implementation Rules
+1. When creating new pages that should match existing ones:
+   - Copy the exact component structure
+   - Reuse the same SCSS classes
+   - Maintain identical padding/margin values
+   - Use the same Material components
+
+2. When implementing reference designs:
+   - Match every visual detail exactly
+   - Use the same layout structure
+   - Copy exact styling values
+   - Maintain responsive behavior
+
+3. For consistency checks:
+   - Compare against existing implementations
+   - Verify all spacing values
+   - Check responsive breakpoints
+   - Validate color usage
+
+4. Error Prevention:
+   - Never mix different layout patterns
+   - Don't introduce new colors without approval
+   - Maintain consistent spacing scale
+   - Keep identical form styling
+
+# Usage Instructions
+When asked to create a UI similar to a reference:
+1. First identify the base template (auth, dashboard, form)
+2. Copy the exact structure from the reference
+3. Use identical class names and styles
+4. Match all visual properties precisely
+5. Verify against these standards before completion 

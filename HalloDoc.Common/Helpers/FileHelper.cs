@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
 
-namespace HalloDoc.Services.Helpers
+namespace HalloDoc.Common.Helpers
 {
     public static class FileHelper
     {

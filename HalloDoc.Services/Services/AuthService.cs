@@ -10,7 +10,7 @@ using HalloDoc.Entities.Data.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using HalloDoc.Repositories.DTOs;
-using HalloDoc.Services.Helpers;
+using HalloDoc.Common.Helpers;
 using HalloDoc.Services.ViewModels;
 using HalloDoc.Repositories.Mappers;
 using System.Threading.Tasks;
@@ -41,7 +41,7 @@ namespace HalloDoc.Services.Services
 
         public string GenerateJwtToken(UserDetailsDto user)
         {
-            return JwtHelper.GenerateJwtToken(user);
+            return JwtHelper.GenerateJwtToken(user.UserId, user.AccountType, user.RoleId);
         }
 
         public async Task<string?> GenerateResetPasswordTokenAsync(string email)

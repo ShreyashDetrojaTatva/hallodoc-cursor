@@ -1,4 +1,3 @@
-using HalloDoc.Repositories.DTOs;
 using HalloDoc.Common.Constants;
 using System;
 using System.IdentityModel.Tokens.Jwt;
@@ -7,17 +6,17 @@ using System.Text;
 using Microsoft.IdentityModel.Tokens;
 using System.Linq;
 
-namespace HalloDoc.Services.Helpers
+namespace HalloDoc.Common.Helpers
 {
     public static class JwtHelper
     {
-        public static string GenerateJwtToken(UserDetailsDto user)
+        public static string GenerateJwtToken(int userId, int accountType, int? roleId)
         {
             var claims = new[]
             {
-                new Claim("UserId", user.UserId.ToString()),
-                new Claim("AccountType", user.AccountType.ToString()),
-                new Claim("RoleId", user.RoleId?.ToString() ?? string.Empty)
+                new Claim("UserId", userId.ToString()),
+                new Claim("AccountType", accountType.ToString()),
+                new Claim("RoleId", roleId?.ToString() ?? string.Empty)
             };
 
             var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(ConfigItems.JwtSecret));

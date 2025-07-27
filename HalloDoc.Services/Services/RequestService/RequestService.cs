@@ -3,11 +3,13 @@ using HalloDoc.Repositories.DTOs;
 using HalloDoc.Repositories.Repositories.RequestRepository;
 using System.Threading.Tasks;
 using HalloDoc.Repositories.Repositories.DocumentRepository;
+using HalloDoc.Repositories.Repositories.AuthRepository;
 using System.Collections.Generic;
 using System.IO;
 using Microsoft.AspNetCore.Http;
 using System;
-using HalloDoc.Services.Helpers;
+using HalloDoc.Common.Constants;
+using HalloDoc.Common.Helpers;
 
 namespace HalloDoc.Services.Services.RequestService
 {
@@ -15,16 +17,115 @@ namespace HalloDoc.Services.Services.RequestService
     {
         private readonly IRequestRepository _requestRepository;
         private readonly IDocumentRepository _documentRepository;
-        public RequestService(IRequestRepository requestRepository, IDocumentRepository documentRepository)
+        private readonly IAuthRepository _authRepository;
+
+        public RequestService(
+            IRequestRepository requestRepository, 
+            IDocumentRepository documentRepository,
+            IAuthRepository authRepository)
         {
             _requestRepository = requestRepository;
             _documentRepository = documentRepository;
+            _authRepository = authRepository;
         }
 
         public async Task<Request> CreateRequestAsync(RequestCreateDto dto)
         {
+            // Check if patient exists
+            var existingUser = await _authRepository.GetUserByEmailAsync(dto.Email);
+            
+            if (existingUser == null)
+            {
+                // Check if email is already in use (double-check to prevent race conditions)
+                var emailExists = await _authRepository.GetUserByEmailAsync(dto.Email);
+                if (emailExists != null)
+                {
+                    throw new InvalidOperationException("Email is already in use.");
+                }
+
+                // Create new user account
+                var newUser = new Users
+                {
+                    Email = dto.Email,
+                    Username = dto.Email, // Use email as username
+                    PhoneNumber = dto.Phone,
+                    PasswordHash = "password", // Default password
+                    AccountType = (int)AccountType.Patient,
+                    IsActive = true,
+                    CreatedAt = DateTime.Now
+                };
+
+                // Create patient profile
+                var newPatient = new Patient
+                {
+                    FirstName = dto.FirstName,
+                    LastName = dto.LastName,
+                    DOB = dto.DOB,
+                    Address = dto.Street,
+                    City = dto.City,
+                    ZipCode = dto.ZipCode,
+                    Status = (int)Status.Active,
+                    CreatedAt = DateTime.Now
+                };
+
+                try
+                {
+                    // Save user and patient
+                    var userId = await _authRepository.CreatePatientAccountAsync(newUser, newPatient);
+
+                    // Generate reset password link
+                    var resetToken = JwtHelper.GenerateResetPasswordToken(userId, dto.Email);
+                    var resetLink = $"http://localhost:4300/reset-password?token={resetToken}";
+
+                    // Send email with reset link
+                    await EmailHelper.SendMail(
+                        dto.Email,
+                        "Welcome to HalloDoc - Set Your Password",
+                        $"Welcome to HalloDoc! Please click the following link to set your password: {resetLink}"
+                    );
+
+                    // Update DTO with new patient ID
+                    dto.PatientId = newPatient.PatientId;
+                }
+                catch (Exception ex)
+                {
+                    // Log the error
+                    throw new InvalidOperationException("Failed to create patient account.", ex);
+                }
+            }
+            else
+            {
+                // Get existing patient ID
+                var patient = await _authRepository.GetPatientByUserIdAsync(existingUser.UserId);
+                if (patient != null)
+                {
+                    dto.PatientId = patient.PatientId;
+                }
+                else
+                {
+                    // Existing user but no patient profile - create one
+                    var newPatient = new Patient
+                    {
+                        UserId = existingUser.UserId,
+                        FirstName = dto.FirstName,
+                        LastName = dto.LastName,
+                        DOB = dto.DOB,
+                        Address = dto.Street,
+                        City = dto.City,
+                        ZipCode = dto.ZipCode,
+                        Status = (int)Status.Active,
+                        CreatedAt = DateTime.Now
+                    };
+
+                    newPatient = await _authRepository.CreatePatientProfileAsync(newPatient);
+                    dto.PatientId = newPatient.PatientId;
+                }
+            }
+
+            // Create request
             var request = await _requestRepository.CreateRequestAsync(dto);
 
+            // Handle file uploads
             if (dto.Files != null && dto.Files.Count > 0)
             {
                 var savedPaths = await FileHelper.SaveRequestFilesAsync(request.RequestId, dto.Files);
@@ -43,6 +144,7 @@ namespace HalloDoc.Services.Services.RequestService
                 }
                 await _documentRepository.AddDocumentsAsync(documents);
             }
+
             return request;
         }
     }

@@ -4,6 +4,9 @@ using HalloDoc.Repositories.Repositories;
 using Microsoft.EntityFrameworkCore;
 using HalloDoc.Repositories.DTOs;
 using HalloDoc.Repositories.Mappers;
+using System;
+using System.Threading.Tasks;
+using System.Linq;
 
 namespace HalloDoc.Repositories.Repositories.AuthRepository
 {
@@ -36,6 +39,44 @@ namespace HalloDoc.Repositories.Repositories.AuthRepository
             user.UpdatedAt = DateTime.Now;
             await _db.SaveChangesAsync();
             return true;
+        }
+
+        public async Task<int> CreatePatientAccountAsync(Users user, Patient patient)
+        {
+            using var transaction = await _db.Database.BeginTransactionAsync();
+            try
+            {
+                // Add user
+                await _db.Users.AddAsync(user);
+                await _db.SaveChangesAsync();
+
+                // Set user ID for patient
+                patient.UserId = user.UserId;
+
+                // Add patient
+                await _db.Patients.AddAsync(patient);
+                await _db.SaveChangesAsync();
+
+                await transaction.CommitAsync();
+                return user.UserId;
+            }
+            catch
+            {
+                await transaction.RollbackAsync();
+                throw;
+            }
+        }
+
+        public async Task<Patient?> GetPatientByUserIdAsync(int userId)
+        {
+            return await _db.Patients.FirstOrDefaultAsync(p => p.UserId == userId && !p.IsDeleted);
+        }
+
+        public async Task<Patient> CreatePatientProfileAsync(Patient patient)
+        {
+            await _db.Patients.AddAsync(patient);
+            await _db.SaveChangesAsync();
+            return patient;
         }
     }
 } 

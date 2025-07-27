@@ -1,8 +1,6 @@
 using HalloDoc.Services.Services;
 using HalloDoc.Services.ViewModels;
-using HalloDoc.Services.Helpers;
 using Microsoft.AspNetCore.Mvc;
-using HalloDoc.Common.Constants;
 using HalloDoc.Repositories.DTOs;
 
 namespace HalloDoc.API.Controllers
