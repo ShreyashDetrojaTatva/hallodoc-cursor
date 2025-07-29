@@ -3,11 +3,11 @@ import { CommonModule } from '@angular/common';
 import { RouterModule, Router } from '@angular/router';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
-import { AuthService } from '../../../services/auth/auth.service';
+import { AuthService } from '@main/services';
 import { Observable } from 'rxjs';
-import { AccountType } from '../../../enums';
-import { NavigationItem } from '../../../interfaces/layout/navigation-item.interface';
-import { ProfileData } from '../../../interfaces/auth/profile-data.interface';
+import { AccountType } from '@main/enums';
+import { NavigationItem } from '@main/interfaces';
+import { ProfileData } from '@main/interfaces';
 
 @Component({
   selector: 'app-header',

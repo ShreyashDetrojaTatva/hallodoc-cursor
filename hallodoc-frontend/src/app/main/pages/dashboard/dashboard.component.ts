@@ -1,28 +1,28 @@
-import { Component } from '@angular/core';
-import { HttpClient, HttpClientModule } from '@angular/common/http';
-import { MatButtonModule } from '@angular/material/button';
-import { MatCardModule } from '@angular/material/card';
-import { MatTableModule } from '@angular/material/table';
-import { SampleButtonComponent } from '../../../core/components/shared/sample-button.component';
-import { AuthService } from '../../services/auth/auth.service';
-import { Router } from '@angular/router';
-import { ProfileData } from '../../interfaces/auth/profile-data.interface';
-import { PingData } from '../../interfaces/dashboard/ping-data.interface';
+import { Component, OnInit } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { HttpClient } from '@angular/common/http';
+import { SampleButtonComponent } from '@core/components';
+import { AuthService } from '@main/services';
+import { catchError, finalize } from 'rxjs/operators';
+import { of } from 'rxjs';
+import { ProfileData } from '@main/interfaces';
+import { PingData } from '@main/interfaces';
+import { MatCardModule } from "@angular/material/card";
 
 @Component({
   selector: 'app-dashboard',
   standalone: true,
-  imports: [HttpClientModule, MatButtonModule, MatCardModule, MatTableModule, SampleButtonComponent],
+  imports: [CommonModule, SampleButtonComponent, MatCardModule],
   templateUrl: './dashboard.component.html',
   styleUrl: './dashboard.component.scss'
 })
-export class DashboardComponent {
+export class DashboardComponent implements OnInit {
   pingMessage = '';
   displayedColumns: string[] = ['id', 'message'];
   dataSource: PingData[] = [];
   user: ProfileData | null = null;
 
-  constructor(private http: HttpClient, private authService: AuthService, private router: Router) {}
+  constructor(private http: HttpClient, private authService: AuthService) {}
 
   ngOnInit() {
     this.user = this.authService.getCurrentUser();
@@ -30,7 +30,6 @@ export class DashboardComponent {
 
   logout() {
     this.authService.logout();
-    this.router.navigate(['/login']);
   }
 
   pingApi() {

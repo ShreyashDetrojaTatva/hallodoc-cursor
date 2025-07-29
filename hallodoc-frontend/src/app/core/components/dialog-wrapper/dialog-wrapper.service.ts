@@ -1,9 +1,9 @@
 import { Injectable } from '@angular/core';
 import { MatDialog, MatDialogConfig } from '@angular/material/dialog';
 import { Observable } from 'rxjs';
-import { DocumentViewerComponent } from '../../../main/components/document-viewer/document-viewer.component';
-import { DocumentViewerData } from '../../../main/interfaces/document-viewer/document-viewer-data.interface';
-import { DialogConfig } from '../../interfaces/dialog/dialog-config.interface';
+import { DocumentViewerComponent } from '@main/components';
+import { DocumentViewerData } from '@main/interfaces';
+import { DialogConfig } from '@core/interfaces';
 
 @Injectable({
   providedIn: 'root'

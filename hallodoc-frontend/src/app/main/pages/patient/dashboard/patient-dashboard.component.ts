@@ -13,10 +13,10 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatChipsModule } from '@angular/material/chips';
 import { ReactiveFormsModule, FormControl } from '@angular/forms';
-import { RequestService } from '../../../services/request/request.service';
+import { RequestService } from '@main/services';
 import { catchError, finalize } from 'rxjs/operators';
 import { of } from 'rxjs';
-import { RequestDashboardData } from '../../../interfaces/request/request-dashboard-data.interface';
+import { RequestDashboardData } from '@main/interfaces';
 
 @Component({
   selector: 'app-patient-dashboard',

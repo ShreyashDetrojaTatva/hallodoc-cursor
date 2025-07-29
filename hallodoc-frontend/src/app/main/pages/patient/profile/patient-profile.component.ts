@@ -1,20 +1,21 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterModule } from '@angular/router';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { MatIconModule } from '@angular/material/icon';
-import { MatButtonModule } from '@angular/material/button';
-import { MatCardModule } from '@angular/material/card';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
-import { MatDatepickerModule } from '@angular/material/datepicker';
-import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { MatButtonModule } from '@angular/material/button';
 import { MatSelectModule } from '@angular/material/select';
-import { AuthService } from '../../../services/auth/auth.service';
+import { MatIconModule } from '@angular/material/icon';
+import { MatCardModule } from '@angular/material/card';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { MatTooltipModule } from '@angular/material/tooltip';
+import { MatDatepickerModule } from '@angular/material/datepicker';
+import { MatNativeDateModule } from '@angular/material/core';
+import { AuthService } from '@main/services';
 import { catchError, finalize } from 'rxjs/operators';
 import { of } from 'rxjs';
-import { ProfileData } from '../../../interfaces/auth/profile-data.interface';
-import { Region } from '../../../interfaces/patient/region.interface';
+import { ProfileData } from '@main/interfaces';
+import { Region } from '@main/interfaces';
 
 @Component({
   selector: 'app-patient-profile',
@@ -23,16 +24,17 @@ import { Region } from '../../../interfaces/patient/region.interface';
   standalone: true,
   imports: [
     CommonModule,
-    RouterModule,
     ReactiveFormsModule,
-    MatIconModule,
-    MatButtonModule,
-    MatCardModule,
     MatFormFieldModule,
     MatInputModule,
-    MatDatepickerModule,
+    MatButtonModule,
+    MatSelectModule,
+    MatIconModule,
+    MatCardModule,
     MatProgressSpinnerModule,
-    MatSelectModule
+    MatTooltipModule,
+    MatDatepickerModule,
+    MatNativeDateModule
   ]
 })
 export class PatientProfileComponent implements OnInit {

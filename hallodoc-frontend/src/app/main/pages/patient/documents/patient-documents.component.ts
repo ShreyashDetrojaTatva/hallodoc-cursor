@@ -7,11 +7,11 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatTooltipModule } from '@angular/material/tooltip';
-import { DialogWrapperService } from '../../../../core/components/dialog-wrapper/dialog-wrapper.service';
-import { RequestService } from '../../../services/request/request.service';
+import { DialogWrapperService } from '@core/components';
+import { RequestService } from '@main/services';
 import { catchError, finalize } from 'rxjs/operators';
 import { of } from 'rxjs';
-import { DocumentData } from '../../../interfaces/document-viewer/document-data.interface';
+import { DocumentData } from '@main/interfaces';
 
 @Component({
   selector: 'app-patient-documents',

@@ -1,13 +1,13 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable, BehaviorSubject } from 'rxjs';
-import { tap } from 'rxjs/operators';
+import { BehaviorSubject, Observable } from 'rxjs';
 import { environment } from '../../../../environments/environment';
+import { tap } from 'rxjs/operators';
+import { LoginResponse } from '@main/interfaces';
+import { ProfileData } from '@main/interfaces';
+import { ForgotPasswordResponse } from '@main/interfaces';
+import { ResetPasswordResponse } from '@main/interfaces';
 import { Router } from '@angular/router';
-import { LoginResponse } from '../../interfaces/auth/login-response.interface';
-import { ProfileData } from '../../interfaces/auth/profile-data.interface';
-import { ForgotPasswordResponse } from '../../interfaces/auth/forgot-password-response.interface';
-import { ResetPasswordResponse } from '../../interfaces/auth/reset-password-response.interface';
 
 @Injectable({
   providedIn: 'root'

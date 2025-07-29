@@ -141,6 +141,46 @@ When asked to create a UI similar to a reference:
 - Prefer using `.interface.ts` as the file extension for interface files.
 - **Never use `any` or untyped object/array. Always create and use a specific interface or type for all data structures, and place them in the correct interface folder.**
 
+## Import Path Aliases and TypeScript Organization
+- **Always use path aliases for imports instead of relative paths:**
+  - Use `@main/*` for main application modules (components, services, interfaces, etc.)
+  - Use `@core/*` for core/shared modules (generic components, utilities, etc.)
+  - **Never use relative paths like `../../../interfaces/request/request-data.interface`**
+- **Import Examples:**
+  ```typescript
+  // ✅ Correct - Using path aliases
+  import { AuthService } from '@main/services';
+  import { ProfileData } from '@main/interfaces';
+  import { DialogWrapperService } from '@core/components';
+  import { AccountType } from '@main/enums';
+  
+  // ❌ Incorrect - Using relative paths
+  import { AuthService } from '../../services/auth/auth.service';
+  import { ProfileData } from '../../../interfaces/auth/profile-data.interface';
+  ```
+- **Exception for same-folder imports:** Only use relative paths for files in the same folder:
+  ```typescript
+  // ✅ Correct - Same folder imports
+  import { OffersComponent } from './offers/offers.component';
+  import { UserService } from './user.service';
+  ```
+- **Index files:** Always create index files in each folder to enable clean imports:
+  - `app/main/index.ts` - exports all main modules
+  - `app/core/index.ts` - exports all core modules
+  - `app/main/components/index.ts` - exports all components
+  - `app/main/services/index.ts` - exports all services
+  - `app/main/interfaces/index.ts` - exports all interfaces
+- **Maintain exports:** When adding new files, always update the corresponding index file to export them.
+- **TypeScript paths:** The `tsconfig.json` is configured with path aliases:
+  ```json
+  "paths": {
+    "@core/*": ["src/app/core/*"],
+    "@main/*": ["src/app/main/*"],
+    "@core": ["src/app/core"],
+    "@main": ["src/app/main"]
+  }
+  ```
+
 # Example Structure
 ```
 app/

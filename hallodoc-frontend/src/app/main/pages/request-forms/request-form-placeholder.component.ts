@@ -6,8 +6,8 @@ import { PatientRequestFormComponent } from './patient/patient-request-form.comp
 import { FamilyRequestFormComponent } from './family/family-request-form.component';
 import { ConciergeRequestFormComponent } from './concierge/concierge-request-form.component';
 import { BusinessRequestFormComponent } from './business/business-request-form.component';
-import { HeaderComponent } from '../../components/layout/header/header.component';
-import { FooterComponent } from '../../../core/components/shared/footer.component';
+import { HeaderComponent } from '@main/components';
+import { FooterComponent } from '@core/components';
 
 @Component({
   selector: 'app-request-form-placeholder',

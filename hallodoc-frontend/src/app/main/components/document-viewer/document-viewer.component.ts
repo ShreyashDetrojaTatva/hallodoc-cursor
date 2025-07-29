@@ -1,11 +1,11 @@
 import { Component, Inject, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MatDialogRef, MAT_DIALOG_DATA, MatDialogModule } from '@angular/material/dialog';
-import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
-import { SafePipe } from '../../pipes/safe.pipe';
-import { DocumentData } from '../../interfaces/document-viewer/document-data.interface';
-import { DocumentViewerData } from '../../interfaces/document-viewer/document-viewer-data.interface';
+import { MatIconModule } from '@angular/material/icon';
+import { SafePipe } from '@main/pipes';
+import { DocumentData } from '@main/interfaces';
+import { DocumentViewerData } from '@main/interfaces';
 
 @Component({
   selector: 'app-document-viewer',
@@ -15,8 +15,8 @@ import { DocumentViewerData } from '../../interfaces/document-viewer/document-vi
   imports: [
     CommonModule,
     MatDialogModule,
-    MatIconModule,
     MatButtonModule,
+    MatIconModule,
     SafePipe
   ]
 })

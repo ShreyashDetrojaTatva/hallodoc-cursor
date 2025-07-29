@@ -1,4 +1,4 @@
-import { AccountType } from '../../enums';
+import { AccountType } from '@main/enums';
 
 export interface NavigationItem {
   label: string;
