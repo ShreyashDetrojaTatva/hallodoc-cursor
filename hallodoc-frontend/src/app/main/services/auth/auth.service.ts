@@ -78,13 +78,12 @@ export class AuthService {
   updateProfile(data: Partial<ProfileData>): Observable<ProfileData> {
     return this.http.put<ProfileData>(`${this.baseUrl}/profile`, data)
       .pipe(
-        tap(updatedProfile => {
+        tap(() => {
           const currentUser = this.getCurrentUser();
+          // Use the form data since backend doesn't return updated profile
           const updatedUser = {
             ...currentUser,
-            firstName: updatedProfile.firstName,
-            lastName: updatedProfile.lastName,
-            phoneNumber: updatedProfile.phoneNumber
+            ...data
           };
           localStorage.setItem('user', JSON.stringify(updatedUser));
           this.currentUserSubject.next(updatedUser);

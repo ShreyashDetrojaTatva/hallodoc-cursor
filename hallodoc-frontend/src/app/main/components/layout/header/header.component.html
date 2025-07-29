@@ -6,19 +6,77 @@
       </a>
     </div>
 
+    <!-- Desktop User Section -->
     <div class="user-section" *ngIf="currentUser$ | async as user">
       <span class="welcome-text">Welcome {{ user.firstName }} {{ user.lastName }}</span>
       <button mat-button class="logout-btn" (click)="onLogout()">
         Logout
       </button>
-      <button mat-icon-button class="theme-toggle">
-        <mat-icon>dark_mode</mat-icon>
+
+    </div>
+
+    <!-- Mobile Hamburger Menu -->
+    <button mat-icon-button class="mobile-menu-btn" (click)="toggleDrawer()">
+      <mat-icon>menu</mat-icon>
+    </button>
+  </div>
+
+  <!-- Desktop Navigation -->
+  <nav class="nav-bar">
+    <ng-container *ngIf="currentUser$ | async as user">
+      <a 
+        *ngFor="let item of getFilteredNavigationItems(user)" 
+        mat-button 
+        [routerLink]="item.route" 
+        routerLinkActive="active"
+      >
+        {{item.label}}
+      </a>
+    </ng-container>
+  </nav>
+
+  <!-- Mobile Drawer -->
+  <div class="mobile-drawer-overlay" *ngIf="isDrawerOpen" (click)="closeDrawer()"></div>
+  <div class="mobile-drawer" [class.open]="isDrawerOpen">
+    <div class="drawer-header">
+      <div class="drawer-logo">
+        <img src="assets/media/common/hallodoc-logo.svg" alt="Doctors To You">
+      </div>
+      <button mat-icon-button (click)="closeDrawer()" class="close-drawer-btn">
+        <mat-icon>close</mat-icon>
+      </button>
+    </div>
+
+    <div class="drawer-user-info" *ngIf="currentUser$ | async as user">
+      <div class="user-avatar">
+        <mat-icon>account_circle</mat-icon>
+      </div>
+      <div class="user-details">
+        <div class="user-name">{{ user.firstName }} {{ user.lastName }}</div>
+        <div class="user-email">{{ user.email }}</div>
+      </div>
+    </div>
+
+    <div class="drawer-nav">
+      <ng-container *ngIf="currentUser$ | async as user">
+        <a 
+          *ngFor="let item of getFilteredNavigationItems(user)" 
+          class="drawer-nav-item" 
+          [routerLink]="item.route" 
+          routerLinkActive="active" 
+          (click)="onNavClick()"
+        >
+          <mat-icon>{{item.icon}}</mat-icon>
+          <span>{{item.label}}</span>
+        </a>
+      </ng-container>
+    </div>
+
+    <div class="drawer-actions">
+      <button mat-button class="drawer-logout-btn" (click)="onLogout()">
+        <mat-icon>logout</mat-icon>
+        Logout
       </button>
     </div>
   </div>
-
-  <nav class="nav-bar">
-    <a mat-button routerLink="/patient/dashboard" routerLinkActive="active">Dashboard</a>
-    <a mat-button routerLink="/patient/profile" routerLinkActive="active">Profile</a>
-  </nav>
 </header> 
