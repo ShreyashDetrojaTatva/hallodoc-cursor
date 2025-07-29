@@ -1,34 +1,36 @@
-import { Component } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
-import { MatCardModule } from '@angular/material/card';
+import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { RouterModule, ActivatedRoute } from '@angular/router';
+import { MatCardModule } from '@angular/material/card';
 import { PatientRequestFormComponent } from './patient/patient-request-form.component';
 import { FamilyRequestFormComponent } from './family/family-request-form.component';
 import { ConciergeRequestFormComponent } from './concierge/concierge-request-form.component';
 import { BusinessRequestFormComponent } from './business/business-request-form.component';
-import { HeaderComponent } from '../../../core/components/shared/header.component';
+import { HeaderComponent } from '../../components/layout/header/header.component';
 import { FooterComponent } from '../../../core/components/shared/footer.component';
 
 @Component({
   selector: 'app-request-form-placeholder',
+  templateUrl: './request-form-placeholder.component.html',
+  styleUrls: ['./request-form-placeholder.component.scss'],
   standalone: true,
   imports: [
-    CommonModule, MatCardModule,
+    CommonModule,
+    MatCardModule,
     PatientRequestFormComponent,
     FamilyRequestFormComponent,
     ConciergeRequestFormComponent,
     BusinessRequestFormComponent,
-    HeaderComponent, FooterComponent
-  ],
-  templateUrl: './request-form-placeholder.component.html',
-  styleUrls: ['./request-form-placeholder.component.scss']
+    HeaderComponent,
+    FooterComponent
+  ]
 })
-export class RequestFormPlaceholderComponent {
+export class RequestFormPlaceholderComponent implements OnInit {
   type = '';
-  public currentYear = new Date().getFullYear();
-  constructor(private route: ActivatedRoute) {
-    this.route.params.subscribe(params => {
-      this.type = params['type'];
-    });
+
+  constructor(private route: ActivatedRoute) {}
+
+  ngOnInit() {
+    this.type = this.route.snapshot.params['type'];
   }
 } 

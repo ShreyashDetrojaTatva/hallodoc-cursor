@@ -1,19 +1,13 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterModule } from '@angular/router';
+import { RouterModule, Router } from '@angular/router';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { AuthService } from '../../../services/auth/auth.service';
 import { Observable } from 'rxjs';
 import { AccountType } from '../../../enums';
-
-interface NavigationItem {
-  label: string;
-  route: string;
-  icon: string;
-  roles?: string[];
-  accountTypes?: AccountType[];
-}
+import { NavigationItem } from '../../../interfaces/layout/navigation-item.interface';
+import { ProfileData } from '../../../interfaces/auth/profile-data.interface';
 
 @Component({
   selector: 'app-header',
@@ -66,15 +60,14 @@ export class HeaderComponent {
     // }
   ];
 
-  constructor(private authService: AuthService) {}
+  constructor(private authService: AuthService, private router: Router) {}
 
-  get currentUser$(): Observable<any> {
+  get currentUser$(): Observable<ProfileData | null> {
     return this.authService.currentUser$;
   }
 
   // Get navigation items based on user role and account type
-  getFilteredNavigationItems(user: any): NavigationItem[] {
-    console.log('User object:', user);
+  getFilteredNavigationItems(user: ProfileData | null): NavigationItem[] {
     if (!user) return [];
     
     return this.navigationItems.filter(item => {
@@ -88,15 +81,17 @@ export class HeaderComponent {
       
       // Check account type-based access
       if (item.accountTypes && user.accountType) {
-        console.log('Checking accountType:', user.accountType, 'against:', item.accountTypes);
         if (item.accountTypes.includes(user.accountType)) {
-          console.log('Match found for:', item.label);
           return true;
         }
       }
       
       return false;
     });
+  }
+
+  get isLoggedIn(): boolean {
+    return this.authService.isLoggedIn();
   }
 
   onLogout() {

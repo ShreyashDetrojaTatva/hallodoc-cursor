@@ -53,11 +53,11 @@ export class ConciergeRequestFormComponent {
     });
   }
 
-  onFileChange(event: any) {
-    const selectedFiles = Array.from(event.target.files) as File[];
-    this.files = selectedFiles;
-    this.fileName = selectedFiles.map(f => f.name).join(', ');
-    this.form.patchValue({ file: selectedFiles });
+  onFileChange(event: Event) {
+    const target = event.target as HTMLInputElement;
+    if (target.files) {
+      this.files = Array.from(target.files);
+    }
   }
 
   goBack() {

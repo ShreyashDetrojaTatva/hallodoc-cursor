@@ -7,23 +7,24 @@
     </div>
 
     <!-- Desktop User Section -->
-    <div class="user-section" *ngIf="currentUser$ | async as user">
-      <span class="welcome-text">Welcome {{ user.firstName }} {{ user.lastName }}</span>
-      <button mat-button class="logout-btn" (click)="onLogout()">
-        Logout
-      </button>
-
-    </div>
+    <ng-container *ngIf="currentUser$ | async as user">
+      <div class="user-section" *ngIf="isLoggedIn">
+        <span class="welcome-text">Welcome {{ user.firstName }} {{ user.lastName }}</span>
+        <button mat-button class="logout-btn" (click)="onLogout()">
+          Logout
+        </button>
+      </div>
+    </ng-container>
 
     <!-- Mobile Hamburger Menu -->
-    <button mat-icon-button class="mobile-menu-btn" (click)="toggleDrawer()">
+    <button mat-icon-button class="mobile-menu-btn" (click)="toggleDrawer()" *ngIf="isLoggedIn">
       <mat-icon>menu</mat-icon>
     </button>
   </div>
 
   <!-- Desktop Navigation -->
-  <nav class="nav-bar">
-    <ng-container *ngIf="currentUser$ | async as user">
+  <ng-container *ngIf="currentUser$ | async as user">
+    <nav class="nav-bar" *ngIf="isLoggedIn">
       <a 
         *ngFor="let item of getFilteredNavigationItems(user)" 
         mat-button 
@@ -32,12 +33,12 @@
       >
         {{item.label}}
       </a>
-    </ng-container>
-  </nav>
+    </nav>
+  </ng-container>
 
   <!-- Mobile Drawer -->
-  <div class="mobile-drawer-overlay" *ngIf="isDrawerOpen" (click)="closeDrawer()"></div>
-  <div class="mobile-drawer" [class.open]="isDrawerOpen">
+  <div class="mobile-drawer-overlay" *ngIf="isLoggedIn && isDrawerOpen" (click)="closeDrawer()"></div>
+  <div class="mobile-drawer" [class.open]="isDrawerOpen" *ngIf="isLoggedIn">
     <div class="drawer-header">
       <div class="drawer-logo">
         <img src="assets/media/common/hallodoc-logo.svg" alt="Doctors To You">
@@ -47,18 +48,18 @@
       </button>
     </div>
 
-    <div class="drawer-user-info" *ngIf="currentUser$ | async as user">
-      <div class="user-avatar">
-        <mat-icon>account_circle</mat-icon>
+    <ng-container *ngIf="currentUser$ | async as user">
+      <div class="drawer-user-info">
+        <div class="user-avatar">
+          <mat-icon>account_circle</mat-icon>
+        </div>
+        <div class="user-details">
+          <div class="user-name">{{ user.firstName }} {{ user.lastName }}</div>
+          <div class="user-email">{{ user.email }}</div>
+        </div>
       </div>
-      <div class="user-details">
-        <div class="user-name">{{ user.firstName }} {{ user.lastName }}</div>
-        <div class="user-email">{{ user.email }}</div>
-      </div>
-    </div>
 
-    <div class="drawer-nav">
-      <ng-container *ngIf="currentUser$ | async as user">
+      <div class="drawer-nav">
         <a 
           *ngFor="let item of getFilteredNavigationItems(user)" 
           class="drawer-nav-item" 
@@ -69,8 +70,8 @@
           <mat-icon>{{item.icon}}</mat-icon>
           <span>{{item.label}}</span>
         </a>
-      </ng-container>
-    </div>
+      </div>
+    </ng-container>
 
     <div class="drawer-actions">
       <button mat-button class="drawer-logout-btn" (click)="onLogout()">

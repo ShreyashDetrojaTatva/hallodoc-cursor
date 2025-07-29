@@ -1,0 +1,1 @@
+export type { DialogConfig } from './dialog-config.interface'; 

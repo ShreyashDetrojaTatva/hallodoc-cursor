@@ -1,17 +1,22 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterModule } from '@angular/router';
+import { RouterModule, Router } from '@angular/router';
+import { MatIconModule } from '@angular/material/icon';
+import { MatButtonModule } from '@angular/material/button';
+import { MatCardModule } from '@angular/material/card';
 import { MatTableModule, MatTableDataSource } from '@angular/material/table';
 import { MatSortModule, MatSort } from '@angular/material/sort';
 import { MatPaginatorModule, MatPaginator } from '@angular/material/paginator';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
-import { MatButtonModule } from '@angular/material/button';
-import { MatIconModule } from '@angular/material/icon';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
-import { AuthService } from '../../../services/auth/auth.service';
+import { MatTooltipModule } from '@angular/material/tooltip';
+import { MatChipsModule } from '@angular/material/chips';
+import { ReactiveFormsModule, FormControl } from '@angular/forms';
 import { RequestService } from '../../../services/request/request.service';
-import { Router } from '@angular/router';
+import { catchError, finalize } from 'rxjs/operators';
+import { of } from 'rxjs';
+import { RequestDashboardData } from '../../../interfaces/request/request-dashboard-data.interface';
 
 @Component({
   selector: 'app-patient-dashboard',
@@ -21,33 +26,38 @@ import { Router } from '@angular/router';
   imports: [
     CommonModule,
     RouterModule,
+    MatIconModule,
+    MatButtonModule,
+    MatCardModule,
     MatTableModule,
     MatSortModule,
     MatPaginatorModule,
     MatFormFieldModule,
     MatInputModule,
-    MatButtonModule,
-    MatIconModule,
-    MatProgressSpinnerModule
+    MatProgressSpinnerModule,
+    MatTooltipModule,
+    MatChipsModule,
+    ReactiveFormsModule
   ]
 })
 export class PatientDashboardComponent implements OnInit {
-  displayedColumns: string[] = ['requestId', 'requestType', 'status', 'createdAt', 'firstName', 'lastName', 'symptoms', 'actions'];
-  dataSource = new MatTableDataSource<any>();
-  isLoading = false;
-  error: string | null = null;
-
   @ViewChild(MatSort) sort!: MatSort;
   @ViewChild(MatPaginator) paginator!: MatPaginator;
 
+  displayedColumns: string[] = ['requestId', 'requestType', 'status', 'createdAt', 'firstName', 'lastName', 'symptoms', 'actions'];
+  dataSource = new MatTableDataSource<RequestDashboardData>();
+  isLoading = false;
+  error: string | null = null;
+  searchControl = new FormControl('');
+
   constructor(
-    private authService: AuthService,
     private requestService: RequestService,
     private router: Router
-  ) { }
+  ) {}
 
   ngOnInit() {
     this.loadRequests();
+    this.setupSearch();
   }
 
   ngAfterViewInit() {
@@ -60,32 +70,36 @@ export class PatientDashboardComponent implements OnInit {
     this.error = null;
 
     this.requestService.getPatientRequests()
-      .subscribe({
-        next: (data) => {
-          this.dataSource.data = data;
-          this.isLoading = false;
-        },
-        error: (error) => {
-          this.error = error.message || 'Failed to load requests. Please try again.';
-          this.isLoading = false;
-          if (error.message.includes('Please log in')) {
-            this.authService.logout(); // This will redirect to login
-          }
-        }
+      .pipe(
+        catchError(err => {
+          this.error = 'Failed to load requests. Please try again.';
+          return of([]);
+        }),
+        finalize(() => this.isLoading = false)
+      )
+      .subscribe(requests => {
+        this.dataSource.data = requests as RequestDashboardData[];
       });
   }
 
   applyFilter(event: Event) {
     const filterValue = (event.target as HTMLInputElement).value;
     this.dataSource.filter = filterValue.trim().toLowerCase();
+  }
 
-    if (this.dataSource.paginator) {
-      this.dataSource.paginator.firstPage();
-    }
+  setupSearch() {
+    this.searchControl.valueChanges.subscribe(value => {
+      this.dataSource.filter = value || '';
+    });
   }
 
   viewDocuments(requestId: number) {
+    console.log('Navigating to documents for request:', requestId);
     this.router.navigate(['/patient/requests', requestId, 'documents']);
+  }
+
+  refresh() {
+    this.loadRequests();
   }
 
   getStatusColor(status: string): string {
@@ -101,9 +115,5 @@ export class PatientDashboardComponent implements OnInit {
       default:
         return '#78909C'; // Grey
     }
-  }
-
-  refresh() {
-    this.loadRequests();
   }
 } 

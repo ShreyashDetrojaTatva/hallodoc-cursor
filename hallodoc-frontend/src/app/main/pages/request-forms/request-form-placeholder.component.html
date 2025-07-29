@@ -1,17 +1,30 @@
 <app-header></app-header>
-<ng-container [ngSwitch]="type">
-  <app-patient-request-form *ngSwitchCase="'patient'"></app-patient-request-form>
-  <app-family-request-form *ngSwitchCase="'family'"></app-family-request-form>
-  <app-concierge-request-form *ngSwitchCase="'concierge'"></app-concierge-request-form>
-  <app-business-request-form *ngSwitchCase="'business'"></app-business-request-form>
-  <ng-container *ngSwitchDefault>
-    <div class="placeholder-root">
-      <mat-card class="placeholder-card">
-        <h2>Request Form Placeholder</h2>
-        <p>Selected type: <strong>{{ type }}</strong></p>
-        <p>Form coming soon...</p>
-      </mat-card>
+
+<div class="container">
+  <mat-card class="form-card">
+    <div class="form-content">
+      @switch (type) {
+        @case ('patient') {
+          <app-patient-request-form></app-patient-request-form>
+        }
+        @case ('family') {
+          <app-family-request-form></app-family-request-form>
+        }
+        @case ('concierge') {
+          <app-concierge-request-form></app-concierge-request-form>
+        }
+        @case ('business') {
+          <app-business-request-form></app-business-request-form>
+        }
+        @default {
+          <div class="error-message">
+            <h2>Invalid Request Type</h2>
+            <p>The request type "{{ type }}" is not valid.</p>
+          </div>
+        }
+      }
     </div>
-  </ng-container>
-</ng-container>
+  </mat-card>
+</div>
+
 <app-footer></app-footer> 

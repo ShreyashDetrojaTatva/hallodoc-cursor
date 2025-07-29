@@ -1,11 +1,7 @@
 import { inject } from '@angular/core';
 import { Router, CanActivateFn } from '@angular/router';
 import { AuthService } from '../services/auth/auth.service';
-
-interface AuthRouteData {
-  requiresAuth?: boolean;
-  redirectIfLoggedIn?: boolean;
-}
+import { AuthRouteData } from '../interfaces/auth/auth-route-data.interface';
 
 export const authGuard: CanActivateFn = (route, state) => {
   const authService = inject(AuthService);

@@ -3,41 +3,8 @@ import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { Observable, throwError } from 'rxjs';
 import { catchError } from 'rxjs/operators';
 import { environment } from '../../../../environments/environment';
-
-export interface RequestData {
-  requestType: number;
-  requestorType: number;
-  requestorFirstName?: string;
-  requestorLastName?: string;
-  requestorEmail?: string;
-  requestorPhone?: string;
-  relationWithPatient?: string;
-  hotelName?: string;
-  propertyName?: string;
-  caseNumber?: string;
-  firstName: string;
-  lastName: string;
-  email: string;
-  phone: string;
-  dob: Date | string;
-  symptoms: string;
-  street?: string;
-  address?: string;
-  city: string;
-  state?: string;
-  regionId?: number;
-  zipCode: string;
-  roomNo?: string;
-  files?: File[];
-  [key: string]: any;
-}
-
-export interface RequestFilter {
-  status?: string;
-  startDate?: Date;
-  endDate?: Date;
-  searchTerm?: string;
-}
+import { RequestData } from '../../interfaces/request/request-data.interface';
+import { RequestFilter } from '../../interfaces/request/request-filter.interface';
 
 @Injectable({
   providedIn: 'root'
@@ -65,7 +32,7 @@ export class RequestService {
     return throwError(() => new Error(errorMessage));
   }
 
-  createRequest(data: RequestData): Observable<any> {
+  createRequest(data: RequestData): Observable<unknown> {
     const formData = new FormData();
     Object.keys(data).forEach(key => {
       if (key === 'files' && data.files) {
@@ -80,17 +47,17 @@ export class RequestService {
         } else if (typeof dobValue === 'string') {
           formData.append(key, dobValue);
         } else {
-          formData.append(key, String(dobValue));
+          formData.append(key, String(data[key as keyof RequestData]));
         }
       } else {
-        formData.append(key, data[key]);
+        formData.append(key, (data as any)[key]);
       }
     });
     return this.http.post(`${this.baseUrl}`, formData)
       .pipe(catchError(this.handleError));
   }
 
-  getPatientRequests(filter?: RequestFilter): Observable<any> {
+  getPatientRequests(filter?: RequestFilter): Observable<unknown> {
     let params = {};
     if (filter) {
       params = {
@@ -103,7 +70,7 @@ export class RequestService {
       .pipe(catchError(this.handleError));
   }
 
-  getRequestDocuments(requestId: number): Observable<any> {
+  getRequestDocuments(requestId: number): Observable<unknown> {
     return this.http.get(`${this.baseUrl}/${requestId}/documents`)
       .pipe(catchError(this.handleError));
   }

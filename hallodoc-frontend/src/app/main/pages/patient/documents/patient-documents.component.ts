@@ -11,13 +11,7 @@ import { DialogWrapperService } from '../../../../core/components/dialog-wrapper
 import { RequestService } from '../../../services/request/request.service';
 import { catchError, finalize } from 'rxjs/operators';
 import { of } from 'rxjs';
-
-interface DocumentData {
-  documentId: number;
-  fileName: string;
-  filePath: string;
-  uploadedAt: Date;
-}
+import { DocumentData } from '../../../interfaces/document-viewer/document-data.interface';
 
 @Component({
   selector: 'app-patient-documents',
@@ -50,25 +44,32 @@ export class PatientDocumentsComponent implements OnInit {
   }
 
   ngOnInit() {
+    console.log('PatientDocumentsComponent initialized with requestId:', this.requestId);
     this.loadDocuments();
   }
 
   loadDocuments() {
-    if (!this.requestId) return;
+    if (!this.requestId) {
+      console.error('No requestId provided');
+      return;
+    }
 
+    console.log('Loading documents for requestId:', this.requestId);
     this.isLoading = true;
     this.error = null;
 
     this.requestService.getRequestDocuments(this.requestId)
       .pipe(
         catchError(err => {
+          console.error('Error loading documents:', err);
           this.error = 'Failed to load documents. Please try again.';
           return of([]);
         }),
         finalize(() => this.isLoading = false)
       )
       .subscribe(documents => {
-        this.documents = documents;
+        console.log('Documents loaded:', documents);
+        this.documents = documents as DocumentData[];
       });
   }
 

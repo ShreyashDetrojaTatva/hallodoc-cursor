@@ -124,3 +124,38 @@ When asked to create a UI similar to a reference:
     1. cd mydir
     2. npm install
     3. ng build 
+
+# Cursor Rules: Component and Interface Organization
+
+## Component Organization
+- Place generic, reusable components (e.g., dialog, button, grid) in `app/core/components`.
+- Place project-specific or feature-specific components (e.g., document-viewer, patient-dashboard) in `app/main/components`.
+- Do not mix generic and project-specific components in the same folder.
+- Organize components into feature-wise subfolders within both `core/components` and `main/components` as needed.
+
+## Interface Organization
+- Place interfaces that are specific to a feature in `app/main/interfaces/[feature]`.
+- Place interfaces that are generic or shared across features in `app/core/interfaces/[feature]`.
+- Always use feature-wise subfolders for interfaces (e.g., `app/main/interfaces/patient/PatientProfile.interface.ts`, `app/core/interfaces/common/DialogConfig.interface.ts`).
+- Do not define interfaces inline in components or services unless they are truly private to that file.
+- Prefer using `.interface.ts` as the file extension for interface files.
+- **Never use `any` or untyped object/array. Always create and use a specific interface or type for all data structures, and place them in the correct interface folder.**
+
+# Example Structure
+```
+app/
+  core/
+    components/
+      dialog/
+      button/
+    interfaces/
+      common/
+      dialog/
+  main/
+    components/
+      patient/
+      admin/
+    interfaces/
+      patient/
+      admin/
+``` 

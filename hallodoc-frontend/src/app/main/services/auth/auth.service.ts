@@ -4,31 +4,17 @@ import { Observable, BehaviorSubject } from 'rxjs';
 import { tap } from 'rxjs/operators';
 import { environment } from '../../../../environments/environment';
 import { Router } from '@angular/router';
-
-interface LoginResponse {
-  token: string;
-  user: any;
-}
-
-interface ProfileData {
-  firstName: string;
-  lastName: string;
-  email: string;
-  username: string;
-  phoneNumber: string;
-  dob: Date;
-  address: string;
-  city: string;
-  regionId: number;
-  zipCode: string;
-}
+import { LoginResponse } from '../../interfaces/auth/login-response.interface';
+import { ProfileData } from '../../interfaces/auth/profile-data.interface';
+import { ForgotPasswordResponse } from '../../interfaces/auth/forgot-password-response.interface';
+import { ResetPasswordResponse } from '../../interfaces/auth/reset-password-response.interface';
 
 @Injectable({
   providedIn: 'root'
 })
 export class AuthService {
   private baseUrl = `${environment.baseUrl}/api/auth`;
-  private currentUserSubject = new BehaviorSubject<any>(null);
+  private currentUserSubject = new BehaviorSubject<ProfileData | null>(null);
   currentUser$ = this.currentUserSubject.asObservable();
 
   constructor(
@@ -67,7 +53,7 @@ export class AuthService {
     return !!localStorage.getItem('token');
   }
 
-  getCurrentUser(): any {
+  getCurrentUser(): ProfileData | null {
     return this.currentUserSubject.value;
   }
 
@@ -80,28 +66,26 @@ export class AuthService {
       .pipe(
         tap(() => {
           const currentUser = this.getCurrentUser();
-          // Use the form data since backend doesn't return updated profile
           const updatedUser = {
             ...currentUser,
             ...data
-          };
+          } as ProfileData;
           localStorage.setItem('user', JSON.stringify(updatedUser));
           this.currentUserSubject.next(updatedUser);
         })
       );
   }
 
-  forgotPassword(email: string): Observable<any> {
-    return this.http.post(`${this.baseUrl}/forgot-password`, { email }).pipe(
+  forgotPassword(email: string): Observable<ForgotPasswordResponse> {
+    return this.http.post<ForgotPasswordResponse>(`${this.baseUrl}/forgot-password`, { email }).pipe(
       tap(response => {
-        if (response && (response as any).resetLink) {
-          console.log('Reset Password Link:', (response as any).resetLink);
+        if (response && response.resetLink) {
         }
       })
     );
   }
 
-  resetPassword(resetData: { token: string; password: string }): Observable<any> {
-    return this.http.post(`${this.baseUrl}/reset-password`, resetData);
+  resetPassword(resetData: { token: string; password: string }): Observable<ResetPasswordResponse> {
+    return this.http.post<ResetPasswordResponse>(`${this.baseUrl}/reset-password`, resetData);
   }
 } 

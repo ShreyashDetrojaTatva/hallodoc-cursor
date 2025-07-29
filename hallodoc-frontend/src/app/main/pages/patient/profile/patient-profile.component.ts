@@ -13,24 +13,8 @@ import { MatSelectModule } from '@angular/material/select';
 import { AuthService } from '../../../services/auth/auth.service';
 import { catchError, finalize } from 'rxjs/operators';
 import { of } from 'rxjs';
-
-interface ProfileData {
-  firstName: string;
-  lastName: string;
-  email: string;
-  username: string;
-  phoneNumber: string;
-  dob: Date;
-  address: string;
-  city: string;
-  regionId: number;
-  zipCode: string;
-}
-
-interface Region {
-  id: number;
-  name: string;
-}
+import { ProfileData } from '../../../interfaces/auth/profile-data.interface';
+import { Region } from '../../../interfaces/patient/region.interface';
 
 @Component({
   selector: 'app-patient-profile',

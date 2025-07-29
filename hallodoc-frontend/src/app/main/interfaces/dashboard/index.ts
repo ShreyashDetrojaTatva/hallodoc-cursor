@@ -1,0 +1,1 @@
+export type { PingData } from './ping-data.interface'; 

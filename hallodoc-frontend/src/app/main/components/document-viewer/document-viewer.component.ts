@@ -4,19 +4,8 @@ import { MatDialogRef, MAT_DIALOG_DATA, MatDialogModule } from '@angular/materia
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
 import { SafePipe } from '../../pipes/safe.pipe';
-
-export interface DocumentData {
-  documentId: number;
-  fileName: string;
-  filePath: string;
-  uploadedAt: Date;
-}
-
-export interface DocumentViewerData {
-  document: DocumentData;
-  title?: string;
-  showDownloadButton?: boolean;
-}
+import { DocumentData } from '../../interfaces/document-viewer/document-data.interface';
+import { DocumentViewerData } from '../../interfaces/document-viewer/document-viewer-data.interface';
 
 @Component({
   selector: 'app-document-viewer',

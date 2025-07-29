@@ -6,6 +6,8 @@ import { MatTableModule } from '@angular/material/table';
 import { SampleButtonComponent } from '../../../core/components/shared/sample-button.component';
 import { AuthService } from '../../services/auth/auth.service';
 import { Router } from '@angular/router';
+import { ProfileData } from '../../interfaces/auth/profile-data.interface';
+import { PingData } from '../../interfaces/dashboard/ping-data.interface';
 
 @Component({
   selector: 'app-dashboard',
@@ -17,8 +19,8 @@ import { Router } from '@angular/router';
 export class DashboardComponent {
   pingMessage = '';
   displayedColumns: string[] = ['id', 'message'];
-  dataSource: any[] = [];
-  user: any = null;
+  dataSource: PingData[] = [];
+  user: ProfileData | null = null;
 
   constructor(private http: HttpClient, private authService: AuthService, private router: Router) {}
 
@@ -32,13 +34,13 @@ export class DashboardComponent {
   }
 
   pingApi() {
-    this.http.get('/api/ping/first', { responseType: 'text' }).subscribe(result => {
-      this.pingMessage = result;
+    this.http.get<string>('/api/ping/first').subscribe(data => {
+      this.pingMessage = data;
     });
   }
 
   loadAllPings() {
-    this.http.get<any[]>('/api/ping/all').subscribe(data => {
+    this.http.get<PingData[]>('/api/ping/all').subscribe(data => {
       this.dataSource = data;
     });
   }

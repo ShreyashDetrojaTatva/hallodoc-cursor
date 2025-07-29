@@ -1,16 +1,9 @@
 import { Injectable } from '@angular/core';
 import { MatDialog, MatDialogConfig } from '@angular/material/dialog';
 import { Observable } from 'rxjs';
-import { DocumentViewerComponent, DocumentViewerData } from '../../../main/components/document-viewer/document-viewer.component';
-
-export interface DialogConfig {
-  width?: string;
-  height?: string;
-  maxWidth?: string;
-  maxHeight?: string;
-  disableClose?: boolean;
-  panelClass?: string | string[];
-}
+import { DocumentViewerComponent } from '../../../main/components/document-viewer/document-viewer.component';
+import { DocumentViewerData } from '../../../main/interfaces/document-viewer/document-viewer-data.interface';
+import { DialogConfig } from '../../interfaces/dialog/dialog-config.interface';
 
 @Injectable({
   providedIn: 'root'
@@ -28,7 +21,7 @@ export class DialogWrapperService {
       showDownloadButton?: boolean;
       config?: DialogConfig;
     }
-  ): Observable<any> {
+  ): Observable<unknown> {
     const data: DocumentViewerData = {
       document,
       title: options?.title,
@@ -53,9 +46,9 @@ export class DialogWrapperService {
    */
   openDialog<T>(
     component: any,
-    data: any,
+    data: unknown,
     config?: DialogConfig
-  ): Observable<any> {
+  ): Observable<unknown> {
     const dialogConfig: MatDialogConfig = {
       data,
       width: config?.width ?? '500px',
