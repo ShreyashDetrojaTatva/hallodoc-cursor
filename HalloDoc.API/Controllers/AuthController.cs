@@ -1,6 +1,10 @@
+using Microsoft.AspNetCore.Mvc;
 using HalloDoc.Services.Services;
 using HalloDoc.Services.ViewModels;
-using Microsoft.AspNetCore.Mvc;
+using HalloDoc.Common.Helpers;
+using Microsoft.AspNetCore.Authorization;
+using System.Security.Claims;
+using System;
 using HalloDoc.Repositories.DTOs;
 
 namespace HalloDoc.API.Controllers
@@ -46,6 +50,44 @@ namespace HalloDoc.API.Controllers
                 return BadRequest(new { message = "Invalid or expired reset token." });
 
             return Ok(new { message = "Password reset successfully." });
+        }
+
+        [HttpGet("profile")]
+        public async Task<IActionResult> GetProfile()
+        {
+            try
+            {
+                var profile = await _authService.GetProfileAsync();
+                if (profile == null)
+                {
+                    return NotFound(new { message = "Profile not found." });
+                }
+
+                return Ok(profile);
+            }
+            catch (Exception)
+            {
+                return StatusCode(500, new { message = "An error occurred while fetching profile." });
+            }
+        }
+
+        [HttpPut("profile")]
+        public async Task<IActionResult> UpdateProfile([FromBody] UpdateProfileDto dto)
+        {
+            try
+            {
+                var success = await _authService.UpdateProfileAsync(dto);
+                if (!success)
+                {
+                    return NotFound(new { message = "Profile not found." });
+                }
+
+                return Ok(new { message = "Profile updated successfully." });
+            }
+            catch (Exception)
+            {
+                return StatusCode(500, new { message = "An error occurred while updating profile." });
+            }
         }
 
         public class ForgotPasswordRequest

@@ -58,6 +58,10 @@ builder.Services.AddScoped<IRequestRepository, RequestRepository>();
 builder.Services.AddScoped<IRequestService, RequestService>();
 builder.Services.AddScoped<IDocumentRepository, DocumentRepository>();
 
+// Register IHttpContextAccessor and WorkContext
+builder.Services.AddHttpContextAccessor();
+builder.Services.AddScoped<HalloDoc.Services.Helpers.IWorkContext, HalloDoc.Services.Helpers.WorkContext>();
+
 // Add JWT authentication
 builder.Services.AddAuthentication(options =>
 {

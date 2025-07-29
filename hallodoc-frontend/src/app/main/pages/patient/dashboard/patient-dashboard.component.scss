@@ -1,0 +1,128 @@
+.dashboard-container {
+  padding: 2rem;
+
+  .header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2rem;
+
+    h1 {
+      margin: 0;
+      font-size: 24px;
+      font-weight: 500;
+    }
+
+    .actions {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+
+      mat-form-field {
+        width: 300px;
+      }
+    }
+  }
+
+  .error-message {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 1rem;
+    margin-bottom: 1rem;
+    background-color: #ffebee;
+    border-radius: 8px;
+
+    mat-icon {
+      color: #f44336;
+    }
+
+    span {
+      flex: 1;
+      color: rgba(0, 0, 0, 0.87);
+    }
+  }
+
+  .loading-container {
+    display: flex;
+    justify-content: center;
+    padding: 2rem;
+  }
+
+  .table-container {
+    mat-form-field {
+      width: 100%;
+      margin-bottom: 1rem;
+    }
+
+    table {
+      width: 100%;
+      background-color: white;
+      border-radius: 8px;
+      overflow: hidden;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+
+      th.mat-header-cell {
+        background-color: #f5f5f5;
+        color: rgba(0, 0, 0, 0.87);
+        font-weight: 500;
+        padding: 1rem;
+      }
+
+      td.mat-cell {
+        padding: 1rem;
+      }
+    }
+
+    .status-chip {
+      padding: 0.5rem 1rem;
+      border-radius: 16px;
+      color: white;
+      font-size: 14px;
+      font-weight: 500;
+      display: inline-block;
+      text-transform: capitalize;
+    }
+
+    .mat-mdc-row:hover {
+      background-color: #f5f5f5;
+    }
+
+    .mat-mdc-no-data-row {
+      td {
+        padding: 2rem;
+        text-align: center;
+        color: rgba(0, 0, 0, 0.54);
+      }
+    }
+  }
+}
+
+// Responsive adjustments
+@media (max-width: 768px) {
+  .dashboard-container {
+    padding: 1rem;
+
+    .header {
+      flex-direction: column;
+      align-items: stretch;
+      gap: 1rem;
+
+      .actions {
+        flex-direction: column;
+
+        mat-form-field {
+          width: 100%;
+        }
+      }
+    }
+
+    .table-container {
+      overflow-x: auto;
+
+      table {
+        min-width: 800px;
+      }
+    }
+  }
+} 

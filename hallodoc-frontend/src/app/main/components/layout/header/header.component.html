@@ -1,0 +1,24 @@
+<header class="header">
+  <div class="header-main">
+    <div class="logo">
+      <a routerLink="/">
+        <img src="assets/media/common/hallodoc-logo.svg" alt="Doctors To You">
+      </a>
+    </div>
+
+    <div class="user-section" *ngIf="currentUser$ | async as user">
+      <span class="welcome-text">Welcome {{ user.firstName }} {{ user.lastName }}</span>
+      <button mat-button class="logout-btn" (click)="onLogout()">
+        Logout
+      </button>
+      <button mat-icon-button class="theme-toggle">
+        <mat-icon>dark_mode</mat-icon>
+      </button>
+    </div>
+  </div>
+
+  <nav class="nav-bar">
+    <a mat-button routerLink="/patient/dashboard" routerLinkActive="active">Dashboard</a>
+    <a mat-button routerLink="/patient/profile" routerLinkActive="active">Profile</a>
+  </nav>
+</header> 

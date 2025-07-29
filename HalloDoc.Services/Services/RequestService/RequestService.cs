@@ -147,5 +147,80 @@ namespace HalloDoc.Services.Services.RequestService
 
             return request;
         }
+
+        public async Task<List<RequestListDto>> GetPatientRequestsAsync(int patientId, RequestFilterDto? filter = null)
+        {
+            return await _requestRepository.GetPatientRequestsAsync(patientId, filter);
+        }
+
+        public async Task<List<DocumentDto>> GetRequestDocumentsAsync(int requestId, int userId)
+        {
+            // Get the patient associated with the user
+            var patient = await _authRepository.GetPatientByUserIdAsync(userId);
+            if (patient == null)
+            {
+                throw new InvalidOperationException("Patient profile not found.");
+            }
+
+            // Get the request to verify ownership
+            var request = await _requestRepository.GetByIdAsync(requestId);
+            if (request == null || request.PatientId != patient.PatientId)
+            {
+                throw new InvalidOperationException("Request not found or access denied.");
+            }
+
+            return await _documentRepository.GetRequestDocumentsAsync(requestId);
+        }
+
+        public async Task<(byte[] FileContents, string ContentType, string FileName)> GetDocumentFileAsync(int documentId, int userId)
+        {
+            // Get the document
+            var document = await _documentRepository.GetDocumentByIdAsync(documentId);
+            if (document == null)
+            {
+                throw new InvalidOperationException("Document not found.");
+            }
+
+            // Get the patient associated with the user
+            var patient = await _authRepository.GetPatientByUserIdAsync(userId);
+            if (patient == null)
+            {
+                throw new InvalidOperationException("Patient profile not found.");
+            }
+
+            // Get the request to verify ownership
+            var request = await _requestRepository.GetByIdAsync(document.RequestId);
+            if (request == null || request.PatientId != patient.PatientId)
+            {
+                throw new InvalidOperationException("Access denied.");
+            }
+
+            // Read the file
+            var filePath = Path.Combine(Directory.GetCurrentDirectory(), document.FilePath);
+            if (!File.Exists(filePath))
+            {
+                throw new InvalidOperationException("File not found on server.");
+            }
+
+            var fileContents = await File.ReadAllBytesAsync(filePath);
+            var contentType = GetContentType(document.FileName);
+
+            return (fileContents, contentType, document.FileName);
+        }
+
+        private string GetContentType(string fileName)
+        {
+            var extension = Path.GetExtension(fileName).ToLowerInvariant();
+            return extension switch
+            {
+                ".pdf" => "application/pdf",
+                ".jpg" => "image/jpeg",
+                ".jpeg" => "image/jpeg",
+                ".png" => "image/png",
+                ".doc" => "application/msword",
+                ".docx" => "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+                _ => "application/octet-stream"
+            };
+        }
     }
 } 

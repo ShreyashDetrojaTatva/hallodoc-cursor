@@ -1,0 +1,20 @@
+<div class="document-viewer">
+  <div class="dialog-header">
+    <h2 mat-dialog-title>{{displayTitle}}</h2>
+    <button mat-icon-button (click)="close()" class="close-button">
+      <mat-icon>close</mat-icon>
+    </button>
+  </div>
+  
+  <div mat-dialog-content class="dialog-content">
+    <iframe [src]="data.document.filePath | safe" frameborder="0"></iframe>
+  </div>
+  
+  <div mat-dialog-actions class="dialog-actions">
+    <button mat-button (click)="close()">Close</button>
+    <button mat-button color="primary" (click)="download()" *ngIf="data.showDownloadButton">
+      <mat-icon>download</mat-icon>
+      Download
+    </button>
+  </div>
+</div> 

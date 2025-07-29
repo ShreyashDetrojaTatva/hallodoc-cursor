@@ -78,5 +78,61 @@ namespace HalloDoc.Repositories.Repositories.AuthRepository
             await _db.SaveChangesAsync();
             return patient;
         }
+
+        public async Task<Users?> GetUserWithPatientAsync(int userId)
+        {
+            return await _db.Users
+                .Include(u => u.Patients)
+                .FirstOrDefaultAsync(u => u.UserId == userId && !u.IsDeleted);
+        }
+
+        public async Task<bool> UpdateProfileAsync(Users user)
+        {
+            try
+            {
+                _db.Users.Update(user);
+                if (user.Patients != null)
+                {
+                    foreach (var patient in user.Patients)
+                    {
+                        _db.Patients.Update(patient);
+                    }
+                }
+                await _db.SaveChangesAsync();
+                return true;
+            }
+            catch
+            {
+                return false;
+            }
+        }
+
+        public async Task<bool> UpdateUserAsync(Users user)
+        {
+            try
+            {
+                _db.Users.Update(user);
+                await _db.SaveChangesAsync();
+                return true;
+            }
+            catch
+            {
+                return false;
+            }
+        }
+
+        public async Task<bool> UpdatePatientAsync(Patient patient)
+        {
+            try
+            {
+                _db.Patients.Update(patient);
+                await _db.SaveChangesAsync();
+                return true;
+            }
+            catch
+            {
+                return false;
+            }
+        }
     }
 } 

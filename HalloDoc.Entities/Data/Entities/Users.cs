@@ -42,8 +42,8 @@ namespace HalloDoc.Entities.Data.Entities
         public int? UpdatedBy { get; set; }
         public bool IsDeleted { get; set; } = false;
 
-        public virtual Admin? Admin { get; set; }
-        public virtual Physician? Physician { get; set; }
-        public virtual Patient? Patient { get; set; }
+        public virtual ICollection<Admin>? Admins { get; set; }
+        public virtual ICollection<Physician>? Physicians { get; set; }
+        public virtual ICollection<Patient>? Patients { get; set; }
     }
 } 

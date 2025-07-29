@@ -13,14 +13,14 @@ namespace HalloDoc.Repositories.Mappers
                 Username = user.Username,
                 Email = user.Email,
                 AccountType = user.AccountType,
-                RoleId = user.AccountType == (int)HalloDoc.Common.Constants.AccountType.Admin && user.Admin != null ? user.Admin.RoleId :
-                        user.AccountType == (int)HalloDoc.Common.Constants.AccountType.Physician && user.Physician != null ? user.Physician.RoleId : (int?)null,
-                FirstName = user.AccountType == (int)HalloDoc.Common.Constants.AccountType.Admin && user.Admin != null ? user.Admin.FirstName :
-                            user.AccountType == (int)HalloDoc.Common.Constants.AccountType.Physician && user.Physician != null ? user.Physician.FirstName :
-                            user.AccountType == (int)HalloDoc.Common.Constants.AccountType.Patient && user.Patient != null ? user.Patient.FirstName : null,
-                LastName = user.AccountType == (int)HalloDoc.Common.Constants.AccountType.Admin && user.Admin != null ? user.Admin.LastName :
-                            user.AccountType == (int)HalloDoc.Common.Constants.AccountType.Physician && user.Physician != null ? user.Physician.LastName :
-                            user.AccountType == (int)HalloDoc.Common.Constants.AccountType.Patient && user.Patient != null ? user.Patient.LastName : null
+                RoleId = user.AccountType == (int)HalloDoc.Common.Constants.AccountType.Admin && user.Admins?.Any() == true ? user.Admins.First().RoleId :
+                        user.AccountType == (int)HalloDoc.Common.Constants.AccountType.Physician && user.Physicians?.Any() == true ? user.Physicians.First().RoleId : (int?)null,
+                FirstName = user.AccountType == (int)HalloDoc.Common.Constants.AccountType.Admin && user.Admins?.Any() == true ? user.Admins.First().FirstName :
+                            user.AccountType == (int)HalloDoc.Common.Constants.AccountType.Physician && user.Physicians?.Any() == true ? user.Physicians.First().FirstName :
+                            user.AccountType == (int)HalloDoc.Common.Constants.AccountType.Patient && user.Patients?.Any() == true ? user.Patients.First().FirstName : null,
+                LastName = user.AccountType == (int)HalloDoc.Common.Constants.AccountType.Admin && user.Admins?.Any() == true ? user.Admins.First().LastName :
+                            user.AccountType == (int)HalloDoc.Common.Constants.AccountType.Physician && user.Physicians?.Any() == true ? user.Physicians.First().LastName :
+                            user.AccountType == (int)HalloDoc.Common.Constants.AccountType.Patient && user.Patients?.Any() == true ? user.Patients.First().LastName : null
             };
         }
     }

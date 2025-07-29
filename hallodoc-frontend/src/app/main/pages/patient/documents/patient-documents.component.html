@@ -1,0 +1,49 @@
+<div class="documents-container">
+  <div class="header">
+    <button mat-icon-button color="primary" routerLink="/patient/dashboard">
+      <mat-icon>arrow_back</mat-icon>
+    </button>
+    <h1>Request Documents</h1>
+    <button mat-icon-button color="primary" (click)="refresh()" matTooltip="Refresh">
+      <mat-icon>refresh</mat-icon>
+    </button>
+  </div>
+
+  <!-- Error Message -->
+  <div *ngIf="error" class="error-message mat-elevation-z1">
+    <mat-icon color="warn">error</mat-icon>
+    <span>{{error}}</span>
+    <button mat-button color="primary" (click)="loadDocuments()">Try Again</button>
+  </div>
+
+  <!-- Loading Spinner -->
+  <div class="loading-container" *ngIf="isLoading">
+    <mat-spinner diameter="50"></mat-spinner>
+  </div>
+
+  <!-- Documents Grid -->
+  <div class="documents-grid" *ngIf="!isLoading">
+    <mat-card *ngFor="let doc of documents" class="document-card">
+      <mat-card-header>
+        <mat-icon mat-card-avatar>description</mat-icon>
+        <mat-card-title>{{doc.fileName}}</mat-card-title>
+        <mat-card-subtitle>{{doc.uploadedAt | date}}</mat-card-subtitle>
+      </mat-card-header>
+      <mat-card-actions>
+        <button mat-icon-button color="primary" (click)="viewDocument(doc)" matTooltip="View">
+          <mat-icon>visibility</mat-icon>
+        </button>
+        <button mat-icon-button color="primary" (click)="downloadDocument(doc)" matTooltip="Download">
+          <mat-icon>download</mat-icon>
+        </button>
+      </mat-card-actions>
+    </mat-card>
+
+    <!-- No Documents Message -->
+    <div class="no-documents" *ngIf="documents.length === 0">
+      <mat-icon>folder_open</mat-icon>
+      <p>No documents found for this request</p>
+    </div>
+  </div>
+
+</div> 

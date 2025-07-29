@@ -14,5 +14,9 @@ namespace HalloDoc.Repositories.Repositories.AuthRepository
         Task<int> CreatePatientAccountAsync(Users user, Patient patient);
         Task<Patient?> GetPatientByUserIdAsync(int userId);
         Task<Patient> CreatePatientProfileAsync(Patient patient);
+        Task<Users?> GetUserWithPatientAsync(int userId);
+        Task<bool> UpdateProfileAsync(Users user);
+        Task<bool> UpdateUserAsync(Users user);
+        Task<bool> UpdatePatientAsync(Patient patient);
     }
 } 

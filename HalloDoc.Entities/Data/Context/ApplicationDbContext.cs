@@ -44,18 +44,18 @@ namespace HalloDoc.Entities.Data.Context
 
             modelBuilder.Entity<Admin>()
                 .HasOne(a => a.User)
-                .WithOne(u => u.Admin)
-                .HasForeignKey<Admin>(a => a.UserId);
+                .WithMany(u => u.Admins)
+                .HasForeignKey(a => a.UserId);
 
             modelBuilder.Entity<Physician>()
                 .HasOne(p => p.User)
-                .WithOne(u => u.Physician)
-                .HasForeignKey<Physician>(p => p.UserId);
+                .WithMany(u => u.Physicians)
+                .HasForeignKey(p => p.UserId);
 
             modelBuilder.Entity<Patient>()
                 .HasOne(p => p.User)
-                .WithOne(u => u.Patient)
-                .HasForeignKey<Patient>(p => p.UserId);
+                .WithMany(u => u.Patients)
+                .HasForeignKey(p => p.UserId);
 
             modelBuilder.Entity<RoleMenus>()
                 .HasOne(rm => rm.Role)

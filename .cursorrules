@@ -12,6 +12,9 @@
 - Do not set Content-Type manually for FormData requests in Angular; let the browser set it.
 - Always keep migrations and the database schema in sync; if you see shadow properties or columns (like PatientId1), fix the model and mapping.
 - For any ambiguous or complex relationships, always document the intended mapping in code comments and .cursorrules.
+- Use Entity Framework includes (.Include()) for GET/READ operations to optimize performance with single queries.
+- Avoid Entity Framework includes (.Include()) for INSERT/UPDATE operations to prevent circular reference issues during entity tracking.
+- When updating related entities, fetch them separately and update each entity independently to avoid EF Core circular reference problems.
 
 # Additional rules from hallodoc-rules.mdc
 - Always create virtual navigation properties for related entities.
@@ -22,7 +25,7 @@
 # Frontend and Workflow Rules
 - When generating new Angular components, always create separate .ts, .html, and .scss files. Never write HTML or CSS inline in the TypeScript file.
 - For frontend changes, always organize component files into logically separate folders (feature or domain-based). Do not clutter all files in a single components folder.
-- When asked to "Fix the error" or similar, immediately attempt to fix the error in code without first asking for confirmation. Only suggest in chat if explicitly requested or if the fix is ambiguous. 
+- When asked to "Fix the error" or similar, immediately attempt to fix the error in code without first asking for confirmation. Only suggest in chat if explicitly requested or if the fix is ambiguous.
 
 # Design System Standards
 
@@ -70,7 +73,7 @@
 
 ## Responsive Rules
 - Break to single column at 768px
-- Stack illustration above content
+- Hide illustration
 - Reduce padding to 1rem
 - Adjust image size to 60% width
 
@@ -109,4 +112,15 @@ When asked to create a UI similar to a reference:
 2. Copy the exact structure from the reference
 3. Use identical class names and styles
 4. Match all visual properties precisely
-5. Verify against these standards before completion 
+5. Verify against these standards before completion
+
+# PowerShell Command Rules
+- Do not use '&&' for command chaining in PowerShell as it is not a valid statement separator
+- Instead, use semicolon (;) for command chaining or run commands separately
+- Example:
+  - Incorrect: cd mydir && npm install && ng build
+  - Correct: cd mydir; npm install; ng build
+  - Or run commands separately:
+    1. cd mydir
+    2. npm install
+    3. ng build 

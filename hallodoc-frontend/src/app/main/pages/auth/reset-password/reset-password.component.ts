@@ -1,81 +1,103 @@
-import { Component } from '@angular/core';
-import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
+import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { RouterModule, ActivatedRoute, Router } from '@angular/router';
+import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatButtonModule } from '@angular/material/button';
-import { Router, ActivatedRoute } from '@angular/router';
 import { MatIconModule } from '@angular/material/icon';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { MatCardModule } from '@angular/material/card';
 import { AuthService } from '../../../services/auth/auth.service';
 
 @Component({
   selector: 'app-reset-password',
+  templateUrl: './reset-password.component.html',
+  styleUrls: ['./reset-password.component.scss'],
   standalone: true,
   imports: [
     CommonModule,
+    RouterModule,
     ReactiveFormsModule,
     MatFormFieldModule,
     MatInputModule,
     MatButtonModule,
-    MatIconModule
-  ],
-  templateUrl: './reset-password.component.html',
-  styleUrls: ['./reset-password.component.scss']
+    MatIconModule,
+    MatProgressSpinnerModule,
+    MatCardModule
+  ]
 })
-export class ResetPasswordComponent {
+export class ResetPasswordComponent implements OnInit {
   form: FormGroup;
-  loading = false;
-  message = '';
-  token = '';
+  isLoading = false;
+  error: string | null = null;
+  token: string | null = null;
 
   constructor(
-    private fb: FormBuilder, 
-    public router: Router, 
+    private fb: FormBuilder,
     private route: ActivatedRoute,
+    private router: Router,
     private auth: AuthService
   ) {
     this.form = this.fb.group({
       password: ['', [Validators.required, Validators.minLength(6)]],
-      confirmPassword: ['', [Validators.required]]
-    }, { validators: this.passwordMatchValidator });
-
-    // Get token from URL query parameter
-    this.route.queryParams.subscribe(params => {
-      this.token = params['token'] || '';
-      if (!this.token) {
-        this.message = 'Invalid reset link. Please request a new password reset.';
-      }
+      confirmPassword: ['', Validators.required]
+    }, {
+      validators: this.passwordMatchValidator
     });
   }
 
-  passwordMatchValidator(form: FormGroup) {
-    const password = form.get('password')?.value;
-    const confirmPassword = form.get('confirmPassword')?.value;
-    return password === confirmPassword ? null : { passwordMismatch: true };
+  ngOnInit() {
+    this.token = this.route.snapshot.queryParamMap.get('token');
+    if (!this.token) {
+      this.router.navigate(['/login']);
+    }
+  }
+
+  passwordMatchValidator(g: FormGroup) {
+    return g.get('password')?.value === g.get('confirmPassword')?.value
+      ? null
+      : { mismatch: true };
   }
 
   onSubmit() {
-    if (this.form.valid && this.token) {
-      this.loading = true;
-      const resetData = {
-        token: this.token,
-        password: this.form.value.password
-      };
-      
-      this.auth.resetPassword(resetData)
-        .subscribe({
-          next: () => {
-            this.message = 'Password reset successfully. You can now login with your new password.';
-            this.loading = false;
-            setTimeout(() => {
-              this.router.navigate(['/login']);
-            }, 2000);
-          },
-          error: () => {
-            this.message = 'An error occurred. Please try again.';
-            this.loading = false;
-          }
-        });
+    if (this.form.invalid || !this.token) return;
+
+    this.isLoading = true;
+    this.error = null;
+
+    const resetData = {
+      token: this.token,
+      password: this.form.value.password
+    };
+
+    this.auth.resetPassword(resetData)
+      .subscribe({
+        next: () => {
+          this.router.navigate(['/login'], {
+            queryParams: { message: 'Password reset successfully. Please login with your new password.' }
+          });
+        },
+        error: () => {
+          this.error = 'Failed to reset password. The link may be expired or invalid.';
+          this.isLoading = false;
+        }
+      });
+  }
+
+  getErrorMessage(controlName: string): string {
+    const control = this.form.get(controlName);
+    if (!control) return '';
+
+    if (control.hasError('required')) {
+      return 'This field is required';
     }
+    if (control.hasError('minlength')) {
+      return 'Password must be at least 6 characters long';
+    }
+    if (controlName === 'confirmPassword' && this.form.hasError('mismatch')) {
+      return 'Passwords do not match';
+    }
+    return '';
   }
 } 

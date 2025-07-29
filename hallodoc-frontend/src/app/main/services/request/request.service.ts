@@ -1,30 +1,115 @@
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
-import { Observable } from 'rxjs';
+import { HttpClient, HttpErrorResponse } from '@angular/common/http';
+import { Observable, throwError } from 'rxjs';
+import { catchError } from 'rxjs/operators';
 import { environment } from '../../../../environments/environment';
 
-@Injectable({ providedIn: 'root' })
+export interface RequestData {
+  requestType: number;
+  requestorType: number;
+  requestorFirstName?: string;
+  requestorLastName?: string;
+  requestorEmail?: string;
+  requestorPhone?: string;
+  relationWithPatient?: string;
+  hotelName?: string;
+  propertyName?: string;
+  caseNumber?: string;
+  firstName: string;
+  lastName: string;
+  email: string;
+  phone: string;
+  dob: Date | string;
+  symptoms: string;
+  street?: string;
+  address?: string;
+  city: string;
+  state?: string;
+  regionId?: number;
+  zipCode: string;
+  roomNo?: string;
+  files?: File[];
+  [key: string]: any;
+}
+
+export interface RequestFilter {
+  status?: string;
+  startDate?: Date;
+  endDate?: Date;
+  searchTerm?: string;
+}
+
+@Injectable({
+  providedIn: 'root'
+})
 export class RequestService {
-  private apiUrl = environment.baseUrl + '/api/request';
+  private baseUrl = `${environment.baseUrl}/api/request`;
 
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient) { }
 
-  createRequest(data: any): Observable<any> {
+  private handleError(error: HttpErrorResponse) {
+    let errorMessage = 'An error occurred';
+    if (error.error instanceof ErrorEvent) {
+      // Client-side error
+      errorMessage = error.error.message;
+    } else {
+      // Server-side error
+      if (error.status === 401) {
+        errorMessage = 'Please log in to access this feature';
+      } else if (error.error?.message) {
+        errorMessage = error.error.message;
+      } else {
+        errorMessage = `Error Code: ${error.status}\nMessage: ${error.message}`;
+      }
+    }
+    return throwError(() => new Error(errorMessage));
+  }
+
+  createRequest(data: RequestData): Observable<any> {
     const formData = new FormData();
-    // Append all fields except file
     Object.keys(data).forEach(key => {
-      if (key !== 'file' && key !== 'files' && data[key] !== null && data[key] !== undefined) {
+      if (key === 'files' && data.files) {
+        data.files.forEach(file => {
+          formData.append('files', file);
+        });
+      } else if (key === 'dob') {
+        // Handle date conversion safely
+        const dobValue = data[key];
+        if (dobValue instanceof Date) {
+          formData.append(key, dobValue.toISOString().split('T')[0]);
+        } else if (typeof dobValue === 'string') {
+          formData.append(key, dobValue);
+        } else {
+          formData.append(key, String(dobValue));
+        }
+      } else {
         formData.append(key, data[key]);
       }
     });
-    // Append file if present
-    if (data.file) {
-      formData.append('Files', data.file);
+    return this.http.post(`${this.baseUrl}`, formData)
+      .pipe(catchError(this.handleError));
+  }
+
+  getPatientRequests(filter?: RequestFilter): Observable<any> {
+    let params = {};
+    if (filter) {
+      params = {
+        ...filter,
+        startDate: filter.startDate?.toISOString(),
+        endDate: filter.endDate?.toISOString()
+      };
     }
-    // For future: support multiple files
-    if (data.files && Array.isArray(data.files)) {
-      data.files.forEach((f: File) => formData.append('Files', f));
-    }
-    return this.http.post(this.apiUrl, formData);
+    return this.http.get(`${this.baseUrl}/patient`, { params })
+      .pipe(catchError(this.handleError));
+  }
+
+  getRequestDocuments(requestId: number): Observable<any> {
+    return this.http.get(`${this.baseUrl}/${requestId}/documents`)
+      .pipe(catchError(this.handleError));
+  }
+
+  downloadDocument(documentId: number): Observable<Blob> {
+    return this.http.get(`${this.baseUrl}/documents/${documentId}/download`, { responseType: 'blob' })
+      .pipe(catchError(this.handleError));
   }
 } 

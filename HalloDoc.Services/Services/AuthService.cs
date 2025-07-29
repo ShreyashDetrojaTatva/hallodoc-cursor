@@ -15,23 +15,25 @@ using HalloDoc.Services.ViewModels;
 using HalloDoc.Repositories.Mappers;
 using System.Threading.Tasks;
 using System.Security.Cryptography;
-using System.Text;
+using HalloDoc.Services.Helpers;
 
 namespace HalloDoc.Services.Services
 {
     public class AuthService : IAuthService
     {
         private readonly IAuthRepository _authRepository;
-        public AuthService(IAuthRepository authRepository)
+        private readonly IWorkContext _workContext;
+        public AuthService(IAuthRepository authRepository, IWorkContext workContext)
         {
             _authRepository = authRepository;
+            _workContext = workContext;
         }
 
         public UserDetailsDto? ValidateUser(LoginViewModel login)
         {
             var userEntity = _authRepository.GetUserByUsernameOrEmail(
                 login.UsernameOrEmail,
-                q => q.Include(u => u.Admin).Include(u => u.Physician).Include(u => u.Patient)
+                q => q.Include(u => u.Admins).Include(u => u.Physicians).Include(u => u.Patients)
             );
             // TODO: Replace with proper hashing (BCrypt) before production
             if (userEntity == null || userEntity.PasswordHash != login.Password)
@@ -73,6 +75,70 @@ namespace HalloDoc.Services.Services
 
             // Update the user's password
             return await _authRepository.UpdateUserPasswordAsync(userId, resetPasswordDto.Password);
+        }
+
+        public async Task<ProfileDto?> GetProfileAsync()
+        {
+            var contextUser = _workContext.CurrentUser();
+            if (contextUser == null)
+                return null;
+            var user = await _authRepository.GetUserWithPatientAsync(contextUser.UserId);
+            if (user == null)
+                return null;
+
+            // Get the first patient (assuming one user has one patient for now)
+            var patient = user.Patients?.FirstOrDefault();
+            if (patient == null)
+                return null;
+
+            return new ProfileDto
+            {
+                FirstName = patient.FirstName,
+                LastName = patient.LastName,
+                Email = user.Email,
+                Username = user.Username,
+                PhoneNumber = user.PhoneNumber,
+                DOB = patient.DOB ?? DateTime.Now,
+                Address = patient.Address,
+                City = patient.City,
+                RegionId = patient.RegionId,
+                ZipCode = patient.ZipCode
+            };
+        }
+
+        public async Task<bool> UpdateProfileAsync(UpdateProfileDto dto)
+        {
+            var contextUser = _workContext.CurrentUser();
+            if (contextUser == null)
+                return false;
+
+            // Get user and patient separately to avoid circular references
+            var user = await _authRepository.GetUserByEmailAsync(contextUser.Email ?? string.Empty);
+            if (user == null)
+                return false;
+
+            var patient = await _authRepository.GetPatientByUserIdAsync(contextUser.UserId);
+            if (patient == null)
+                return false;
+
+            // Update user entity
+            user.PhoneNumber = dto.PhoneNumber;
+            user.UpdatedAt = DateTime.Now;
+            var userUpdateResult = await _authRepository.UpdateUserAsync(user);
+            if (!userUpdateResult)
+                return false;
+
+            // Update patient entity separately
+            patient.FirstName = dto.FirstName;
+            patient.LastName = dto.LastName;
+            patient.DOB = dto.DOB;
+            patient.Address = dto.Address;
+            patient.City = dto.City;
+            patient.RegionId = dto.RegionId;
+            patient.ZipCode = dto.ZipCode;
+            patient.UpdatedAt = DateTime.Now;
+
+            return await _authRepository.UpdatePatientAsync(patient);
         }
     }
 } 

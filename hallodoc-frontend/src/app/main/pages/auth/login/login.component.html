@@ -1,33 +1,56 @@
-<div class="login-root">
-  <button mat-stroked-button color="primary" class="back-btn" (click)="goBack()" style="position: absolute; top: 2rem; left: 2rem; z-index: 10;">
-    <mat-icon>arrow_back</mat-icon> Back
-  </button>
-  <div class="login-illustration">
-    <img src="./assets/media/auth/login-banner.png" alt="Doctor Illustration" />
+<div class="login-container">
+  <div class="illustration">
+    <img src="assets/media/auth/login-banner.png" alt="Doctor Illustration">
   </div>
-  <div class="login-content">
-    <div class="login-header">
-      <img src="./assets/media/common/hallodoc-logo.svg" alt="HalloDoc" class="logo" />
-      <h2>Login To Your Account</h2>
-    </div>
-    <form [formGroup]="loginForm" (ngSubmit)="onSubmit()">
-      <mat-form-field appearance="outline" class="full-width">
-        <mat-label>Username</mat-label>
-        <mat-icon matPrefix>person</mat-icon>
-        <input matInput formControlName="usernameOrEmail" autocomplete="username" />
-      </mat-form-field>
-      <mat-form-field appearance="outline" class="full-width">
-        <mat-label>Password</mat-label>
-        <mat-icon matPrefix>lock</mat-icon>
-        <input matInput type="password" formControlName="password" autocomplete="current-password" />
-      </mat-form-field>
-      <div class="error-message" *ngIf="error()">{{ error() }}</div>
-      <button mat-raised-button color="primary" class="login-btn" [disabled]="loginForm.invalid || loading()" type="submit">
-        {{ loading() ? 'Logging in...' : 'Log In' }}
+
+  <div class="content">
+    <div class="header">
+      <button mat-icon-button color="primary" routerLink="/" class="back-button">
+        <mat-icon>arrow_back</mat-icon>
       </button>
-    </form>
-    <div class="forgot-password-row">
-      <a (click)="goToForgotPassword()">Forgot Password?</a>
+      <img src="assets/media/common/hallodoc-logo.svg" alt="HalloDoc" class="logo">
+      <h1>Welcome Back</h1>
     </div>
+
+    <!-- Error Message -->
+    <div *ngIf="error" class="error-message mat-elevation-z1">
+      <mat-icon color="warn">error</mat-icon>
+      <span>{{error}}</span>
+    </div>
+
+    <!-- Loading Spinner -->
+    <div class="loading-container" *ngIf="isLoading">
+      <mat-spinner diameter="50"></mat-spinner>
+    </div>
+
+    <form [formGroup]="form" (ngSubmit)="onSubmit()" class="login-form" *ngIf="!isLoading">
+      <mat-card>
+        <mat-card-content>
+          <mat-form-field appearance="outline">
+            <mat-label>Username or Email</mat-label>
+            <input matInput formControlName="usernameOrEmail" required>
+            <mat-error *ngIf="form.get('usernameOrEmail')?.hasError('required')">
+              Username or email is required
+            </mat-error>
+          </mat-form-field>
+
+          <mat-form-field appearance="outline">
+            <mat-label>Password</mat-label>
+            <input matInput type="password" formControlName="password" required>
+            <mat-error *ngIf="form.get('password')?.hasError('required')">
+              Password is required
+            </mat-error>
+          </mat-form-field>
+
+          <button mat-raised-button color="primary" type="submit" [disabled]="form.invalid || isLoading">
+            Log In
+          </button>
+
+          <div class="links">
+            <a routerLink="/forgot-password">Forgot Password?</a>
+          </div>
+        </mat-card-content>
+      </mat-card>
+    </form>
   </div>
 </div> 

@@ -1,43 +1,99 @@
-import { Injectable, signal } from '@angular/core';
+import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable, tap } from 'rxjs';
-// Adjust the import path for environment as needed
+import { Observable, BehaviorSubject } from 'rxjs';
+import { tap } from 'rxjs/operators';
 import { environment } from '../../../../environments/environment';
+import { Router } from '@angular/router';
 
-@Injectable({ providedIn: 'root' })
+interface LoginResponse {
+  token: string;
+  user: any;
+}
+
+interface ProfileData {
+  firstName: string;
+  lastName: string;
+  email: string;
+  username: string;
+  phoneNumber: string;
+  dob: Date;
+  address: string;
+  city: string;
+  regionId: number;
+  zipCode: string;
+}
+
+@Injectable({
+  providedIn: 'root'
+})
 export class AuthService {
-  private readonly TOKEN_KEY = 'token';
-  private readonly USER_KEY = 'user';
+  private baseUrl = `${environment.baseUrl}/api/auth`;
+  private currentUserSubject = new BehaviorSubject<any>(null);
+  currentUser$ = this.currentUserSubject.asObservable();
 
-  constructor(private http: HttpClient) {}
-
-  login(usernameOrEmail: string, password: string): Observable<any> {
-    return this.http.post<any>(`${environment.baseUrl}/api/auth/login`, { usernameOrEmail, password }).pipe(
-      tap(res => {
-        if (res && res.token && res.user) {
-          localStorage.setItem(this.TOKEN_KEY, res.token);
-          localStorage.setItem(this.USER_KEY, JSON.stringify(res.user));
-        }
-      })
-    );
+  constructor(
+    private http: HttpClient,
+    private router: Router
+  ) {
+    this.loadCurrentUser();
   }
 
-  logout(): void {
-    localStorage.removeItem(this.TOKEN_KEY);
-    localStorage.removeItem(this.USER_KEY);
+  private loadCurrentUser() {
+    const user = localStorage.getItem('user');
+    if (user) {
+      this.currentUserSubject.next(JSON.parse(user));
+    }
+  }
+
+  login(usernameOrEmail: string, password: string): Observable<LoginResponse> {
+    return this.http.post<LoginResponse>(`${this.baseUrl}/login`, { usernameOrEmail, password })
+      .pipe(
+        tap(response => {
+          localStorage.setItem('token', response.token);
+          localStorage.setItem('user', JSON.stringify(response.user));
+          this.currentUserSubject.next(response.user);
+        })
+      );
+  }
+
+  logout() {
+    localStorage.removeItem('token');
+    localStorage.removeItem('user');
+    this.currentUserSubject.next(null);
+    this.router.navigate(['/login']);
   }
 
   isLoggedIn(): boolean {
-    return !!localStorage.getItem(this.TOKEN_KEY);
+    return !!localStorage.getItem('token');
   }
 
   getCurrentUser(): any {
-    const user = localStorage.getItem(this.USER_KEY);
-    return user ? JSON.parse(user) : null;
+    return this.currentUserSubject.value;
+  }
+
+  getProfile(): Observable<ProfileData> {
+    return this.http.get<ProfileData>(`${this.baseUrl}/profile`);
+  }
+
+  updateProfile(data: Partial<ProfileData>): Observable<ProfileData> {
+    return this.http.put<ProfileData>(`${this.baseUrl}/profile`, data)
+      .pipe(
+        tap(updatedProfile => {
+          const currentUser = this.getCurrentUser();
+          const updatedUser = {
+            ...currentUser,
+            firstName: updatedProfile.firstName,
+            lastName: updatedProfile.lastName,
+            phoneNumber: updatedProfile.phoneNumber
+          };
+          localStorage.setItem('user', JSON.stringify(updatedUser));
+          this.currentUserSubject.next(updatedUser);
+        })
+      );
   }
 
   forgotPassword(email: string): Observable<any> {
-    return this.http.post(`${environment.baseUrl}/api/auth/forgot-password`, { email }).pipe(
+    return this.http.post(`${this.baseUrl}/forgot-password`, { email }).pipe(
       tap(response => {
         if (response && (response as any).resetLink) {
           console.log('Reset Password Link:', (response as any).resetLink);
@@ -47,6 +103,6 @@ export class AuthService {
   }
 
   resetPassword(resetData: { token: string; password: string }): Observable<any> {
-    return this.http.post(`${environment.baseUrl}/api/auth/reset-password`, resetData);
+    return this.http.post(`${this.baseUrl}/reset-password`, resetData);
   }
 } 
