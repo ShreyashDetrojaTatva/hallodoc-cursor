@@ -2,15 +2,15 @@ import { Injectable } from '@angular/core';
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { Observable, throwError } from 'rxjs';
 import { catchError } from 'rxjs/operators';
-import { environment } from '../../../../environments/environment';
 import { RequestData } from '@main/interfaces';
 import { RequestFilter } from '@main/interfaces';
+import { PATIENT_ENDPOINTS, REQUEST_FORM_ENDPOINTS } from '@main/constants';
+import { RequestType } from '@main/enums';
 
 @Injectable({
   providedIn: 'root'
 })
 export class RequestService {
-  private baseUrl = `${environment.baseUrl}/api/request`;
 
   constructor(private http: HttpClient) { }
 
@@ -53,7 +53,9 @@ export class RequestService {
         formData.append(key, (data as any)[key]);
       }
     });
-    return this.http.post(`${this.baseUrl}`, formData)
+    
+    // Use common endpoint for all request types
+    return this.http.post(REQUEST_FORM_ENDPOINTS.CREATE_REQUEST, formData)
       .pipe(catchError(this.handleError));
   }
 
@@ -66,17 +68,17 @@ export class RequestService {
         endDate: filter.endDate?.toISOString()
       };
     }
-    return this.http.get(`${this.baseUrl}/patient`, { params })
+    return this.http.get(PATIENT_ENDPOINTS.GET_REQUESTS, { params })
       .pipe(catchError(this.handleError));
   }
 
   getRequestDocuments(requestId: number): Observable<unknown> {
-    return this.http.get(`${this.baseUrl}/${requestId}/documents`)
+    return this.http.get(PATIENT_ENDPOINTS.GET_DOCUMENTS(requestId))
       .pipe(catchError(this.handleError));
   }
 
-  downloadDocument(documentId: number): Observable<Blob> {
-    return this.http.get(`${this.baseUrl}/documents/${documentId}/download`, { responseType: 'blob' })
+  downloadDocument(requestId: number, documentId: number): Observable<Blob> {
+    return this.http.get(PATIENT_ENDPOINTS.DOWNLOAD_DOCUMENT(requestId, documentId), { responseType: 'blob' })
       .pipe(catchError(this.handleError));
   }
 } 

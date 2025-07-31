@@ -58,6 +58,25 @@ export const routes: Routes = [
     }
   },
   {
+    path: 'admin',
+    component: LayoutComponent,
+    canActivate: [authGuard],
+    data: { 
+      requiresAuth: true,
+      redirectIfLoggedIn: false 
+    },
+    children: [
+      {
+        path: 'dashboard',
+        loadComponent: () => import('./main/pages/dashboard/dashboard.component').then(m => m.DashboardComponent),
+        data: { 
+          requiresAuth: true,
+          redirectIfLoggedIn: false 
+        }
+      }
+    ]
+  },
+  {
     path: 'patient',
     component: LayoutComponent,
     canActivate: [authGuard],

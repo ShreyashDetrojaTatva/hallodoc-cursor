@@ -52,5 +52,8 @@ namespace HalloDoc.Entities.Data.Entities
         public int RoleId { get; set; }
         [ForeignKey("RoleId")]
         public virtual Roles Role { get; set; } = null!;
+
+        // Navigation properties
+        public virtual ICollection<Request> Requests { get; set; } = new List<Request>();
     }
 } 

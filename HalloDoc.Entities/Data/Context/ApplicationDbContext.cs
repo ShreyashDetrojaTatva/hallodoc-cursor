@@ -85,6 +85,12 @@ namespace HalloDoc.Entities.Data.Context
                 .WithMany(r => r.Requests)
                 .HasForeignKey(r => r.PatientId)
                 .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<Request>()
+                .HasOne(r => r.Physician)
+                .WithMany(p => p.Requests)
+                .HasForeignKey(r => r.PhysicianId)
+                .OnDelete(DeleteBehavior.Restrict);
         }
     }
 } 

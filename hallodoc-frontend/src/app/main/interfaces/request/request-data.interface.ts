@@ -1,6 +1,8 @@
+import { RequestType, RequestorType } from '@main/enums';
+
 export interface RequestData {
-  requestType: number;
-  requestorType: number;
+  requestType: RequestType;
+  requestorType: RequestorType;
   requestorFirstName?: string;
   requestorLastName?: string;
   requestorEmail?: string;

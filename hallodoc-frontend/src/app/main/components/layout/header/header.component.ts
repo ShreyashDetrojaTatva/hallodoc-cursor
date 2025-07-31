@@ -37,6 +37,12 @@ export class HeaderComponent {
       route: '/patient/profile',
       icon: 'person',
       accountTypes: [AccountType.Patient]
+    },
+    {
+      label: 'Dashboard',
+      route: '/admin/dashboard',
+      icon: 'admin_panel_settings',
+      accountTypes: [AccountType.Admin]
     }
     // Future navigation items can be added here
     // Example:
@@ -45,12 +51,6 @@ export class HeaderComponent {
     //   route: '/patient/documents',
     //   icon: 'folder',
     //   accountTypes: [AccountType.Patient]
-    // },
-    // {
-    //   label: 'Admin Panel',
-    //   route: '/admin/dashboard',
-    //   icon: 'admin_panel_settings',
-    //   accountTypes: [AccountType.Admin]
     // },
     // {
     //   label: 'Physician Dashboard',

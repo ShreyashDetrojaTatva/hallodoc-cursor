@@ -22,7 +22,7 @@ namespace HalloDoc.Repositories.Mappers
                 CaseNumber = dto.CaseNumber,
                 PatientId = dto.PatientId,
                 CreatedAt = DateTime.Now,
-                RequestStatus = (int)RequestStatus.New // Default to New
+                RequestStatus = (int)RequestStatus.Unassigned // Default to Unassigned
             };
         }
 

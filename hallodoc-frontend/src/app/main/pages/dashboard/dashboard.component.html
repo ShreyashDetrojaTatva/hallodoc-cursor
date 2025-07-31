@@ -1,36 +1,224 @@
-<mat-card>
-  <div style="display: flex; justify-content: space-between; align-items: center;">
-    @if(user) {
-      <div style="font-size: 1rem; color: #333;">
-        <strong>User:</strong> {{ user.username || user.email }}<br>
-        <strong>Account Type:</strong> {{ user.accountType }}
+<!-- Dashboard Content -->
+<div class="dashboard-content">
+  <!-- Status Cards -->
+  <div class="status-cards">
+    <div 
+      *ngFor="let state of dashboardStates" 
+      class="status-card"
+      [class.active]="selectedState === state.id"
+      (click)="onStateChange(state.id)"
+      [style.background-color]="state.color"
+    >
+      <div class="card-content">
+        <mat-icon class="card-icon">{{ state.icon }}</mat-icon>
+        <div class="card-info">
+          <h3 class="card-title">{{ state.name }}</h3>
+          <p class="card-count">{{ state.count }}</p>
+        </div>
       </div>
-    }
-    <button mat-stroked-button color="warn" (click)="logout()">Logout</button>
+    </div>
   </div>
-  <h2>Dashboard</h2>
-  <button mat-raised-button color="primary" (click)="pingApi()">Get Ping Message</button>
-  <app-sample-button label="Sample Shared Button"></app-sample-button>
-  @if (pingMessage) {
-    <div id="ping-result">Ping Message: {{ pingMessage }}</div>
-  }
-  <button mat-stroked-button color="accent" (click)="loadAllPings()">Load All Pings</button>
-  @if (dataSource.length) {
-    <table mat-table [dataSource]="dataSource" class="mat-elevation-z8">
-      <ng-container matColumnDef="id">
-        <th mat-header-cell *matHeaderCellDef> ID </th>
-        @for (element of dataSource; track element.id) {
-          <td mat-cell *matCellDef="let element"> {{element.id}} </td>
-        }
-      </ng-container>
-      <ng-container matColumnDef="message">
-        <th mat-header-cell *matHeaderCellDef> Message </th>
-        @for (element of dataSource; track element.id) {
-          <td mat-cell *matCellDef="let element"> {{element.message}} </td>
-        }
-      </ng-container>
-      <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-      <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
-    </table>
-  }
-</mat-card>
+
+  <!-- Patients Section -->
+  <div class="patients-section">
+    <div class="section-header">
+      <h2>Patients ({{ selectedState }})</h2>
+      
+      <!-- Action Buttons -->
+      <div class="action-buttons">
+        <button mat-raised-button color="primary" class="action-btn">
+          <mat-icon>description</mat-icon>
+          Create Requests
+        </button>
+        <button mat-stroked-button class="action-btn" (click)="exportRequests()">
+          <mat-icon>file_download</mat-icon>
+          Export
+        </button>
+        <button mat-stroked-button class="action-btn" (click)="exportAllRequests()">
+          <mat-icon>file_download</mat-icon>
+          Export All
+        </button>
+        <button mat-stroked-button class="action-btn">
+          <mat-icon>support_agent</mat-icon>
+          Request DTY Support
+        </button>
+      </div>
+    </div>
+
+    <!-- Filters -->
+    <div class="filters-section">
+      <div class="search-filter">
+        <mat-form-field appearance="outline" class="search-field">
+          <mat-label>Search Patients</mat-label>
+          <input 
+            matInput 
+            placeholder="Search by patient name..."
+            [(ngModel)]="filters.searchTerm"
+            (input)="onSearchChange($any($event.target).value)"
+          >
+          <mat-icon matSuffix>search</mat-icon>
+        </mat-form-field>
+      </div>
+
+      <div class="type-filter">
+        <mat-form-field appearance="outline" class="type-field">
+          <mat-label>Patient Type</mat-label>
+          <mat-select 
+            [(ngModel)]="filters.requestType"
+            (selectionChange)="onRequestTypeChange($event.value)"
+          >
+            <mat-option *ngFor="let type of requestTypes" [value]="type.value">
+              {{ type.label }}
+            </mat-option>
+          </mat-select>
+        </mat-form-field>
+      </div>
+    </div>
+
+    <!-- Patient Type Legend -->
+    <div class="type-legend">
+      <div class="legend-item">
+        <div class="legend-color patient"></div>
+        <span>Patient</span>
+      </div>
+      <div class="legend-item">
+        <div class="legend-color family"></div>
+        <span>Family/Friend</span>
+      </div>
+      <div class="legend-item">
+        <div class="legend-color concierge"></div>
+        <span>Concierge</span>
+      </div>
+      <div class="legend-item">
+        <div class="legend-color business"></div>
+        <span>Business</span>
+      </div>
+    </div>
+
+    <!-- Loading Spinner -->
+    <div *ngIf="isLoading" class="loading-container">
+      <mat-spinner diameter="40"></mat-spinner>
+      <p>Loading requests...</p>
+    </div>
+
+    <!-- Data Table -->
+    <div *ngIf="!isLoading" class="table-container">
+      <table mat-table [dataSource]="dataSource" class="requests-table">
+        
+        <!-- Patient Full Name Column -->
+        <ng-container matColumnDef="patientFullName">
+          <th mat-header-cell *matHeaderCellDef>Name</th>
+          <td mat-cell *matCellDef="let request" [class]="'request-row-' + getRequestTypeClass(request.requestType)">
+            <div class="patient-name">
+              {{ request.patientFullName }}
+            </div>
+          </td>
+        </ng-container>
+
+        <!-- Date of Birth Column -->
+        <ng-container matColumnDef="dateOfBirth">
+          <th mat-header-cell *matHeaderCellDef>Date Of Birth</th>
+          <td mat-cell *matCellDef="let request" [class]="'request-row-' + getRequestTypeClass(request.requestType)">
+            <div class="dob-cell">
+              <span>{{ request.dateOfBirth }}</span>
+            </div>
+          </td>
+        </ng-container>
+
+        <!-- Requestor Name Column -->
+        <ng-container matColumnDef="requestorName">
+          <th mat-header-cell *matHeaderCellDef>Requestor</th>
+          <td mat-cell *matCellDef="let request" [class]="'request-row-' + getRequestTypeClass(request.requestType)">{{ request.requestorName }}</td>
+        </ng-container>
+
+        <!-- Physician Name Column -->
+        <ng-container matColumnDef="physicianName">
+          <th mat-header-cell *matHeaderCellDef>Physician Name</th>
+          <td mat-cell *matCellDef="let request" [class]="'request-row-' + getRequestTypeClass(request.requestType)">{{ request.physicianName || '-' }}</td>
+        </ng-container>
+
+        <!-- Date of Service Column -->
+        <ng-container matColumnDef="dateOfService">
+          <th mat-header-cell *matHeaderCellDef>Date of Service</th>
+          <td mat-cell *matCellDef="let request" [class]="'request-row-' + getRequestTypeClass(request.requestType)">{{ request.dateOfService || '-' }}</td>
+        </ng-container>
+
+        <!-- Requested Date Column -->
+        <ng-container matColumnDef="requestedDate">
+          <th mat-header-cell *matHeaderCellDef>Requested Date</th>
+          <td mat-cell *matCellDef="let request" [class]="'request-row-' + getRequestTypeClass(request.requestType)">{{ request.requestedDate }}</td>
+        </ng-container>
+
+        <!-- Phone Column -->
+        <ng-container matColumnDef="phone">
+          <th mat-header-cell *matHeaderCellDef>Phone</th>
+          <td mat-cell *matCellDef="let request" [class]="'request-row-' + getRequestTypeClass(request.requestType)">
+            <div class="phone-cell">
+              <div class="phone-number">{{ request.phone }}</div>
+            </div>
+          </td>
+        </ng-container>
+
+        <!-- Address Column -->
+        <ng-container matColumnDef="address">
+          <th mat-header-cell *matHeaderCellDef>Address</th>
+          <td mat-cell *matCellDef="let request" [class]="'request-row-' + getRequestTypeClass(request.requestType)">{{ request.address }}</td>
+        </ng-container>
+
+        <!-- Request Status Column -->
+        <ng-container matColumnDef="requestStatus">
+          <th mat-header-cell *matHeaderCellDef>Status</th>
+          <td mat-cell *matCellDef="let request" [class]="'request-row-' + getRequestTypeClass(request.requestType)">
+            <span class="status-badge">{{ request.requestStatus || '-' }}</span>
+          </td>
+        </ng-container>
+
+        <!-- Actions Column -->
+        <ng-container matColumnDef="actions">
+          <th mat-header-cell *matHeaderCellDef>Actions</th>
+          <td mat-cell *matCellDef="let request" [class]="'request-row-' + getRequestTypeClass(request.requestType)">
+            <button 
+              mat-icon-button 
+              [matMenuTriggerFor]="actionMenu"
+              class="action-button"
+            >
+              <mat-icon>more_vert</mat-icon>
+            </button>
+            <mat-menu #actionMenu="matMenu">
+              <button 
+                mat-menu-item 
+                *ngFor="let action of getRequestActions(request)"
+                (click)="onActionClick(action.action, request)"
+                [disabled]="action.disabled"
+              >
+                <mat-icon>{{ action.icon }}</mat-icon>
+                <span>{{ action.label }}</span>
+              </button>
+            </mat-menu>
+          </td>
+        </ng-container>
+
+        <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+        <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+      </table>
+
+      <!-- Pagination -->
+      <mat-paginator 
+        [length]="totalCount"
+        [pageSize]="filters.pageSize"
+        [pageIndex]="filters.page - 1"
+        [pageSizeOptions]="[5, 10, 25, 50]"
+        (page)="onPageChange($event.pageIndex + 1)"
+        showFirstLastButtons
+      >
+      </mat-paginator>
+    </div>
+
+    <!-- Empty State -->
+    <div *ngIf="!isLoading && dataSource.length === 0" class="empty-state">
+      <mat-icon class="empty-icon">inbox</mat-icon>
+      <h3>No requests found</h3>
+      <p>No requests match your current filters.</p>
+    </div>
+  </div>
+</div>

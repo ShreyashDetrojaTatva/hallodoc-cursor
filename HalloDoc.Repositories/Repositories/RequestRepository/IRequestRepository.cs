@@ -10,5 +10,9 @@ namespace HalloDoc.Repositories.Repositories.RequestRepository
         Task<Request> CreateRequestAsync(RequestCreateDto dto);
         Task<List<RequestListDto>> GetPatientRequestsAsync(int patientId, RequestFilterDto? filter = null);
         Task<Request?> GetByIdAsync(int requestId);
+        
+        // Admin Dashboard Methods
+        Task<List<RequestDataDto>> GetRequestsByStatusIdsAsync(int[] statusIds, DashboardFiltersDto filters);
+        Task<List<RequestDataDto>> GetAllRequestsAsync(DashboardFiltersDto filters);
     }
 } 

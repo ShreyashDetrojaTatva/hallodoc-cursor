@@ -9,6 +9,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatCardModule } from '@angular/material/card';
 import { AuthService } from '@main/services';
+import { AccountType } from '@main/enums';
 
 @Component({
   selector: 'app-login',
@@ -53,8 +54,13 @@ export class LoginComponent {
       this.form.value.usernameOrEmail,
       this.form.value.password
     ).subscribe({
-      next: () => {
-        this.router.navigate(['/patient/dashboard']);
+      next: (response) => {
+        // Redirect based on account type
+        if (response.user.accountType === AccountType.Admin) {
+          this.router.navigate(['/admin/dashboard']);
+        } else {
+          this.router.navigate(['/patient/dashboard']);
+        }
       },
       error: (error) => {
         this.error = 'Invalid username/email or password';

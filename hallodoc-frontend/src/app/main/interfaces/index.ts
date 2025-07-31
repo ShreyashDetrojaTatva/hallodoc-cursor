@@ -14,4 +14,7 @@ export * from './document-viewer';
 export * from './patient';
 
 // Dashboard Interfaces
-export * from './dashboard'; 
+export * from './dashboard';
+
+// Admin Dashboard Interfaces
+export * from './admin'; 

@@ -87,5 +87,98 @@ namespace HalloDoc.Repositories.Repositories.RequestRepository
         {
             return await _db.Requests.FindAsync(requestId);
         }
+
+        // Admin Dashboard Methods
+        public async Task<List<RequestDataDto>> GetRequestsByStatusIdsAsync(int[] statusIds, DashboardFiltersDto filters)
+        {
+            var query = _db.Requests
+                .Include(r => r.RequestClient)
+                .Include(r => r.Physician)
+                .Where(r => statusIds.Contains(r.RequestStatus));
+
+            // Apply search filter
+            if (!string.IsNullOrEmpty(filters.SearchTerm))
+            {
+                var search = filters.SearchTerm.ToLower();
+                query = query.Where(r =>
+                    (r.RequestClient != null && r.RequestClient.FirstName != null && r.RequestClient.FirstName.ToLower().Contains(search)) ||
+                    (r.RequestClient != null && r.RequestClient.LastName != null && r.RequestClient.LastName.ToLower().Contains(search))
+                );
+            }
+
+            // Apply request type filter
+            if (!string.IsNullOrEmpty(filters.RequestType) && filters.RequestType != "All")
+            {
+                query = query.Where(r => r.RequestType.ToString() == filters.RequestType);
+            }
+
+            // Get results with pagination
+            var results = await query
+                .OrderByDescending(r => r.CreatedAt)
+                .Skip((filters.Page - 1) * filters.PageSize)
+                .Take(filters.PageSize)
+                .ToListAsync();
+
+            return results.Select(r => new RequestDataDto
+            {
+                Id = r.RequestId,
+                PatientFullName = r.RequestClient != null ? $"{r.RequestClient.FirstName} {r.RequestClient.LastName}".Trim() : "Unknown",
+                DateOfBirth = r.RequestClient != null && r.RequestClient.DOB.HasValue ? r.RequestClient.DOB.Value.ToString("MMM dd, yyyy") : "Unknown",
+                RequestorName = r.RequestClient != null ? $"{r.RequestClient.FirstName} {r.RequestClient.LastName}".Trim() : "Unknown",
+                PhysicianName = r.Physician != null ? $"{r.Physician.FirstName} {r.Physician.LastName}".Trim() : null,
+                DateOfService = r.AcceptedDate?.ToString("MMM dd, yyyy") ?? null,
+                Phone = r.RequestClient != null ? r.RequestClient.Phone ?? "Unknown" : "Unknown",
+                Address = r.RequestClient != null ? $"{r.RequestClient.Street}, {r.RequestClient.City} {r.RequestClient.State} {r.RequestClient.ZipCode}".Trim() : "Unknown",
+                RequestStatus = r.RequestStatus.ToString(),
+                RequestType = (int)r.RequestType,
+                RequestedDate = r.CreatedAt.ToString("MMM dd, yyyy HH:mm")
+            }).ToList();
+        }
+
+        public async Task<List<RequestDataDto>> GetAllRequestsAsync(DashboardFiltersDto filters)
+        {
+            var query = _db.Requests
+                .Include(r => r.RequestClient)
+                .Include(r => r.Physician)
+                .AsQueryable();
+
+            // Apply search filter
+            if (!string.IsNullOrEmpty(filters.SearchTerm))
+            {
+                var search = filters.SearchTerm.ToLower();
+                query = query.Where(r =>
+                    (r.RequestClient != null && r.RequestClient.FirstName != null && r.RequestClient.FirstName.ToLower().Contains(search)) ||
+                    (r.RequestClient != null && r.RequestClient.LastName != null && r.RequestClient.LastName.ToLower().Contains(search))
+                );
+            }
+
+            // Apply request type filter
+            if (!string.IsNullOrEmpty(filters.RequestType) && filters.RequestType != "All")
+            {
+                query = query.Where(r => r.RequestType.ToString() == filters.RequestType);
+            }
+
+            // Get results with pagination
+            var results = await query
+                .OrderByDescending(r => r.CreatedAt)
+                .Skip((filters.Page - 1) * filters.PageSize)
+                .Take(filters.PageSize)
+                .ToListAsync();
+
+            return results.Select(r => new RequestDataDto
+            {
+                Id = r.RequestId,
+                PatientFullName = r.RequestClient != null ? $"{r.RequestClient.FirstName} {r.RequestClient.LastName}".Trim() : "Unknown",
+                DateOfBirth = r.RequestClient != null && r.RequestClient.DOB.HasValue ? r.RequestClient.DOB.Value.ToString("MMM dd, yyyy") : "Unknown",
+                RequestorName = r.RequestClient != null ? $"{r.RequestClient.FirstName} {r.RequestClient.LastName}".Trim() : "Unknown",
+                PhysicianName = r.Physician != null ? $"{r.Physician.FirstName} {r.Physician.LastName}".Trim() : null,
+                DateOfService = r.AcceptedDate?.ToString("MMM dd, yyyy") ?? null,
+                Phone = r.RequestClient != null ? r.RequestClient.Phone ?? "Unknown" : "Unknown",
+                Address = r.RequestClient != null ? $"{r.RequestClient.Street}, {r.RequestClient.City} {r.RequestClient.State} {r.RequestClient.ZipCode}".Trim() : "Unknown",
+                RequestStatus = r.RequestStatus.ToString(),
+                RequestType = (int)r.RequestType,
+                RequestedDate = r.CreatedAt.ToString("MMM dd, yyyy HH:mm")
+            }).ToList();
+        }
     }
 } 

@@ -1,0 +1,248 @@
+================================================================================
+HALLODOC ADMIN PAGES - PROJECT PLAN & CHECKLIST
+================================================================================
+
+OVERVIEW
+--------
+Admin has 3 main pages in navbar:
+- Dashboard (main functionality)
+- My Profile (view/update)
+- Records (search/filter past requests)
+
+ADMIN DASHBOARD - REQUEST FLOW
+==============================
+
+Dashboard States (6):
+1. New
+2. Pending  
+3. Active
+4. Conclude
+5. To-Close
+6. Unpaid
+
+Request Status Mapping to Dashboard States:
+------------------------------------------
+- New: Unassigned (1)
+- Pending: Accepted (2)
+- Active: MDEnRoute (4), MDONSite (5)
+- Conclude: Conclude (6)
+- To-Close: Closed (8), Cancelled (3), CancelledByPatient (7)
+- Unpaid: Unpaid (9)
+
+Original Request Statuses:
+-------------------------
+1. Unassigned = 1
+2. Accepted = 2
+3. Cancelled = 3
+4. MDEnRoute = 4
+5. MDONSite = 5
+6. Conclude = 6
+7. CancelledByPatient = 7
+8. Closed = 8
+9. Unpaid = 9
+10. Clear = 10
+11. Blocked = 11
+
+Request Flow:
+-------------
+1. Request Created → New (Unassigned)
+2. Admin assigns to physician OR cancels
+3. Physician accepts → Pending (Accepted)
+4. Admin sends agreement → Patient accepts → Active (MDEnRoute)
+5. Patient rejects → CancelledByPatient
+6. Physician generates encounter → Active (MDONSite)
+7. Physician finalizes encounter → Conclude (Conclude)
+8. Physician concludes care → To-Close (Closed)
+9. Admin closes case → Unpaid (Unpaid) → FLOW COMPLETE
+10. Admin clears the case → Request cleared. Not shown anywhere (Clear)
+
+State-Specific Actions:
+======================
+
+NEW (Unassigned):
+- Assign Request
+- Cancel Request
+- View Request
+- View Documents (also upload new)
+
+PENDING (Accepted):
+- View Request
+- View Documents (also upload new)
+- View Notes
+- Send Agreement
+- Clear Case (move to Clear state)
+
+ACTIVE (MDEnRoute, MDONSite):
+- Send Order
+- View Request
+- View Documents (also upload new)
+- View Notes
+
+CONCLUDE (Conclude):
+- Same as Active
+
+TO-CLOSE (Closed, Cancelled, CancelledByPatient):
+- View Request
+- View Documents (also upload new)
+- View Notes
+- Close Case
+
+UNPAID (Unpaid):
+- View Request
+- View Documents (also upload new)
+- View Notes
+
+ADDITIONAL ADMIN FEATURES
+========================
+- Profile (view/update)
+- Search Records (search/filter/export past requests)
+- Physician and Admin CRUD
+- Role CRUD (with page access for admin/physician account types)
+- Vendors CRUD (for sending request orders - order CRUD only)
+
+DEVELOPMENT APPROACH
+===================
+1. Start with Dashboard - set all 6 states, get requests perfectly state-wise
+2. Implement dropdown options for different state-wise actions
+3. Once requests are properly fetched, work on individual actions
+4. Add other admin features (profile, records, CRUD operations)
+5. Move to Physician phase after admin features complete
+
+DETAILED CHECKLIST
+==================
+
+PHASE 1: ADMIN DASHBOARD
+-------------------------
+✅ [Completed] Design and implement dashboard with 6 states
+✅ [Completed] Create request grid for each state
+✅ [Completed] Implement state-specific dropdown actions
+✅ [Completed] Backend API for dashboard requests
+✅ [Completed] Pagination for request grids
+✅ [Completed] Status mapping functions (request status → dashboard state)
+✅ [Completed] Filtering and sorting options
+□ [Pending] Real-time updates for request status changes
+
+PHASE 2: REQUEST ACTIONS
+-------------------------
+□ [Pending] Assign Request functionality
+□ [Pending] Cancel Request functionality
+□ [Pending] View Request details modal/page
+□ [Pending] Document viewer/upload system
+□ [Pending] Send Agreement functionality
+□ [Pending] Clear Case functionality
+□ [Pending] Send Order functionality
+□ [Pending] View Notes functionality
+□ [Pending] Close Case functionality
+
+PHASE 3: ADMIN PROFILE
+----------------------
+□ [Pending] View profile page
+□ [Pending] Update profile functionality
+□ [Pending] Profile form validation
+□ [Pending] Profile image upload (if needed)
+
+PHASE 4: ADMIN RECORDS
+----------------------
+□ [Pending] Search/filter interface
+□ [Pending] Records grid with pagination
+□ [Pending] Export functionality
+□ [Pending] Advanced filtering options
+□ [Pending] Date range selection
+
+PHASE 5: USER MANAGEMENT
+------------------------
+□ [Pending] Physician CRUD (add, edit, delete, list)
+□ [Pending] Admin CRUD (add, edit, delete, list)
+□ [Pending] User search and filtering
+□ [Pending] Bulk operations (if needed)
+
+PHASE 6: ROLE MANAGEMENT
+-------------------------
+□ [Pending] Role CRUD operations
+□ [Pending] Page access management for admin/physician
+□ [Pending] Role assignment to users
+□ [Pending] Permission system implementation
+
+PHASE 7: VENDOR MANAGEMENT
+---------------------------
+□ [Pending] Vendor CRUD operations
+□ [Pending] Vendor assignment to orders
+□ [Pending] Order management system
+
+PHASE 8: PHYSICIAN PHASE
+-------------------------
+□ [Pending] Physician dashboard design
+□ [Pending] Physician-specific request flows
+□ [Pending] Physician profile management
+□ [Pending] Physician-patient interaction features
+
+TECHNICAL REQUIREMENTS
+======================
+
+Frontend (Angular):
+-------------------
+- Dashboard component with 6 state tabs
+- Request grid component with pagination
+- Action dropdown component (state-specific)
+- Modal components for view/edit operations
+- Document viewer/upload component
+- Search and filter components
+- CRUD forms for users, roles, vendors
+
+Backend (.NET):
+---------------
+- Admin dashboard API with filtering
+- Request status mapping service
+- Document upload/download APIs
+- User management APIs
+- Role and permission APIs
+- Vendor management APIs
+- Email service for agreements/notifications
+
+Database:
+----------
+- Request status tracking
+- User roles and permissions
+- Document storage
+- Vendor information
+- Audit logs for admin actions
+
+MICRO-TASKS FOR DASHBOARD API
+=============================
+When starting dashboard API development:
+□ Create AdminDashboardController
+□ Implement GetRequestsByState endpoint
+□ Add pagination parameters
+□ Create status mapping service
+□ Add filtering by request type
+□ Add sorting options
+□ Implement caching for performance
+□ Add authorization checks
+□ Create DTOs for dashboard data
+□ Add unit tests
+
+MICRO-TASKS FOR REQUEST ACTIONS
+===============================
+When implementing request actions:
+□ Create action service interfaces
+□ Implement each action method
+□ Add validation for each action
+□ Create success/error handling
+□ Add audit logging
+□ Update request status after actions
+□ Send notifications where needed
+□ Add confirmation dialogs
+
+NOTES
+=====
+- Always use repository pattern for database access
+- Implement proper error handling and logging
+- Add unit tests for critical functionality
+- Follow existing code organization patterns
+- Use path aliases (@main, @core) for imports
+- Maintain consistent UI/UX patterns
+- Document API endpoints and data structures
+
+Last Updated: [Current Date]
+Status: Planning Phase
+Next Action: Start with Admin Dashboard UI structure 

@@ -19,6 +19,14 @@ namespace HalloDoc.Entities.Data.Entities
         [ForeignKey("PatientId")]
         public virtual Patient? Patient { get; set; }
 
+        // Physician assignment
+        public int? PhysicianId { get; set; } // FK to Physician (nullable)
+        [ForeignKey("PhysicianId")]
+        public virtual Physician? Physician { get; set; }
+        
+        [Column(TypeName = "timestamp without time zone")]
+        public DateTime? AcceptedDate { get; set; } // When physician accepts the case
+
         // Generic requestor info
         [MaxLength(100)]
         public string? RequestorFirstName { get; set; }
