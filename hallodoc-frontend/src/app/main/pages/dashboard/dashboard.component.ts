@@ -124,8 +124,6 @@ export class DashboardComponent implements OnInit, OnDestroy {
     this.isLoading = true;
     this.adminDashboardService.getRequestsByState(this.selectedState, this.filters).subscribe({
       next: (response) => {
-        console.log('Received requests data:', response.requests);
-        console.log('Request types in data:', response.requests.map(r => ({ id: r.id, requestType: r.requestType, typeName: this.getRequestTypeName(r.requestType) })));
         this.dataSource = response.requests;
         this.totalCount = response.totalCount;
         this.updateDisplayedColumns();
@@ -282,32 +280,6 @@ export class DashboardComponent implements OnInit, OnDestroy {
   }
 
   getRequestTypeClass(requestType: number): string {
-    switch (requestType) {
-      case RequestType.Patient:
-        return 'patient';
-      case RequestType.Family:
-        return 'family';
-      case RequestType.Concierge:
-        return 'concierge';
-      case RequestType.Business:
-        return 'business';
-      default:
-        return 'patient';
-    }
-  }
-
-  getRequestTypeName(requestType: number): string {
-    switch (requestType) {
-      case RequestType.Patient:
-        return 'Patient';
-      case RequestType.Family:
-        return 'Family';
-      case RequestType.Concierge:
-        return 'Concierge';
-      case RequestType.Business:
-        return 'Business';
-      default:
-        return 'Unknown';
-    }
+    return RequestStatusMapper.getRequestTypeClass(requestType);
   }
 }

@@ -1,4 +1,4 @@
-import { RequestStatus, DashboardRequestStatus } from '@main/enums';
+import { RequestStatus, DashboardRequestStatus, RequestType } from '@main/enums';
 
 /**
  * Maps RequestStatus to DashboardRequestStatus based on the admin plan
@@ -115,6 +115,24 @@ export class RequestStatusMapper {
         return 'UNPAID';
       default:
         return 'UNKNOWN';
+    }
+  }
+
+  /**
+   * Gets the CSS class name for a RequestType
+   */
+  static getRequestTypeClass(requestType: number): string {
+    switch (requestType) {
+      case RequestType.Patient:
+        return 'patient';
+      case RequestType.Family:
+        return 'family';
+      case RequestType.Concierge:
+        return 'concierge';
+      case RequestType.Business:
+        return 'business';
+      default:
+        return 'patient';
     }
   }
 } 
