@@ -1,5 +1,6 @@
 using HalloDoc.Entities.Data.Entities;
 using HalloDoc.Repositories.DTOs;
+using HalloDoc.Repositories.DTOs.Pagination;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
@@ -12,7 +13,7 @@ namespace HalloDoc.Repositories.Repositories.RequestRepository
         Task<Request?> GetByIdAsync(int requestId);
         
         // Admin Dashboard Methods
-        Task<List<RequestDataDto>> GetRequestsByStatusIdsAsync(int[] statusIds, DashboardFiltersDto filters);
-        Task<List<RequestDataDto>> GetAllRequestsAsync(DashboardFiltersDto filters);
+        Task<PaginationResponseDto<RequestDataDto>> GetRequestsByStatusIdsAsync(int[] statusIds, PaginationRequestDto<DashboardFiltersDto> request);
+        Task<PaginationResponseDto<RequestDataDto>> GetAllRequestsAsync(PaginationRequestDto<DashboardFiltersDto> request);
     }
 } 

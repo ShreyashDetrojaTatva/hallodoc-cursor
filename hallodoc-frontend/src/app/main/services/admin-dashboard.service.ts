@@ -1,7 +1,8 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { DashboardResponse, DashboardFilters, AdminRequestData, DashboardState } from '@main/interfaces/admin/dashboard.interface';
+import { AdminRequestData, DashboardState } from '@main/interfaces/admin/dashboard.interface';
+import { PaginationRequest, PaginationResponse, PaginationDashboardFilters } from '@main/interfaces/pagination';
 import { ADMIN_DASHBOARD_ENDPOINTS } from '@main/constants';
 import { DashboardRequestStatus } from '@main/enums';
 
@@ -12,21 +13,41 @@ export class AdminDashboardService {
 
   constructor(private http: HttpClient) {}
 
-  getRequestsByState(state: DashboardRequestStatus, filters: DashboardFilters): Observable<DashboardResponse> {
+  getRequestsByState(state: DashboardRequestStatus, request: PaginationRequest<PaginationDashboardFilters>): Observable<PaginationResponse<AdminRequestData>> {
     let params = new HttpParams()
       .set('state', state)
-      .set('page', filters.page.toString())
-      .set('pageSize', filters.pageSize.toString());
+      .set('pageIndex', request.pageIndex.toString())
+      .set('pageSize', request.pageSize.toString());
 
-    if (filters.searchTerm) {
-      params = params.set('searchTerm', filters.searchTerm);
+    if (request.searchString) {
+      params = params.set('searchString', request.searchString);
     }
 
-    if (filters.requestType !== null) {
-      params = params.set('requestType', filters.requestType.toString());
+    if (request.sortColumn) {
+      params = params.set('sortColumn', request.sortColumn);
     }
 
-    return this.http.get<DashboardResponse>(ADMIN_DASHBOARD_ENDPOINTS.GET_REQUESTS_BY_STATE, { params });
+    if (request.sortDirection) {
+      params = params.set('sortDirection', request.sortDirection);
+    }
+
+    if (request.filters.requestType !== undefined && request.filters.requestType !== null) {
+      params = params.set('requestType', request.filters.requestType.toString());
+    }
+
+    if (request.filters.regionId !== undefined && request.filters.regionId !== null) {
+      params = params.set('regionId', request.filters.regionId.toString());
+    }
+
+    if (request.filters.fromDate) {
+      params = params.set('fromDate', request.filters.fromDate);
+    }
+
+    if (request.filters.toDate) {
+      params = params.set('toDate', request.filters.toDate);
+    }
+
+    return this.http.get<PaginationResponse<AdminRequestData>>(ADMIN_DASHBOARD_ENDPOINTS.GET_REQUESTS_BY_STATE, { params });
   }
 
   getStateCounts(): Observable<DashboardState[]> {
@@ -34,18 +55,38 @@ export class AdminDashboardService {
   }
 
   // Stub methods for export functionality
-  exportRequests(state: DashboardRequestStatus, filters: DashboardFilters): Observable<Blob> {
+  exportRequests(state: DashboardRequestStatus, request: PaginationRequest<PaginationDashboardFilters>): Observable<Blob> {
     let params = new HttpParams()
       .set('state', state)
-      .set('page', filters.page.toString())
-      .set('pageSize', filters.pageSize.toString());
+      .set('pageIndex', request.pageIndex.toString())
+      .set('pageSize', request.pageSize.toString());
 
-    if (filters.searchTerm) {
-      params = params.set('searchTerm', filters.searchTerm);
+    if (request.searchString) {
+      params = params.set('searchString', request.searchString);
     }
 
-    if (filters.requestType !== null) {
-      params = params.set('requestType', filters.requestType.toString());
+    if (request.sortColumn) {
+      params = params.set('sortColumn', request.sortColumn);
+    }
+
+    if (request.sortDirection) {
+      params = params.set('sortDirection', request.sortDirection);
+    }
+
+    if (request.filters.requestType !== undefined && request.filters.requestType !== null) {
+      params = params.set('requestType', request.filters.requestType.toString());
+    }
+
+    if (request.filters.regionId !== undefined && request.filters.regionId !== null) {
+      params = params.set('regionId', request.filters.regionId.toString());
+    }
+
+    if (request.filters.fromDate) {
+      params = params.set('fromDate', request.filters.fromDate);
+    }
+
+    if (request.filters.toDate) {
+      params = params.set('toDate', request.filters.toDate);
     }
 
     return this.http.get(ADMIN_DASHBOARD_ENDPOINTS.EXPORT_REQUESTS, { 
@@ -54,17 +95,37 @@ export class AdminDashboardService {
     });
   }
 
-  exportAllRequests(filters: DashboardFilters): Observable<Blob> {
+  exportAllRequests(request: PaginationRequest<PaginationDashboardFilters>): Observable<Blob> {
     let params = new HttpParams()
-      .set('page', filters.page.toString())
-      .set('pageSize', filters.pageSize.toString());
+      .set('pageIndex', request.pageIndex.toString())
+      .set('pageSize', request.pageSize.toString());
 
-    if (filters.searchTerm) {
-      params = params.set('searchTerm', filters.searchTerm);
+    if (request.searchString) {
+      params = params.set('searchString', request.searchString);
     }
 
-    if (filters.requestType !== null) {
-      params = params.set('requestType', filters.requestType.toString());
+    if (request.sortColumn) {
+      params = params.set('sortColumn', request.sortColumn);
+    }
+
+    if (request.sortDirection) {
+      params = params.set('sortDirection', request.sortDirection);
+    }
+
+    if (request.filters.requestType !== undefined && request.filters.requestType !== null) {
+      params = params.set('requestType', request.filters.requestType.toString());
+    }
+
+    if (request.filters.regionId !== undefined && request.filters.regionId !== null) {
+      params = params.set('regionId', request.filters.regionId.toString());
+    }
+
+    if (request.filters.fromDate) {
+      params = params.set('fromDate', request.filters.fromDate);
+    }
+
+    if (request.filters.toDate) {
+      params = params.set('toDate', request.filters.toDate);
     }
 
     return this.http.get(ADMIN_DASHBOARD_ENDPOINTS.EXPORT_ALL_REQUESTS, { 

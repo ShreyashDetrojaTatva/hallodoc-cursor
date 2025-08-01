@@ -17,4 +17,6 @@ export * from './patient';
 export * from './dashboard';
 
 // Admin Dashboard Interfaces
-export * from './admin'; 
+export * from './admin';
+// Pagination Interfaces
+export * from './pagination'; 

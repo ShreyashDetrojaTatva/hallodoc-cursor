@@ -53,7 +53,7 @@
           <input 
             matInput 
             placeholder="Search by patient name..."
-            [(ngModel)]="filters.searchTerm"
+            [(ngModel)]="paginationRequest.searchString"
             (input)="onSearchChange($any($event.target).value)"
           >
           <mat-icon matSuffix>search</mat-icon>
@@ -64,7 +64,7 @@
         <mat-form-field appearance="outline" class="type-field">
           <mat-label>Patient Type</mat-label>
           <mat-select 
-            [(ngModel)]="filters.requestType"
+            [(ngModel)]="paginationRequest.filters.requestType"
             (selectionChange)="onRequestTypeChange($event.value)"
           >
             <mat-option *ngFor="let type of requestTypes" [value]="type.value">
@@ -205,11 +205,10 @@
       <!-- Pagination -->
       <mat-paginator 
         [length]="totalCount"
-        [pageSize]="filters.pageSize"
-        [pageIndex]="filters.page - 1"
+        [pageSize]="paginationRequest.pageSize"
+        [pageIndex]="paginationRequest.pageIndex - 1"
         [pageSizeOptions]="[5, 10, 25, 50]"
-        (page)="onPageChange($event.pageIndex + 1)"
-        showFirstLastButtons
+        (page)="onPageChange($event)"
       >
       </mat-paginator>
     </div>

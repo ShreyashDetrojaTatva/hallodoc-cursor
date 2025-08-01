@@ -1,6 +1,7 @@
 using HalloDoc.Entities.Data.Entities;
 using HalloDoc.Entities.Data.Context;
 using HalloDoc.Repositories.DTOs;
+using HalloDoc.Repositories.DTOs.Pagination;
 using HalloDoc.Repositories.Mappers;
 using Microsoft.EntityFrameworkCore;
 using System;
@@ -89,7 +90,7 @@ namespace HalloDoc.Repositories.Repositories.RequestRepository
         }
 
         // Admin Dashboard Methods
-        public async Task<List<RequestDataDto>> GetRequestsByStatusIdsAsync(int[] statusIds, DashboardFiltersDto filters)
+        public async Task<PaginationResponseDto<RequestDataDto>> GetRequestsByStatusIdsAsync(int[] statusIds, PaginationRequestDto<DashboardFiltersDto> request)
         {
             var query = _db.Requests
                 .Include(r => r.RequestClient)
@@ -97,9 +98,9 @@ namespace HalloDoc.Repositories.Repositories.RequestRepository
                 .Where(r => statusIds.Contains(r.RequestStatus));
 
             // Apply search filter
-            if (!string.IsNullOrEmpty(filters.SearchTerm))
+            if (!string.IsNullOrEmpty(request.SearchString))
             {
-                var search = filters.SearchTerm.ToLower();
+                var search = request.SearchString.ToLower();
                 query = query.Where(r =>
                     (r.RequestClient != null && r.RequestClient.FirstName != null && r.RequestClient.FirstName.ToLower().Contains(search)) ||
                     (r.RequestClient != null && r.RequestClient.LastName != null && r.RequestClient.LastName.ToLower().Contains(search))
@@ -107,19 +108,44 @@ namespace HalloDoc.Repositories.Repositories.RequestRepository
             }
 
             // Apply request type filter
-            if (!string.IsNullOrEmpty(filters.RequestType) && filters.RequestType != "All")
+            if (request.Filters.RequestType.HasValue)
             {
-                query = query.Where(r => r.RequestType.ToString() == filters.RequestType);
+                query = query.Where(r => (int)r.RequestType == request.Filters.RequestType.Value);
             }
 
-            // Get results with pagination
+            // Apply date range filters
+            if (request.Filters.FromDate.HasValue)
+            {
+                query = query.Where(r => r.CreatedAt >= request.Filters.FromDate.Value);
+            }
+
+            if (request.Filters.ToDate.HasValue)
+            {
+                query = query.Where(r => r.CreatedAt <= request.Filters.ToDate.Value);
+            }
+
+            // Get total count for pagination
+            var totalCount = await query.CountAsync();
+
+            // Apply sorting
+            if (!string.IsNullOrEmpty(request.SortColumn))
+            {
+                query = request.SortDirection?.ToLower() == "desc" 
+                    ? ApplySorting(query, request.SortColumn, false)
+                    : ApplySorting(query, request.SortColumn, true);
+            }
+            else
+            {
+                query = query.OrderByDescending(r => r.CreatedAt);
+            }
+
+            // Apply pagination
             var results = await query
-                .OrderByDescending(r => r.CreatedAt)
-                .Skip((filters.Page - 1) * filters.PageSize)
-                .Take(filters.PageSize)
+                .Skip((request.PageIndex - 1) * request.PageSize)
+                .Take(request.PageSize)
                 .ToListAsync();
 
-            return results.Select(r => new RequestDataDto
+            var items = results.Select(r => new RequestDataDto
             {
                 Id = r.RequestId,
                 PatientFullName = r.RequestClient != null ? $"{r.RequestClient.FirstName} {r.RequestClient.LastName}".Trim() : "Unknown",
@@ -133,9 +159,18 @@ namespace HalloDoc.Repositories.Repositories.RequestRepository
                 RequestType = (int)r.RequestType,
                 RequestedDate = r.CreatedAt.ToString("MMM dd, yyyy HH:mm")
             }).ToList();
+
+            return new PaginationResponseDto<RequestDataDto>(
+                items, 
+                totalCount, 
+                request.PageIndex, 
+                request.PageSize, 
+                request.SortDirection ?? "asc", 
+                request.SortColumn ?? string.Empty
+            );
         }
 
-        public async Task<List<RequestDataDto>> GetAllRequestsAsync(DashboardFiltersDto filters)
+        public async Task<PaginationResponseDto<RequestDataDto>> GetAllRequestsAsync(PaginationRequestDto<DashboardFiltersDto> request)
         {
             var query = _db.Requests
                 .Include(r => r.RequestClient)
@@ -143,9 +178,9 @@ namespace HalloDoc.Repositories.Repositories.RequestRepository
                 .AsQueryable();
 
             // Apply search filter
-            if (!string.IsNullOrEmpty(filters.SearchTerm))
+            if (!string.IsNullOrEmpty(request.SearchString))
             {
-                var search = filters.SearchTerm.ToLower();
+                var search = request.SearchString.ToLower();
                 query = query.Where(r =>
                     (r.RequestClient != null && r.RequestClient.FirstName != null && r.RequestClient.FirstName.ToLower().Contains(search)) ||
                     (r.RequestClient != null && r.RequestClient.LastName != null && r.RequestClient.LastName.ToLower().Contains(search))
@@ -153,19 +188,44 @@ namespace HalloDoc.Repositories.Repositories.RequestRepository
             }
 
             // Apply request type filter
-            if (!string.IsNullOrEmpty(filters.RequestType) && filters.RequestType != "All")
+            if (request.Filters.RequestType.HasValue)
             {
-                query = query.Where(r => r.RequestType.ToString() == filters.RequestType);
+                query = query.Where(r => (int)r.RequestType == request.Filters.RequestType.Value);
             }
 
-            // Get results with pagination
+            // Apply date range filters
+            if (request.Filters.FromDate.HasValue)
+            {
+                query = query.Where(r => r.CreatedAt >= request.Filters.FromDate.Value);
+            }
+
+            if (request.Filters.ToDate.HasValue)
+            {
+                query = query.Where(r => r.CreatedAt <= request.Filters.ToDate.Value);
+            }
+
+            // Get total count for pagination
+            var totalCount = await query.CountAsync();
+
+            // Apply sorting
+            if (!string.IsNullOrEmpty(request.SortColumn))
+            {
+                query = request.SortDirection?.ToLower() == "desc" 
+                    ? ApplySorting(query, request.SortColumn, false)
+                    : ApplySorting(query, request.SortColumn, true);
+            }
+            else
+            {
+                query = query.OrderByDescending(r => r.CreatedAt);
+            }
+
+            // Apply pagination
             var results = await query
-                .OrderByDescending(r => r.CreatedAt)
-                .Skip((filters.Page - 1) * filters.PageSize)
-                .Take(filters.PageSize)
+                .Skip((request.PageIndex - 1) * request.PageSize)
+                .Take(request.PageSize)
                 .ToListAsync();
 
-            return results.Select(r => new RequestDataDto
+            var items = results.Select(r => new RequestDataDto
             {
                 Id = r.RequestId,
                 PatientFullName = r.RequestClient != null ? $"{r.RequestClient.FirstName} {r.RequestClient.LastName}".Trim() : "Unknown",
@@ -179,6 +239,37 @@ namespace HalloDoc.Repositories.Repositories.RequestRepository
                 RequestType = (int)r.RequestType,
                 RequestedDate = r.CreatedAt.ToString("MMM dd, yyyy HH:mm")
             }).ToList();
+
+            return new PaginationResponseDto<RequestDataDto>(
+                items, 
+                totalCount, 
+                request.PageIndex, 
+                request.PageSize, 
+                request.SortDirection ?? "asc", 
+                request.SortColumn ?? string.Empty
+            );
+        }
+
+        private IQueryable<Request> ApplySorting(IQueryable<Request> query, string sortColumn, bool ascending)
+        {
+            return sortColumn.ToLower() switch
+            {
+                "patientfullname" => ascending 
+                    ? query.OrderBy(r => r.RequestClient != null ? r.RequestClient.FirstName + " " + r.RequestClient.LastName : "")
+                    : query.OrderByDescending(r => r.RequestClient != null ? r.RequestClient.FirstName + " " + r.RequestClient.LastName : ""),
+                "requesteddate" => ascending 
+                    ? query.OrderBy(r => r.CreatedAt)
+                    : query.OrderByDescending(r => r.CreatedAt),
+                "requesttype" => ascending 
+                    ? query.OrderBy(r => r.RequestType)
+                    : query.OrderByDescending(r => r.RequestType),
+                "requeststatus" => ascending 
+                    ? query.OrderBy(r => r.RequestStatus)
+                    : query.OrderByDescending(r => r.RequestStatus),
+                _ => ascending 
+                    ? query.OrderBy(r => r.CreatedAt)
+                    : query.OrderByDescending(r => r.CreatedAt)
+            };
         }
     }
 } 

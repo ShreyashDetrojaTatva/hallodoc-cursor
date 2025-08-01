@@ -74,7 +74,7 @@ export class PatientDocumentsComponent implements OnInit {
   }
 
   downloadDocument(document: DocumentData) {
-    this.requestService.downloadDocument(this.requestId, document.documentId)
+    this.requestService.downloadDocument(document.documentId)
       .subscribe(blob => {
         const url = window.URL.createObjectURL(blob);
         const link = window.document.createElement('a');
@@ -89,7 +89,7 @@ export class PatientDocumentsComponent implements OnInit {
 
   viewDocument(document: DocumentData) {
     // Create a blob URL for viewing the document
-    this.requestService.downloadDocument(this.requestId, document.documentId)
+    this.requestService.downloadDocument(document.documentId)
       .subscribe(blob => {
         const url = window.URL.createObjectURL(blob);
         const documentWithBlob = {
@@ -98,9 +98,7 @@ export class PatientDocumentsComponent implements OnInit {
         };
         
         // Open document in dialog using the wrapper service
-        this.dialogWrapper.openDocumentViewer(documentWithBlob, {
-          showDownloadButton: true
-        });
+        this.dialogWrapper.openDocumentViewer(documentWithBlob);
       });
   }
 

@@ -16,6 +16,18 @@
 - Avoid Entity Framework includes (.Include()) for INSERT/UPDATE operations to prevent circular reference issues during entity tracking.
 - When updating related entities, fetch them separately and update each entity independently to avoid EF Core circular reference problems.
 
+# API Endpoint Rules
+- **ALWAYS check the actual backend controller structure before adding any endpoint to api-endpoints.ts**
+- **NEVER add endpoints randomly or assume the route structure**
+- **Verify the exact controller name, route attribute, and action method signatures**
+- **Check HTTP method (GET, POST, PUT, DELETE) and parameter types ([FromQuery], [FromBody], [FromForm])**
+- **Ensure endpoint paths match the actual backend implementation exactly**
+- **Example verification process:**
+  1. Check `HalloDoc.API/Controllers/[ControllerName].cs`
+  2. Verify `[Route("api/[controller]")]` or custom route
+  3. Check action method signatures and HTTP attributes
+  4. Match frontend endpoint to exact backend route structure
+
 # Additional rules from hallodoc-rules.mdc
 - Always create virtual navigation properties for related entities.
 - For one-to-many and many-to-many relationships, define virtual ICollection<T> properties on the "one" side.

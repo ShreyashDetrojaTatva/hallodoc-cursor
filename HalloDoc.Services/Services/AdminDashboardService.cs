@@ -1,6 +1,7 @@
 using HalloDoc.Common.Constants;
 using HalloDoc.Common.Utility;
 using HalloDoc.Repositories.DTOs;
+using HalloDoc.Repositories.DTOs.Pagination;
 using HalloDoc.Repositories.Repositories.RequestRepository;
 using Microsoft.EntityFrameworkCore;
 
@@ -15,21 +16,13 @@ namespace HalloDoc.Services.Services
             _requestRepository = requestRepository;
         }
 
-        public async Task<DashboardResponseDto> GetRequestsByStateAsync(DashboardRequestStatus state, DashboardFiltersDto filters)
+        public async Task<PaginationResponseDto<RequestDataDto>> GetRequestsByStateAsync(DashboardRequestStatus state, PaginationRequestDto<DashboardFiltersDto> request)
         {
             // Get requests based on state mapping
             var statusIds = RequestStatusMapper.GetStatusIdsForState(state);
-            var requests = await _requestRepository.GetRequestsByStatusIdsAsync(statusIds, filters);
+            var response = await _requestRepository.GetRequestsByStatusIdsAsync(statusIds, request);
 
-            // Get state counts
-            var stateCounts = await GetStateCountsAsync();
-
-            return new DashboardResponseDto
-            {
-                Requests = requests,
-                TotalCount = requests.Count,
-                StateCounts = stateCounts
-            };
+            return response;
         }
 
         public async Task<List<DashboardStateDto>> GetStateCountsAsync()
@@ -47,21 +40,21 @@ namespace HalloDoc.Services.Services
             return stateCounts;
         }
 
-        public async Task<byte[]> ExportRequestsAsync(DashboardRequestStatus state, DashboardFiltersDto filters)
+        public async Task<byte[]> ExportRequestsAsync(DashboardRequestStatus state, PaginationRequestDto<DashboardFiltersDto> request)
         {
             var statusIds = RequestStatusMapper.GetStatusIdsForState(state);
-            var requests = await _requestRepository.GetRequestsByStatusIdsAsync(statusIds, filters);
+            var response = await _requestRepository.GetRequestsByStatusIdsAsync(statusIds, request);
             
             // Convert to CSV format
-            return GenerateCsvData(requests);
+            return GenerateCsvData(response.Items);
         }
 
-        public async Task<byte[]> ExportAllRequestsAsync(DashboardFiltersDto filters)
+        public async Task<byte[]> ExportAllRequestsAsync(PaginationRequestDto<DashboardFiltersDto> request)
         {
-            var requests = await _requestRepository.GetAllRequestsAsync(filters);
+            var response = await _requestRepository.GetAllRequestsAsync(request);
             
             // Convert to CSV format
-            return GenerateCsvData(requests);
+            return GenerateCsvData(response.Items);
         }
 
         private async Task<int> GetRequestCountByStatusIds(int[] statusIds)

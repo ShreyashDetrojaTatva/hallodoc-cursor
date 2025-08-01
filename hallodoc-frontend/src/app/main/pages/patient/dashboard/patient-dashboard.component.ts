@@ -6,17 +6,18 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
 import { MatTableModule, MatTableDataSource } from '@angular/material/table';
 import { MatSortModule, MatSort } from '@angular/material/sort';
-import { MatPaginatorModule, MatPaginator } from '@angular/material/paginator';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatChipsModule } from '@angular/material/chips';
-import { ReactiveFormsModule, FormControl } from '@angular/forms';
+import { MatSelectModule } from '@angular/material/select';
+import { ReactiveFormsModule, FormControl, FormGroup } from '@angular/forms';
 import { RequestService } from '@main/services';
 import { catchError, finalize } from 'rxjs/operators';
 import { of } from 'rxjs';
 import { RequestDashboardData } from '@main/interfaces';
+import { RequestStatus, RequestType } from '@main/enums';
 
 @Component({
   selector: 'app-patient-dashboard',
@@ -31,24 +32,37 @@ import { RequestDashboardData } from '@main/interfaces';
     MatCardModule,
     MatTableModule,
     MatSortModule,
-    MatPaginatorModule,
     MatFormFieldModule,
     MatInputModule,
     MatProgressSpinnerModule,
     MatTooltipModule,
     MatChipsModule,
+    MatSelectModule,
     ReactiveFormsModule
   ]
 })
 export class PatientDashboardComponent implements OnInit {
   @ViewChild(MatSort) sort!: MatSort;
-  @ViewChild(MatPaginator) paginator!: MatPaginator;
 
   displayedColumns: string[] = ['requestId', 'requestType', 'status', 'createdAt', 'firstName', 'lastName', 'symptoms', 'actions'];
   dataSource = new MatTableDataSource<RequestDashboardData>();
   isLoading = false;
   error: string | null = null;
-  searchControl = new FormControl('');
+  
+  // Filter controls
+  filterForm = new FormGroup({
+    searchTerm: new FormControl(''),
+    requestType: new FormControl('')
+  });
+
+  // Filter options using enums
+  requestTypeOptions = [
+    { value: '', label: 'All Types' },
+    { value: RequestType.Patient.toString(), label: 'Patient' },
+    { value: RequestType.Family.toString(), label: 'Family/Friend' },
+    { value: RequestType.Concierge.toString(), label: 'Concierge' },
+    { value: RequestType.Business.toString(), label: 'Business' }
+  ];
 
   constructor(
     private requestService: RequestService,
@@ -57,12 +71,11 @@ export class PatientDashboardComponent implements OnInit {
 
   ngOnInit() {
     this.loadRequests();
-    this.setupSearch();
+    this.setupFilters();
   }
 
   ngAfterViewInit() {
     this.dataSource.sort = this.sort;
-    this.dataSource.paginator = this.paginator;
   }
 
   loadRequests() {
@@ -79,18 +92,43 @@ export class PatientDashboardComponent implements OnInit {
       )
       .subscribe(requests => {
         this.dataSource.data = requests as RequestDashboardData[];
+        this.applyFilters();
       });
   }
 
-  applyFilter(event: Event) {
-    const filterValue = (event.target as HTMLInputElement).value;
-    this.dataSource.filter = filterValue.trim().toLowerCase();
+  setupFilters() {
+    this.filterForm.valueChanges.subscribe(() => {
+      this.applyFilters();
+    });
   }
 
-  setupSearch() {
-    this.searchControl.valueChanges.subscribe(value => {
-      this.dataSource.filter = value || '';
-    });
+  applyFilters() {
+    const searchTerm = this.filterForm.get('searchTerm')?.value?.toLowerCase() || '';
+    const requestType = this.filterForm.get('requestType')?.value || '';
+
+    this.dataSource.filterPredicate = (data: RequestDashboardData, filter: string) => {
+      const filters = filter.split('|');
+      const searchFilter = filters[0];
+      const typeFilter = filters[1];
+
+      // Search filter
+      const matchesSearch = !searchFilter || 
+        data.firstName?.toLowerCase().includes(searchFilter) ||
+        data.lastName?.toLowerCase().includes(searchFilter) ||
+        data.symptoms?.toLowerCase().includes(searchFilter) ||
+        data.requestId?.toString().includes(searchFilter);
+
+      // Request type filter
+      const matchesType = !typeFilter || data.requestType === typeFilter;
+
+      return matchesSearch && matchesType;
+    };
+
+    this.dataSource.filter = `${searchTerm}|${requestType}`;
+  }
+
+  clearFilters() {
+    this.filterForm.reset();
   }
 
   viewDocuments(requestId: number) {
@@ -115,5 +153,10 @@ export class PatientDashboardComponent implements OnInit {
       default:
         return '#78909C'; // Grey
     }
+  }
+
+  getRequestTypeDisplayName(type: string): string {
+    const typeOption = this.requestTypeOptions.find(option => option.value === type);
+    return typeOption ? typeOption.label : type;
   }
 } 

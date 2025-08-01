@@ -1,11 +1,16 @@
 .dashboard-container {
   padding: 2rem;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
 
   .header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 2rem;
+    margin-bottom: 1rem;
+    flex-shrink: 0;
 
     h1 {
       margin: 0;
@@ -32,6 +37,7 @@
     margin-bottom: 1rem;
     background-color: #ffebee;
     border-radius: 8px;
+    flex-shrink: 0;
 
     mat-icon {
       color: #f44336;
@@ -47,52 +53,89 @@
     display: flex;
     justify-content: center;
     padding: 2rem;
+    flex: 1;
   }
 
   .table-container {
-    mat-form-field {
-      width: 100%;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+
+    .filter-section {
       margin-bottom: 1rem;
+      padding: 1.5rem;
+      background-color: #f8f9fa;
+      border-radius: 8px;
+      border: 1px solid #e9ecef;
+      flex-shrink: 0;
+
+      .filter-form {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 1rem;
+        align-items: flex-end;
+
+        .filter-field {
+          flex: 1;
+          min-width: 200px;
+          max-width: 300px;
+        }
+
+        .clear-filters-btn {
+          height: 56px;
+          margin-left: auto;
+        }
+      }
     }
 
-    table {
-      width: 100%;
-      background-color: white;
+    .table-wrapper {
+      flex: 1;
+      overflow: auto;
       border-radius: 8px;
-      overflow: hidden;
       box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 
-      th.mat-header-cell {
-        background-color: #f5f5f5;
-        color: rgba(0, 0, 0, 0.87);
+      table {
+        width: 100%;
+        background-color: white;
+        border-radius: 8px;
+        overflow: hidden;
+
+        th.mat-header-cell {
+          background-color: #f5f5f5;
+          color: rgba(0, 0, 0, 0.87);
+          font-weight: 500;
+          padding: 1rem;
+          position: sticky;
+          top: 0;
+          z-index: 10;
+        }
+
+        td.mat-cell {
+          padding: 1rem;
+        }
+      }
+
+      .status-chip {
+        padding: 0.5rem 1rem;
+        border-radius: 16px;
+        color: white;
+        font-size: 14px;
         font-weight: 500;
-        padding: 1rem;
+        display: inline-block;
+        text-transform: capitalize;
       }
 
-      td.mat-cell {
-        padding: 1rem;
+      .mat-mdc-row:hover {
+        background-color: #f5f5f5;
       }
-    }
 
-    .status-chip {
-      padding: 0.5rem 1rem;
-      border-radius: 16px;
-      color: white;
-      font-size: 14px;
-      font-weight: 500;
-      display: inline-block;
-      text-transform: capitalize;
-    }
-
-    .mat-mdc-row:hover {
-      background-color: #f5f5f5;
-    }
-
-    .mat-mdc-no-data-row {
-      td {
-        padding: 2rem;
-        text-align: center;
-        color: rgba(0, 0, 0, 0.54);
+      .mat-mdc-no-data-row {
+        td {
+          padding: 2rem;
+          text-align: center;
+          color: rgba(0, 0, 0, 0.54);
+        }
       }
     }
   }
@@ -102,11 +145,13 @@
 @media (max-width: 768px) {
   .dashboard-container {
     padding: 1rem;
+    height: 100vh;
 
     .header {
       flex-direction: column;
       align-items: stretch;
       gap: 1rem;
+      margin-bottom: 1rem;
 
       .actions {
         flex-direction: column;
@@ -118,10 +163,26 @@
     }
 
     .table-container {
-      overflow-x: auto;
+      .filter-section {
+        .filter-form {
+          flex-direction: column;
+          align-items: stretch;
 
-      table {
-        min-width: 800px;
+          .filter-field {
+            max-width: none;
+          }
+
+          .clear-filters-btn {
+            margin-left: 0;
+            margin-top: 1rem;
+          }
+        }
+      }
+
+      .table-wrapper {
+        table {
+          min-width: 800px;
+        }
       }
     }
   }

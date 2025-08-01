@@ -36,9 +36,8 @@ export interface DashboardResponse {
 }
 
 export interface RequestAction {
-  id: string;
   label: string;
-  icon: string;
   action: string;
+  icon: string;
   disabled?: boolean;
 } 

@@ -77,8 +77,8 @@ export class RequestService {
       .pipe(catchError(this.handleError));
   }
 
-  downloadDocument(requestId: number, documentId: number): Observable<Blob> {
-    return this.http.get(PATIENT_ENDPOINTS.DOWNLOAD_DOCUMENT(requestId, documentId), { responseType: 'blob' })
+  downloadDocument(documentId: number): Observable<Blob> {
+    return this.http.get(PATIENT_ENDPOINTS.DOWNLOAD_DOCUMENT(documentId), { responseType: 'blob' })
       .pipe(catchError(this.handleError));
   }
 } 
