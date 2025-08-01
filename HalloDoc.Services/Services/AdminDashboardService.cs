@@ -29,12 +29,12 @@ namespace HalloDoc.Services.Services
         {
             var stateCounts = new List<DashboardStateDto>
             {
-                new DashboardStateDto { Id = 1, Name = "NEW", Count = await GetRequestCountByStatusIds(new[] { 1 }), Color = "#1976d2", Icon = "settings" },
-                new DashboardStateDto { Id = 2, Name = "PENDING", Count = await GetRequestCountByStatusIds(new[] { 2 }), Color = "#42a5f5", Icon = "notifications" },
-                new DashboardStateDto { Id = 3, Name = "ACTIVE", Count = await GetRequestCountByStatusIds(new[] { 4, 5 }), Color = "#66bb6a", Icon = "check_circle" },
-                new DashboardStateDto { Id = 4, Name = "CONCLUDE", Count = await GetRequestCountByStatusIds(new[] { 6 }), Color = "#ec407a", Icon = "schedule" },
-                new DashboardStateDto { Id = 5, Name = "TO-CLOSE", Count = await GetRequestCountByStatusIds(new[] { 8, 3, 7 }), Color = "#42a5f5", Icon = "folder" },
-                new DashboardStateDto { Id = 6, Name = "UNPAID", Count = await GetRequestCountByStatusIds(new[] { 9 }), Color = "#ab47bc", Icon = "attach_money" }
+                new DashboardStateDto { Id = (int)DashboardRequestStatus.New, Name = "NEW", Count = await GetRequestCountByStatusIds(RequestStatusMapper.GetStatusIdsForState(DashboardRequestStatus.New)), Color = "#1976d2", Icon = "settings" },
+                new DashboardStateDto { Id = (int)DashboardRequestStatus.Pending, Name = "PENDING", Count = await GetRequestCountByStatusIds(RequestStatusMapper.GetStatusIdsForState(DashboardRequestStatus.Pending)), Color = "#42a5f5", Icon = "notifications" },
+                new DashboardStateDto { Id = (int)DashboardRequestStatus.Active, Name = "ACTIVE", Count = await GetRequestCountByStatusIds(RequestStatusMapper.GetStatusIdsForState(DashboardRequestStatus.Active)), Color = "#66bb6a", Icon = "check_circle" },
+                new DashboardStateDto { Id = (int)DashboardRequestStatus.Conclude, Name = "CONCLUDE", Count = await GetRequestCountByStatusIds(RequestStatusMapper.GetStatusIdsForState(DashboardRequestStatus.Conclude)), Color = "#ec407a", Icon = "schedule" },
+                new DashboardStateDto { Id = (int)DashboardRequestStatus.ToClose, Name = "TO-CLOSE", Count = await GetRequestCountByStatusIds(RequestStatusMapper.GetStatusIdsForState(DashboardRequestStatus.ToClose)), Color = "#42a5f5", Icon = "folder" },
+                new DashboardStateDto { Id = (int)DashboardRequestStatus.Unpaid, Name = "UNPAID", Count = await GetRequestCountByStatusIds(RequestStatusMapper.GetStatusIdsForState(DashboardRequestStatus.Unpaid)), Color = "#ab47bc", Icon = "attach_money" }
             };
 
             return stateCounts;
@@ -59,9 +59,8 @@ namespace HalloDoc.Services.Services
 
         private async Task<int> GetRequestCountByStatusIds(int[] statusIds)
         {
-            // This would be implemented in the repository
-            // For now, return a mock count
-            return await Task.FromResult(new Random().Next(100, 2000));
+            // Get real count from the repository
+            return await _requestRepository.GetRequestCountByStatusIdsAsync(statusIds);
         }
 
         private byte[] GenerateCsvData(List<RequestDataDto> requests)

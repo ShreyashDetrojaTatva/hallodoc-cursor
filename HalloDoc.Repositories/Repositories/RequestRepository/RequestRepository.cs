@@ -250,6 +250,13 @@ namespace HalloDoc.Repositories.Repositories.RequestRepository
             );
         }
 
+        public async Task<int> GetRequestCountByStatusIdsAsync(int[] statusIds)
+        {
+            return await _db.Requests
+                .Where(r => statusIds.Contains(r.RequestStatus))
+                .CountAsync();
+        }
+
         private IQueryable<Request> ApplySorting(IQueryable<Request> query, string sortColumn, bool ascending)
         {
             return sortColumn.ToLower() switch

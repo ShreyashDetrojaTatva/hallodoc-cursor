@@ -15,5 +15,6 @@ namespace HalloDoc.Repositories.Repositories.RequestRepository
         // Admin Dashboard Methods
         Task<PaginationResponseDto<RequestDataDto>> GetRequestsByStatusIdsAsync(int[] statusIds, PaginationRequestDto<DashboardFiltersDto> request);
         Task<PaginationResponseDto<RequestDataDto>> GetAllRequestsAsync(PaginationRequestDto<DashboardFiltersDto> request);
+        Task<int> GetRequestCountByStatusIdsAsync(int[] statusIds);
     }
 } 
