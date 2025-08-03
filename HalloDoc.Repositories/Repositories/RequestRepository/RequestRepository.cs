@@ -276,16 +276,6 @@ namespace HalloDoc.Repositories.Repositories.RequestRepository
             }
         }
 
-        public async Task<List<Physician>> GetPhysiciansAsync()
-        {
-            return await _db.Physicians
-                .Include(p => p.User) // Include User to get Email and PhoneNumber
-                .Where(p => !p.IsDeleted) // Only non-deleted physicians
-                .OrderBy(p => p.FirstName)
-                .ThenBy(p => p.LastName)
-                .ToListAsync();
-        }
-
         private IQueryable<Request> ApplySorting(IQueryable<Request> query, string sortColumn, bool ascending)
         {
             return sortColumn.ToLower() switch

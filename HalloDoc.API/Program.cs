@@ -13,6 +13,7 @@ using HalloDoc.Repositories.Repositories.AuthRepository;
 using HalloDoc.Repositories.Repositories.RequestRepository;
 using HalloDoc.Services.Services.RequestService;
 using HalloDoc.Repositories.Repositories.DocumentRepository;
+using HalloDoc.Repositories.Repositories.PhysicianRepository;
 
 var builder = WebApplication.CreateBuilder(args);
 var env = builder.Environment;
@@ -59,6 +60,7 @@ builder.Services.AddScoped<IRequestService, RequestService>();
 builder.Services.AddScoped<IDocumentRepository, DocumentRepository>();
 builder.Services.AddScoped<IAdminDashboardService, AdminDashboardService>();
 builder.Services.AddScoped<IAdminRequestService, AdminRequestService>();
+builder.Services.AddScoped<IPhysicianRepository, PhysicianRepository>();
 
 // Register IHttpContextAccessor and WorkContext
 builder.Services.AddHttpContextAccessor();

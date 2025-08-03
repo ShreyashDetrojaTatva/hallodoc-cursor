@@ -1,5 +1,6 @@
 using HalloDoc.Repositories.DTOs;
 using HalloDoc.Repositories.Repositories.RequestRepository;
+using HalloDoc.Repositories.Repositories.PhysicianRepository;
 using Microsoft.EntityFrameworkCore;
 
 namespace HalloDoc.Services.Services
@@ -7,10 +8,12 @@ namespace HalloDoc.Services.Services
     public class AdminRequestService : IAdminRequestService
     {
         private readonly IRequestRepository _requestRepository;
+        private readonly IPhysicianRepository _physicianRepository;
 
-        public AdminRequestService(IRequestRepository requestRepository)
+        public AdminRequestService(IRequestRepository requestRepository, IPhysicianRepository physicianRepository)
         {
             _requestRepository = requestRepository;
+            _physicianRepository = physicianRepository;
         }
 
         public async Task<RequestDetailsDto?> GetRequestDetailsAsync(int requestId)
@@ -107,7 +110,7 @@ namespace HalloDoc.Services.Services
         {
             try
             {
-                var physicians = await _requestRepository.GetPhysiciansAsync();
+                var physicians = await _physicianRepository.GetActivePhysiciansAsync();
                 return physicians.Select(p => new PhysicianDto
                 {
                     PhysicianId = p.PhysicianId,
