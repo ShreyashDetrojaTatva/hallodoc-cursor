@@ -19,6 +19,7 @@ namespace HalloDoc.Repositories.DTOs
         public string DateOfBirth { get; set; } = string.Empty;
         public string RequestorName { get; set; } = string.Empty;
         public string? PhysicianName { get; set; }
+        public int? PhysicianId { get; set; }
         public string? DateOfService { get; set; }
         public string Phone { get; set; } = string.Empty;
         public string Address { get; set; } = string.Empty;

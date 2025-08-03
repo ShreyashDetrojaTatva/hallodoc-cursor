@@ -1,0 +1,159 @@
+<div class="view-request-container">
+  <!-- Header -->
+  <div class="page-header">
+    <div class="header-content">
+      <button mat-icon-button (click)="goBack()" class="back-button">
+        <mat-icon>arrow_back</mat-icon>
+      </button>
+      <div class="header-title">
+        <h1>View Request</h1>
+        <span class="request-type-chip" [style.background-color]="getStatusColor(requestData?.requestStatus || 0)">
+          {{ getRequestTypeLabel(requestData?.requestType || 0) }}
+        </span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Loading Spinner -->
+  <div *ngIf="isLoading" class="loading-container">
+    <mat-spinner diameter="40"></mat-spinner>
+    <p>Loading request details...</p>
+  </div>
+
+  <!-- Error Message -->
+  <div *ngIf="error" class="error-message">
+    <mat-icon>error</mat-icon>
+    <span>{{ error }}</span>
+  </div>
+
+  <!-- Request Form -->
+  <div *ngIf="!isLoading && !error && requestData" class="request-form-container">
+    <form [formGroup]="requestForm" class="request-form">
+      
+      <!-- Patient Information Section -->
+      <div class="form-section">
+        <h2 class="section-title">Patient Information</h2>
+        <div class="form-grid">
+          <mat-form-field class="form-field" appearance="outline">
+            <mat-label>First Name</mat-label>
+            <input matInput formControlName="patientFirstName" [readonly]="!isEditMode">
+          </mat-form-field>
+
+          <mat-form-field class="form-field" appearance="outline">
+            <mat-label>Last Name</mat-label>
+            <input matInput formControlName="patientLastName" [readonly]="!isEditMode">
+          </mat-form-field>
+
+          <mat-form-field class="form-field" appearance="outline">
+            <mat-label>Date of Birth</mat-label>
+            <input matInput [matDatepicker]="patientDOBPicker" formControlName="patientDOB" [readonly]="!isEditMode">
+            <mat-datepicker-toggle matSuffix [for]="patientDOBPicker"></mat-datepicker-toggle>
+            <mat-datepicker #patientDOBPicker></mat-datepicker>
+          </mat-form-field>
+
+          <mat-form-field class="form-field" appearance="outline">
+            <mat-label>Phone Number</mat-label>
+            <input matInput formControlName="patientPhone" [readonly]="!isEditMode">
+            <mat-icon matSuffix>phone</mat-icon>
+          </mat-form-field>
+
+          <mat-form-field class="form-field" appearance="outline">
+            <mat-label>Email</mat-label>
+            <input matInput formControlName="patientEmail" [readonly]="!isEditMode">
+            <mat-icon matSuffix>email</mat-icon>
+          </mat-form-field>
+
+          <mat-form-field class="form-field" appearance="outline">
+            <mat-label>Street</mat-label>
+            <input matInput formControlName="patientStreet" [readonly]="!isEditMode">
+          </mat-form-field>
+
+          <mat-form-field class="form-field" appearance="outline">
+            <mat-label>City</mat-label>
+            <input matInput formControlName="patientCity" [readonly]="!isEditMode">
+          </mat-form-field>
+
+          <mat-form-field class="form-field" appearance="outline">
+            <mat-label>State</mat-label>
+            <input matInput formControlName="patientState" [readonly]="!isEditMode">
+          </mat-form-field>
+
+          <mat-form-field class="form-field" appearance="outline">
+            <mat-label>Zip Code</mat-label>
+            <input matInput formControlName="patientZipCode" [readonly]="!isEditMode">
+            <mat-icon matSuffix>location_on</mat-icon>
+          </mat-form-field>
+        </div>
+      </div>
+
+      <!-- Request Information Section -->
+      <div class="form-section">
+        <h2 class="section-title">Request Information</h2>
+        <div class="form-grid">
+          <mat-form-field class="form-field full-width" appearance="outline">
+            <mat-label>Symptoms</mat-label>
+            <textarea matInput formControlName="symptoms" rows="3" [readonly]="!isEditMode"></textarea>
+          </mat-form-field>
+        </div>
+      </div>
+
+      <!-- Requestor Information Section - Only show for non-patient requests -->
+      <div class="form-section" *ngIf="requestData?.requestType !== 1">
+        <h2 class="section-title">Requestor Information</h2>
+        <div class="form-grid">
+          <mat-form-field class="form-field" appearance="outline">
+            <mat-label>First Name</mat-label>
+            <input matInput formControlName="requestorFirstName" [readonly]="!isEditMode">
+          </mat-form-field>
+
+          <mat-form-field class="form-field" appearance="outline">
+            <mat-label>Last Name</mat-label>
+            <input matInput formControlName="requestorLastName" [readonly]="!isEditMode">
+          </mat-form-field>
+
+          <mat-form-field class="form-field" appearance="outline">
+            <mat-label>Phone Number</mat-label>
+            <input matInput formControlName="requestorPhone" [readonly]="!isEditMode">
+            <mat-icon matSuffix>phone</mat-icon>
+          </mat-form-field>
+
+          <mat-form-field class="form-field" appearance="outline">
+            <mat-label>Email</mat-label>
+            <input matInput formControlName="requestorEmail" [readonly]="!isEditMode">
+            <mat-icon matSuffix>email</mat-icon>
+          </mat-form-field>
+
+          <mat-form-field class="form-field" appearance="outline">
+            <mat-label>Relation to Patient</mat-label>
+            <input matInput formControlName="requestorRelation" [readonly]="!isEditMode">
+          </mat-form-field>
+        </div>
+      </div>
+
+      <!-- Action Buttons -->
+      <div class="action-buttons">
+        <button mat-button color="primary" (click)="viewNotes()" class="action-btn">
+          <mat-icon>note</mat-icon>
+          View Notes
+        </button>
+        
+        <div class="edit-actions" *ngIf="!isEditMode">
+          <button mat-raised-button color="primary" (click)="toggleEditMode()" class="action-btn">
+            <mat-icon>edit</mat-icon>
+            Edit
+          </button>
+        </div>
+        
+        <div class="save-actions" *ngIf="isEditMode">
+          <button mat-button (click)="toggleEditMode()" class="action-btn">
+            Cancel
+          </button>
+          <button mat-raised-button color="primary" (click)="saveRequest()" [disabled]="!requestForm.valid || isLoading" class="action-btn">
+            <mat-icon>save</mat-icon>
+            Save
+          </button>
+        </div>
+      </div>
+    </form>
+  </div>
+</div> 

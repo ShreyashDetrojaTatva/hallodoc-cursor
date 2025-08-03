@@ -38,7 +38,7 @@ namespace HalloDoc.Repositories.Repositories.RequestRepository
         public async Task<List<RequestListDto>> GetPatientRequestsAsync(int patientId, RequestFilterDto? filter = null)
         {
             var query = _db.Requests
-                .Include(r => r.RequestClient)
+                .Include(r => r.RequestClients)
                 .Where(r => r.PatientId == patientId);
 
             if (filter != null)
@@ -62,9 +62,9 @@ namespace HalloDoc.Repositories.Repositories.RequestRepository
                 {
                     var search = filter.SearchTerm.ToLower();
                     query = query.Where(r =>
-                        (r.RequestClient != null && r.RequestClient.FirstName != null && r.RequestClient.FirstName.ToLower().Contains(search)) ||
-                        (r.RequestClient != null && r.RequestClient.LastName != null && r.RequestClient.LastName.ToLower().Contains(search)) ||
-                        (r.RequestClient != null && r.RequestClient.Symptoms != null && r.RequestClient.Symptoms.ToLower().Contains(search))
+                        (r.RequestClients.Any() && r.RequestClients.First().FirstName != null && r.RequestClients.First().FirstName.ToLower().Contains(search)) ||
+                        (r.RequestClients.Any() && r.RequestClients.First().LastName != null && r.RequestClients.First().LastName.ToLower().Contains(search)) ||
+                        (r.Symptoms != null && r.Symptoms.ToLower().Contains(search))
                     );
                 }
             }
@@ -77,23 +77,26 @@ namespace HalloDoc.Repositories.Repositories.RequestRepository
                     RequestType = r.RequestType.ToString(),
                     Status = r.RequestStatus.ToString(),
                     CreatedAt = r.CreatedAt,
-                    FirstName = r.RequestClient != null ? r.RequestClient.FirstName ?? string.Empty : string.Empty,
-                    LastName = r.RequestClient != null ? r.RequestClient.LastName ?? string.Empty : string.Empty,
-                    Symptoms = r.RequestClient != null ? r.RequestClient.Symptoms ?? string.Empty : string.Empty
+                    FirstName = r.RequestClients.Any() ? r.RequestClients.First().FirstName ?? string.Empty : string.Empty,
+                    LastName = r.RequestClients.Any() ? r.RequestClients.First().LastName ?? string.Empty : string.Empty,
+                    Symptoms = r.Symptoms ?? string.Empty
                 })
                 .ToListAsync();
         }
 
         public async Task<Request?> GetByIdAsync(int requestId)
         {
-            return await _db.Requests.FindAsync(requestId);
+            return await _db.Requests
+                .Include(r => r.RequestClients)
+                .Include(r => r.Physician)
+                .FirstOrDefaultAsync(r => r.RequestId == requestId);
         }
 
         // Admin Dashboard Methods
         public async Task<PaginationResponseDto<RequestDataDto>> GetRequestsByStatusIdsAsync(int[] statusIds, PaginationRequestDto<DashboardFiltersDto> request)
         {
             var query = _db.Requests
-                .Include(r => r.RequestClient)
+                .Include(r => r.RequestClients)
                 .Include(r => r.Physician)
                 .Where(r => statusIds.Contains(r.RequestStatus));
 
@@ -102,8 +105,8 @@ namespace HalloDoc.Repositories.Repositories.RequestRepository
             {
                 var search = request.SearchString.ToLower();
                 query = query.Where(r =>
-                    (r.RequestClient != null && r.RequestClient.FirstName != null && r.RequestClient.FirstName.ToLower().Contains(search)) ||
-                    (r.RequestClient != null && r.RequestClient.LastName != null && r.RequestClient.LastName.ToLower().Contains(search))
+                    (r.RequestClients.Any() && r.RequestClients.First().FirstName != null && r.RequestClients.First().FirstName.ToLower().Contains(search)) ||
+                    (r.RequestClients.Any() && r.RequestClients.First().LastName != null && r.RequestClients.First().LastName.ToLower().Contains(search))
                 );
             }
 
@@ -148,13 +151,14 @@ namespace HalloDoc.Repositories.Repositories.RequestRepository
             var items = results.Select(r => new RequestDataDto
             {
                 Id = r.RequestId,
-                PatientFullName = r.RequestClient != null ? $"{r.RequestClient.FirstName} {r.RequestClient.LastName}".Trim() : "Unknown",
-                DateOfBirth = r.RequestClient != null && r.RequestClient.DOB.HasValue ? r.RequestClient.DOB.Value.ToString("MMM dd, yyyy") : "Unknown",
-                RequestorName = r.RequestClient != null ? $"{r.RequestClient.FirstName} {r.RequestClient.LastName}".Trim() : "Unknown",
+                PatientFullName = r.RequestClients.Any() ? $"{r.RequestClients.First().FirstName} {r.RequestClients.First().LastName}".Trim() : "Unknown",
+                DateOfBirth = r.RequestClients.Any() && r.RequestClients.First().DOB.HasValue ? r.RequestClients.First().DOB.Value.ToString("MMM dd, yyyy") : "Unknown",
+                RequestorName = r.RequestClients.Any() ? $"{r.RequestClients.First().FirstName} {r.RequestClients.First().LastName}".Trim() : "Unknown",
                 PhysicianName = r.Physician != null ? $"{r.Physician.FirstName} {r.Physician.LastName}".Trim() : null,
+                PhysicianId = r.PhysicianId,
                 DateOfService = r.AcceptedDate?.ToString("MMM dd, yyyy") ?? null,
-                Phone = r.RequestClient != null ? r.RequestClient.Phone ?? "Unknown" : "Unknown",
-                Address = r.RequestClient != null ? $"{r.RequestClient.Street}, {r.RequestClient.City} {r.RequestClient.State} {r.RequestClient.ZipCode}".Trim() : "Unknown",
+                Phone = r.RequestClients.Any() ? r.RequestClients.First().Phone ?? "Unknown" : "Unknown",
+                Address = r.RequestClients.Any() ? $"{r.RequestClients.First().Street}, {r.RequestClients.First().City} {r.RequestClients.First().State} {r.RequestClients.First().ZipCode}".Trim() : "Unknown",
                 RequestStatus = r.RequestStatus.ToString(),
                 RequestType = (int)r.RequestType,
                 RequestedDate = r.CreatedAt.ToString("MMM dd, yyyy HH:mm")
@@ -173,7 +177,7 @@ namespace HalloDoc.Repositories.Repositories.RequestRepository
         public async Task<PaginationResponseDto<RequestDataDto>> GetAllRequestsAsync(PaginationRequestDto<DashboardFiltersDto> request)
         {
             var query = _db.Requests
-                .Include(r => r.RequestClient)
+                .Include(r => r.RequestClients)
                 .Include(r => r.Physician)
                 .AsQueryable();
 
@@ -182,8 +186,8 @@ namespace HalloDoc.Repositories.Repositories.RequestRepository
             {
                 var search = request.SearchString.ToLower();
                 query = query.Where(r =>
-                    (r.RequestClient != null && r.RequestClient.FirstName != null && r.RequestClient.FirstName.ToLower().Contains(search)) ||
-                    (r.RequestClient != null && r.RequestClient.LastName != null && r.RequestClient.LastName.ToLower().Contains(search))
+                    (r.RequestClients.Any() && r.RequestClients.First().FirstName != null && r.RequestClients.First().FirstName.ToLower().Contains(search)) ||
+                    (r.RequestClients.Any() && r.RequestClients.First().LastName != null && r.RequestClients.First().LastName.ToLower().Contains(search))
                 );
             }
 
@@ -228,13 +232,14 @@ namespace HalloDoc.Repositories.Repositories.RequestRepository
             var items = results.Select(r => new RequestDataDto
             {
                 Id = r.RequestId,
-                PatientFullName = r.RequestClient != null ? $"{r.RequestClient.FirstName} {r.RequestClient.LastName}".Trim() : "Unknown",
-                DateOfBirth = r.RequestClient != null && r.RequestClient.DOB.HasValue ? r.RequestClient.DOB.Value.ToString("MMM dd, yyyy") : "Unknown",
-                RequestorName = r.RequestClient != null ? $"{r.RequestClient.FirstName} {r.RequestClient.LastName}".Trim() : "Unknown",
+                PatientFullName = r.RequestClients.Any() ? $"{r.RequestClients.First().FirstName} {r.RequestClients.First().LastName}".Trim() : "Unknown",
+                DateOfBirth = r.RequestClients.Any() && r.RequestClients.First().DOB.HasValue ? r.RequestClients.First().DOB.Value.ToString("MMM dd, yyyy") : "Unknown",
+                RequestorName = r.RequestClients.Any() ? $"{r.RequestClients.First().FirstName} {r.RequestClients.First().LastName}".Trim() : "Unknown",
                 PhysicianName = r.Physician != null ? $"{r.Physician.FirstName} {r.Physician.LastName}".Trim() : null,
+                PhysicianId = r.PhysicianId,
                 DateOfService = r.AcceptedDate?.ToString("MMM dd, yyyy") ?? null,
-                Phone = r.RequestClient != null ? r.RequestClient.Phone ?? "Unknown" : "Unknown",
-                Address = r.RequestClient != null ? $"{r.RequestClient.Street}, {r.RequestClient.City} {r.RequestClient.State} {r.RequestClient.ZipCode}".Trim() : "Unknown",
+                Phone = r.RequestClients.Any() ? r.RequestClients.First().Phone ?? "Unknown" : "Unknown",
+                Address = r.RequestClients.Any() ? $"{r.RequestClients.First().Street}, {r.RequestClients.First().City} {r.RequestClients.First().State} {r.RequestClients.First().ZipCode}".Trim() : "Unknown",
                 RequestStatus = r.RequestStatus.ToString(),
                 RequestType = (int)r.RequestType,
                 RequestedDate = r.CreatedAt.ToString("MMM dd, yyyy HH:mm")
@@ -257,13 +262,37 @@ namespace HalloDoc.Repositories.Repositories.RequestRepository
                 .CountAsync();
         }
 
+        public async Task<bool> UpdateAsync(Request request)
+        {
+            try
+            {
+                _db.Requests.Update(request);
+                await _db.SaveChangesAsync();
+                return true;
+            }
+            catch
+            {
+                return false;
+            }
+        }
+
+        public async Task<List<Physician>> GetPhysiciansAsync()
+        {
+            return await _db.Physicians
+                .Include(p => p.User) // Include User to get Email and PhoneNumber
+                .Where(p => !p.IsDeleted) // Only non-deleted physicians
+                .OrderBy(p => p.FirstName)
+                .ThenBy(p => p.LastName)
+                .ToListAsync();
+        }
+
         private IQueryable<Request> ApplySorting(IQueryable<Request> query, string sortColumn, bool ascending)
         {
             return sortColumn.ToLower() switch
             {
                 "patientfullname" => ascending 
-                    ? query.OrderBy(r => r.RequestClient != null ? r.RequestClient.FirstName + " " + r.RequestClient.LastName : "")
-                    : query.OrderByDescending(r => r.RequestClient != null ? r.RequestClient.FirstName + " " + r.RequestClient.LastName : ""),
+                    ? query.OrderBy(r => r.RequestClients.Any() ? r.RequestClients.First().FirstName + " " + r.RequestClients.First().LastName : "")
+                    : query.OrderByDescending(r => r.RequestClients.Any() ? r.RequestClients.First().FirstName + " " + r.RequestClients.First().LastName : ""),
                 "requesteddate" => ascending 
                     ? query.OrderBy(r => r.CreatedAt)
                     : query.OrderByDescending(r => r.CreatedAt),

@@ -221,6 +221,21 @@
         .action-button {
           color: #666;
         }
+
+        .action-buttons {
+          display: flex;
+          gap: 0.5rem;
+          align-items: center;
+
+          .action-button {
+            color: #666;
+            
+            &:hover {
+              color: #1976d2;
+              background-color: #f0f0f0;
+            }
+          }
+        }
       }
 
       mat-paginator {

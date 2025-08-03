@@ -48,8 +48,12 @@ namespace HalloDoc.Entities.Data.Entities
         [MaxLength(100)]
         public string? CaseNumber { get; set; } // Business
 
+        // Request information
+        [MaxLength(500)]
+        public string? Symptoms { get; set; } // Symptoms description
+
         // Navigation
-        public virtual RequestClient? RequestClient { get; set; }
+        public virtual ICollection<RequestClient> RequestClients { get; set; } = new List<RequestClient>();
         public virtual ICollection<Document>? Documents { get; set; }
     }
 } 

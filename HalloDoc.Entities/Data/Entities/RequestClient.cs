@@ -33,8 +33,6 @@ namespace HalloDoc.Entities.Data.Entities
         public string ZipCode { get; set; } = null!;
         [MaxLength(100)]
         public string? RoomNo { get; set; }
-        [MaxLength(500)]
-        public string Symptoms { get; set; } = null!;
         public int? UserId { get; set; } // Link to Users if patient is registered
     }
 } 

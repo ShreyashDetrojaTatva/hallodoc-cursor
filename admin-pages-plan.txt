@@ -124,11 +124,13 @@ PHASE 1: ADMIN DASHBOARD
 
 PHASE 2: REQUEST ACTIONS
 -------------------------
-□ [Pending] Assign Request functionality
+✅ [Completed] Assign Request functionality
   - Modal/form to assign request to physician
   - Physician selection dropdown
   - Update physician id in request table
   - Send notification to physician
+  - Validation for physician availability
+  - Assignment history tracking
 
 □ [Pending] Cancel Request functionality
   - Confirmation dialog with reason
@@ -137,7 +139,7 @@ PHASE 2: REQUEST ACTIONS
   - Cancel reason tracking
   - Audit log for cancellation
 
-□ [Pending] View Request details page
+✓ [Completed] View Request details page
   - Detailed request information display
   - requestor details
   - Patient details and contact info

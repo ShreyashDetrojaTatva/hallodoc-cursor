@@ -69,9 +69,9 @@ namespace HalloDoc.Entities.Data.Context
 
             // Request/RequestClient/Document relationships
             modelBuilder.Entity<Request>()
-                .HasOne(r => r.RequestClient)
-                .WithOne(rc => rc.Request)
-                .HasForeignKey<RequestClient>(rc => rc.RequestId)
+                .HasMany(r => r.RequestClients)
+                .WithOne(r => r.Request)
+                .HasForeignKey(rc => rc.RequestId)
                 .OnDelete(DeleteBehavior.Cascade);
 
             modelBuilder.Entity<Request>()

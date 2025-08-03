@@ -1,0 +1,49 @@
+<div class="assign-request-dialog">
+  <div class="dialog-header">
+    <h2 mat-dialog-title>Assign Request</h2>
+    <button mat-icon-button (click)="onCancel()" class="close-button">
+      <mat-icon>close</mat-icon>
+    </button>
+  </div>
+
+  <mat-dialog-content>
+    <div class="dialog-content">
+      <p class="description">
+        Select a physician to assign this request to. The request will remain in "New" status until the physician accepts it.
+      </p>
+
+      <form [formGroup]="assignForm" (ngSubmit)="onSubmit()">
+        <mat-form-field class="form-field" appearance="outline">
+          <mat-label>Select Physician</mat-label>
+          <mat-select formControlName="physicianId" required>
+            <mat-option *ngFor="let physician of physicians" [value]="physician.physicianId">
+              {{ physician.fullName }} - {{ physician.email }}
+            </mat-option>
+          </mat-select>
+          <mat-error *ngIf="assignForm.get('physicianId')?.hasError('required')">
+            Please select a physician
+          </mat-error>
+        </mat-form-field>
+
+        <div class="error-message" *ngIf="error">
+          {{ error }}
+        </div>
+      </form>
+    </div>
+  </mat-dialog-content>
+
+  <mat-dialog-actions align="end">
+    <button mat-button (click)="onCancel()" [disabled]="isLoading">
+      Cancel
+    </button>
+    <button 
+      mat-raised-button 
+      color="primary" 
+      (click)="onSubmit()" 
+      [disabled]="!assignForm.valid || isLoading">
+      <mat-icon *ngIf="!isLoading">assignment</mat-icon>
+      <mat-spinner *ngIf="isLoading" diameter="20"></mat-spinner>
+      {{ currentPhysicianId ? 'Reassign' : 'Assign' }}
+    </button>
+  </mat-dialog-actions>
+</div> 

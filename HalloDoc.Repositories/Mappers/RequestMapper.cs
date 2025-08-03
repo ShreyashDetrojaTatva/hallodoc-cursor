@@ -21,6 +21,7 @@ namespace HalloDoc.Repositories.Mappers
                 PropertyName = dto.PropertyName,
                 CaseNumber = dto.CaseNumber,
                 PatientId = dto.PatientId,
+                Symptoms = dto.Symptoms,
                 CreatedAt = DateTime.Now,
                 RequestStatus = (int)RequestStatus.Unassigned // Default to Unassigned
             };
@@ -40,7 +41,6 @@ namespace HalloDoc.Repositories.Mappers
                 State = dto.State,
                 ZipCode = dto.ZipCode,
                 RoomNo = dto.RoomNo,
-                Symptoms = dto.Symptoms,
                 UserId = dto.UserId
             };
         }

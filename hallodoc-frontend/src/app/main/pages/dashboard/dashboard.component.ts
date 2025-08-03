@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit, OnDestroy, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MatCardModule } from '@angular/material/card';
@@ -12,6 +12,10 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatChipsModule } from '@angular/material/chips';
 import { MatMenuModule } from '@angular/material/menu';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { MatTooltipModule } from '@angular/material/tooltip';
+import { MatDialog, MatDialogModule } from '@angular/material/dialog';
+import { Router } from '@angular/router';
+import { MatMenuTrigger } from '@angular/material/menu';
 import { Subject } from 'rxjs';
 import { AuthService } from '@main/services';
 import { 
@@ -23,6 +27,8 @@ import { PaginationRequest, PaginationResponse, PaginationDashboardFilters } fro
 import { DashboardRequestStatus, RequestType } from '@main/enums';
 import { RequestStatusMapper } from '@main/utils/request-status-mapper';
 import { AdminDashboardService } from '@main/services/admin-dashboard.service';
+import { AdminRequestService } from '@main/services/admin-request.service';
+import { AssignRequestComponent } from '@main/components/admin/assign-request/assign-request.component';
 
 @Component({
   selector: 'app-dashboard',
@@ -41,13 +47,20 @@ import { AdminDashboardService } from '@main/services/admin-dashboard.service';
     MatIconModule,
     MatChipsModule,
     MatMenuModule,
-    MatProgressSpinnerModule
+    MatProgressSpinnerModule,
+    MatTooltipModule,
+    MatDialogModule
   ],
   templateUrl: './dashboard.component.html',
   styleUrl: './dashboard.component.scss'
 })
 export class DashboardComponent implements OnInit, OnDestroy {
   private destroy$ = new Subject<void>();
+
+  @ViewChild(MatMenuTrigger) menuTrigger!: MatMenuTrigger;
+
+  // Make enum available in template
+  DashboardRequestStatus = DashboardRequestStatus;
 
   // Dashboard states
   dashboardStates: DashboardState[] = [
@@ -90,6 +103,9 @@ export class DashboardComponent implements OnInit, OnDestroy {
   isLoading = false;
   isLoadingStates = false;
 
+  // Current request for menu context
+  currentRequest: AdminRequestData | null = null;
+
   // Request types for filter
   requestTypes = [
     { value: null, label: 'All' },
@@ -101,7 +117,10 @@ export class DashboardComponent implements OnInit, OnDestroy {
 
   constructor(
     private authService: AuthService,
-    private adminDashboardService: AdminDashboardService
+    private adminDashboardService: AdminDashboardService,
+    private adminRequestService: AdminRequestService,
+    private router: Router,
+    private dialog: MatDialog
   ) {}
 
   ngOnInit() {
@@ -194,9 +213,12 @@ export class DashboardComponent implements OnInit, OnDestroy {
       'actions'
     ];
 
-    // Add physician and date of service columns for states that have them
+    // Add physician column for all states to show assignments
+    this.displayedColumns.splice(3, 0, 'physicianName');
+
+    // Add date of service column for states that have them (non-NEW states)
     if (this.selectedState !== DashboardRequestStatus.New) {
-      this.displayedColumns.splice(3, 0, 'physicianName', 'dateOfService');
+      this.displayedColumns.splice(4, 0, 'dateOfService');
     }
 
     // Add request status column for To-Close state
@@ -206,56 +228,147 @@ export class DashboardComponent implements OnInit, OnDestroy {
   }
 
   getRequestActions(request: AdminRequestData): RequestAction[] {
+    let actions: RequestAction[] = [];
+    
     switch (this.selectedState) {
       case DashboardRequestStatus.New:
-        return [
+        actions = [
           { label: 'Assign Request', action: 'assign', icon: 'person_add' },
           { label: 'Cancel Request', action: 'cancel', icon: 'cancel' },
           { label: 'View Request', action: 'view', icon: 'visibility' },
           { label: 'View Documents', action: 'documents', icon: 'description' }
         ];
+        break;
 
       case DashboardRequestStatus.Pending:
-        return [
+        actions = [
           { label: 'View Request', action: 'view', icon: 'visibility' },
           { label: 'View Documents', action: 'documents', icon: 'description' },
           { label: 'View Notes', action: 'notes', icon: 'note' },
           { label: 'Send Agreement', action: 'send-agreement', icon: 'send' },
           { label: 'Clear Case', action: 'clear', icon: 'check_circle' }
         ];
+        break;
 
       case DashboardRequestStatus.Active:
       case DashboardRequestStatus.Conclude:
-        return [
+        actions = [
           { label: 'Send Order', action: 'send-order', icon: 'shopping_cart' },
           { label: 'View Request', action: 'view', icon: 'visibility' },
           { label: 'View Documents', action: 'documents', icon: 'description' },
           { label: 'View Notes', action: 'notes', icon: 'note' }
         ];
+        break;
 
       case DashboardRequestStatus.ToClose:
-        return [
+        actions = [
           { label: 'View Request', action: 'view', icon: 'visibility' },
           { label: 'View Documents', action: 'documents', icon: 'description' },
           { label: 'View Notes', action: 'notes', icon: 'note' },
           { label: 'Close Case', action: 'close', icon: 'close' }
         ];
+        break;
 
       case DashboardRequestStatus.Unpaid:
-        return [
+        actions = [
           { label: 'View Request', action: 'view', icon: 'visibility' },
           { label: 'View Documents', action: 'documents', icon: 'description' },
           { label: 'View Notes', action: 'notes', icon: 'note' }
         ];
+        break;
 
       default:
-        return [];
+        actions = [];
+        break;
     }
+    
+    return actions;
+  }
+
+  setCurrentRequest(request: AdminRequestData) {
+    this.currentRequest = request;
+  }
+
+  onMenuButtonClick(request: AdminRequestData) {
+    // Menu button clicked - context is set via setCurrentRequest
+  }
+
+  onMenuItemMouseDown(action: string) {
+    // Menu item mousedown - not needed for current implementation
   }
 
   onActionClick(action: string, request: AdminRequestData) {
-    console.log(`Action ${action} clicked for request ${request.id}`);
-    // TODO: Implement action handlers
+    switch (action) {
+      case 'view':
+        // Navigate to view request page
+        this.router.navigate(['/admin/request', request.id, 'view']);
+        break;
+        
+      case 'documents':
+        // Navigate to documents page (to be implemented)
+        console.log('Navigate to documents page for request:', request.id);
+        break;
+        
+      case 'notes':
+        // Navigate to notes page (to be implemented)
+        console.log('Navigate to notes page for request:', request.id);
+        break;
+        
+      case 'assign':
+        this.openAssignDialog(request);
+        break;
+        
+      case 'cancel':
+        // Cancel request (to be implemented)
+        console.log('Cancel request:', request.id);
+        break;
+        
+      case 'send-agreement':
+        // Send agreement (to be implemented)
+        console.log('Send agreement for request:', request.id);
+        break;
+        
+      case 'clear':
+        // Clear case (to be implemented)
+        console.log('Clear case for request:', request.id);
+        break;
+        
+      case 'send-order':
+        // Send order (to be implemented)
+        console.log('Send order for request:', request.id);
+        break;
+        
+      case 'close':
+        // Close case (to be implemented)
+        console.log('Close case for request:', request.id);
+        break;
+        
+      default:
+        console.log('Unknown action:', action, 'for request:', request.id);
+        break;
+    }
+  }
+
+  openAssignDialog(request: AdminRequestData) {
+    const dialogRef = this.dialog.open(AssignRequestComponent, {
+      width: '500px',
+      maxWidth: '90vw',
+      maxHeight: '90vh',
+      disableClose: false,
+      autoFocus: true,
+      data: {
+        requestId: request.id,
+        currentPhysicianId: request.physicianId || null
+      }
+    });
+
+    dialogRef.afterClosed().subscribe(result => {
+      if (result?.success) {
+        // Refresh both the requests list and state counts after successful assignment
+        this.loadRequests();
+        this.loadStateCounts();
+      }
+    });
   }
 
   exportRequests() {
@@ -300,5 +413,9 @@ export class DashboardComponent implements OnInit, OnDestroy {
 
   getRequestTypeClass(requestType: number): string {
     return RequestStatusMapper.getRequestTypeClass(requestType);
+  }
+
+  getMenuReference(requestId: number): string {
+    return `actionMenu${requestId}`;
   }
 }

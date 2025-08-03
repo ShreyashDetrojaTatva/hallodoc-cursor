@@ -14,6 +14,7 @@ export interface AdminRequestData {
   dateOfBirth: string;
   requestorName: string;
   physicianName?: string;
+  physicianId?: number;
   dateOfService?: string;
   phone: string;
   address: string;

@@ -13,102 +13,107 @@ export const routes: Routes = [
     }
   },
   {
-    path: 'login',
-    loadComponent: () => import('./main/pages/auth/login/login.component').then(m => m.LoginComponent),
-    canActivate: [authGuard],
-    data: { 
-      requiresAuth: false,
-      redirectIfLoggedIn: true 
-    }
-  },
-  {
-    path: 'forgot-password',
-    loadComponent: () => import('./main/pages/auth/forgot-password/forgot-password.component').then(m => m.ForgotPasswordComponent),
-    canActivate: [authGuard],
-    data: { 
-      requiresAuth: false,
-      redirectIfLoggedIn: true 
-    }
-  },
-  {
-    path: 'reset-password',
-    loadComponent: () => import('./main/pages/auth/reset-password/reset-password.component').then(m => m.ResetPasswordComponent),
-    canActivate: [authGuard],
-    data: { 
-      requiresAuth: false,
-      redirectIfLoggedIn: true 
-    }
-  },
-  {
     path: 'request-type',
     loadComponent: () => import('./main/pages/request-type/request-type.component').then(m => m.RequestTypeComponent),
     canActivate: [authGuard],
-    data: { 
+    data: {
       requiresAuth: false,
-      redirectIfLoggedIn: true 
+      redirectIfLoggedIn: true
     }
   },
   {
     path: 'request-form/:type',
     loadComponent: () => import('./main/pages/request-forms/request-form-placeholder.component').then(m => m.RequestFormPlaceholderComponent),
     canActivate: [authGuard],
-    data: { 
+    data: {
       requiresAuth: false,
-      redirectIfLoggedIn: true 
+      redirectIfLoggedIn: true
     }
-  },
-  {
-    path: 'admin',
-    component: LayoutComponent,
-    canActivate: [authGuard],
-    data: { 
-      requiresAuth: true,
-      redirectIfLoggedIn: false 
-    },
-    children: [
-      {
-        path: 'dashboard',
-        loadComponent: () => import('./main/pages/dashboard/dashboard.component').then(m => m.DashboardComponent),
-        data: { 
-          requiresAuth: true,
-          redirectIfLoggedIn: false 
-        }
-      }
-    ]
   },
   {
     path: 'patient',
     component: LayoutComponent,
     canActivate: [authGuard],
-    data: { 
+    data: {
       requiresAuth: true,
-      redirectIfLoggedIn: false 
+      redirectIfLoggedIn: false
     },
     children: [
       {
         path: 'dashboard',
         loadComponent: () => import('./main/pages/patient/dashboard/patient-dashboard.component').then(m => m.PatientDashboardComponent),
-        data: { 
+        data: {
           requiresAuth: true,
-          redirectIfLoggedIn: false 
+          redirectIfLoggedIn: false
         }
       },
       {
         path: 'requests/:id/documents',
         loadComponent: () => import('./main/pages/patient/documents/patient-documents.component').then(m => m.PatientDocumentsComponent),
-        data: { 
+        data: {
           requiresAuth: true,
-          redirectIfLoggedIn: false 
+          redirectIfLoggedIn: false
         }
       },
       {
         path: 'profile',
         loadComponent: () => import('./main/pages/patient/profile/patient-profile.component').then(m => m.PatientProfileComponent),
-        data: { 
+        data: {
           requiresAuth: true,
-          redirectIfLoggedIn: false 
+          redirectIfLoggedIn: false
         }
       }
     ]
+  },
+  {
+    path: 'admin',
+    component: LayoutComponent,
+    canActivate: [authGuard],
+    data: {
+      requiresAuth: true,
+      redirectIfLoggedIn: false
+    },
+    children: [
+      {
+        path: 'dashboard',
+        loadComponent: () => import('./main/pages/dashboard/dashboard.component').then(m => m.DashboardComponent),
+        data: {
+          requiresAuth: true,
+          redirectIfLoggedIn: false
+        }
+      },
+      {
+        path: 'request/:id/view',
+        loadComponent: () => import('./main/pages/admin/view-request/view-request.component').then(m => m.ViewRequestComponent),
+        data: {
+          requiresAuth: true,
+          redirectIfLoggedIn: false
+        }
+      }
+    ]
+  },
+  {
+    path: 'request-forms',
+    loadComponent: () => import('./main/pages/request-forms/request-form-placeholder.component').then(m => m.RequestFormPlaceholderComponent),
+    data: {
+      requiresAuth: false,
+      redirectIfLoggedIn: false
+    }
+  },
+  {
+    path: 'login',
+    loadComponent: () => import('./main/pages/auth/login/login.component').then(m => m.LoginComponent),
+    data: {
+      requiresAuth: false,
+      redirectIfLoggedIn: true
+    }
+  },
+  {
+    path: 'forgot-password',
+    loadComponent: () => import('./main/pages/auth/forgot-password/forgot-password.component').then(m => m.ForgotPasswordComponent),
+    data: {
+      requiresAuth: false,
+      redirectIfLoggedIn: false
+    }
   }
 ];

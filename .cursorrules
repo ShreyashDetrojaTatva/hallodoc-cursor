@@ -16,6 +16,32 @@
 - Avoid Entity Framework includes (.Include()) for INSERT/UPDATE operations to prevent circular reference issues during entity tracking.
 - When updating related entities, fetch them separately and update each entity independently to avoid EF Core circular reference problems.
 
+# DateTime Handling Rules for PostgreSQL
+- **ALWAYS use local time for timestamp without time zone columns**
+- **NEVER use DateTime.UtcNow for timestamp without time zone fields**
+- **When sending dates to frontend**: Ensure dates are in local format, not UTC
+- **Frontend date handling**: Always create new Date() objects for date fields to ensure proper local time handling
+- **Database storage**: All DateTime fields must use `[Column(TypeName = "timestamp without time zone")]` attribute
+- **Entity Framework**: Use `DateTime.Now` for new records
+- **API DTOs**: Ensure DateTime properties are handled as local time, not UTC
+- **Common patterns**:
+  ```csharp
+  // ✅ Correct - Local time for timestamp without timezone
+  entity.CreatedAt = DateTime.Now;
+  
+  // ❌ Incorrect - UTC for timestamp without timezone
+  entity.CreatedAt = DateTime.UtcNow;
+  entity.UpdatedAt = dateFromFrontend; // May be UTC
+  ```
+- **Frontend patterns**:
+  ```typescript
+  // ✅ Correct - Ensure local date
+  const localDate = formData.date ? new Date(formData.date) : null;
+  
+  // ❌ Incorrect - May send UTC
+  const date = formData.date;
+  ```
+
 # API Endpoint Rules
 - **ALWAYS check the actual backend controller structure before adding any endpoint to api-endpoints.ts**
 - **NEVER add endpoints randomly or assume the route structure**
@@ -28,6 +54,14 @@
   3. Check action method signatures and HTTP attributes
   4. Match frontend endpoint to exact backend route structure
 
+# Route Management Rules
+- **NEVER remove or modify existing routes in app.routes.ts without explicit user request**
+- **ALWAYS check for existing pages and components before making route changes**
+- **When adding new routes, preserve the existing route structure and patterns**
+- **Before modifying routes, verify that all referenced components exist**
+- **Maintain existing route hierarchy and authentication patterns**
+- **If a route seems unused, verify it's not referenced in any components before removing**
+
 # Additional rules from hallodoc-rules.mdc
 - Always create virtual navigation properties for related entities.
 - For one-to-many and many-to-many relationships, define virtual ICollection<T> properties on the "one" side.
@@ -36,7 +70,7 @@
 
 # Frontend and Workflow Rules
 - When generating new Angular components, always create separate .ts, .html, and .scss files. Never write HTML or CSS inline in the TypeScript file.
-- For frontend changes, always organize component files into logically separate folders (feature or domain-based). Do not clutter all files in a single components folder.
+- For frontend changes, always organize component files into logically separate folders (feature or domain-based). Do not clutter all files in a single folder under components folder.
 - When asked to "Fix the error" or similar, immediately attempt to fix the error in code without first asking for confirmation. Only suggest in chat if explicitly requested or if the fix is ambiguous.
 
 # Design System Standards
@@ -211,3 +245,53 @@ app/
       patient/
       admin/
 ``` 
+
+# Enum and Utility/Helper Function Rules
+
+## Frontend (Angular/TypeScript)
+- **ALWAYS use enums instead of magic numbers or string literals for status, types, and constants**
+- **Create enums in `app/main/enums/` folder with descriptive names**
+- **Use enums for all request statuses, account types, request types, and other constants**
+- **Create utility functions for common operations like date formatting, validation, etc.**
+- **Place utility functions in `app/core/utils/` folder**
+- **Examples:**
+  ```typescript
+  // ✅ Correct - Using enums
+  if (request.status === RequestStatus.New) { ... }
+  if (user.accountType === AccountType.Patient) { ... }
+  
+  // ❌ Incorrect - Using magic numbers
+  if (request.status === 1) { ... }
+  if (user.accountType === 2) { ... }
+  
+  // ✅ Correct - Using utility functions
+  const formattedDate = formatDate(date);
+  const isValidEmail = validateEmail(email);
+  ```
+
+## Backend (C#/.NET)
+- **ALWAYS use enums instead of magic numbers or string literals**
+- **Create enums in `HalloDoc.Common.Constants` namespace**
+- **Use enums for all status fields, type fields, and other constants**
+- **Create helper/utility classes for common operations**
+- **Place utility classes in `HalloDoc.Common.Helpers` namespace**
+- **Examples:**
+  ```csharp
+  // ✅ Correct - Using enums
+  if (request.RequestStatus == RequestStatus.New) { ... }
+  if (user.AccountType == AccountType.Patient) { ... }
+  
+  // ❌ Incorrect - Using magic numbers
+  if (request.RequestStatus == 1) { ... }
+  if (user.AccountType == 2) { ... }
+  
+  // ✅ Correct - Using helper functions
+  var formattedDate = DateHelper.FormatForDisplay(date);
+  var isValidEmail = ValidationHelper.IsValidEmail(email);
+  ```
+
+## Common Patterns
+- **Status enums**: RequestStatus, DashboardRequestStatus, AccountStatus
+- **Type enums**: RequestType, AccountType, DocumentType
+- **Utility functions**: Date formatting, email validation, phone validation, address formatting
+- **Helper classes**: ValidationHelper, DateHelper, StringHelper, SecurityHelper 
