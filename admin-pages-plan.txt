@@ -125,14 +125,59 @@ PHASE 1: ADMIN DASHBOARD
 PHASE 2: REQUEST ACTIONS
 -------------------------
 □ [Pending] Assign Request functionality
+  - Modal/form to assign request to physician
+  - Physician selection dropdown
+  - Update physician id in request table
+  - Send notification to physician
+
 □ [Pending] Cancel Request functionality
-□ [Pending] View Request details modal/page
+  - Confirmation dialog with reason
+  - Update request status to "Cancelled"
+  - Send notification to patient
+  - Cancel reason tracking
+  - Audit log for cancellation
+
+□ [Pending] View Request details page
+  - Detailed request information display
+  - requestor details
+  - Patient details and contact info
+  - button to go to view Documents
+  - button to assign case
+
 □ [Pending] Document viewer/upload system
+  - Document upload functionality with drag-drop
+  - Document list and management interface
+  - Integration with existing document viewer
+  - view/download document
+
 □ [Pending] Send Agreement functionality
+  - Agreement template 
+  - Send Email for sending agreements
+  - update request status to MDEnRoute on accepted
+  - update request status to CancelledByPatient on rejected
+
 □ [Pending] Clear Case functionality
+  - Move request to "Clear" state
+  - Confirmation dialog 
+  - clear requests are not visible on dashboard
+
 □ [Pending] Send Order functionality
+  - Order creation interface
+  - Vendor selection and management
+  - Order tracking
+  - Order history and details
+
 □ [Pending] View Notes functionality
+  - Notes display and management interface
+  - Add/edit notes in text
+  - Notes categorization (admin notes, physician notes)
+
 □ [Pending] Close Case functionality
+  - Final case closure workflow
+  - Update to "Closed" status
+  - Case summary and final report
+  - Closure confirmation and validation
+  - Final documentation requirements
 
 PHASE 3: ADMIN PROFILE
 ----------------------
