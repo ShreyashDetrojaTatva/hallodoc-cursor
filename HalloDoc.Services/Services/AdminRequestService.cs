@@ -147,5 +147,27 @@ namespace HalloDoc.Services.Services
                 return false;
             }
         }
+
+        public async Task<bool> CancelRequestAsync(CancelRequestDto cancelRequest)
+        {
+            try
+            {
+                var request = await _requestRepository.GetByIdAsync(cancelRequest.RequestId);
+                if (request == null)
+                {
+                    return false;
+                }
+
+                // Cancel the request (change status to Cancelled)
+                request.RequestStatus = (int)HalloDoc.Common.Constants.RequestStatus.Cancelled;
+                // Note: CancellationReason will be stored in notes table later
+
+                return await _requestRepository.UpdateAsync(request);
+            }
+            catch
+            {
+                return false;
+            }
+        }
     }
 } 

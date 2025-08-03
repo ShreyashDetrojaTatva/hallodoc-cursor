@@ -1,0 +1,50 @@
+<div class="cancel-request-dialog">
+  <div class="dialog-header">
+    <h2 mat-dialog-title>Cancel Request</h2>
+    <button mat-icon-button (click)="onCancel()" class="close-button">
+      <mat-icon>close</mat-icon>
+    </button>
+  </div>
+
+  <mat-dialog-content>
+    <div class="dialog-content">
+      <p class="description">
+        Are you sure you want to cancel this request? This action will move the request to the "To-Close" status and cannot be undone.
+      </p>
+
+      <form [formGroup]="cancelForm" (ngSubmit)="onSubmit()">
+        <mat-form-field class="form-field" appearance="outline">
+          <mat-label>Cancellation Reason (Optional)</mat-label>
+          <textarea 
+            matInput 
+            formControlName="cancellationReason" 
+            rows="3" 
+            placeholder="Enter the reason for cancellation..."></textarea>
+          <mat-hint>This will be stored for future reference</mat-hint>
+          <mat-error *ngIf="cancelForm.get('cancellationReason')?.hasError('maxlength')">
+            Cancellation reason cannot exceed 500 characters
+          </mat-error>
+        </mat-form-field>
+
+        <div class="error-message" *ngIf="error">
+          {{ error }}
+        </div>
+      </form>
+    </div>
+  </mat-dialog-content>
+
+  <mat-dialog-actions align="end">
+    <button mat-button (click)="onCancel()" [disabled]="isLoading">
+      Keep Request
+    </button>
+    <button 
+      mat-raised-button 
+      color="warn" 
+      (click)="onSubmit()" 
+      [disabled]="!cancelForm.valid || isLoading">
+      <mat-icon *ngIf="!isLoading">cancel</mat-icon>
+      <mat-spinner *ngIf="isLoading" diameter="20"></mat-spinner>
+      Cancel Request
+    </button>
+  </mat-dialog-actions>
+</div> 

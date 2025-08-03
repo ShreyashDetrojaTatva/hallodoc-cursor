@@ -165,7 +165,7 @@
         <ng-container matColumnDef="requestStatus">
           <th mat-header-cell *matHeaderCellDef>Status</th>
           <td mat-cell *matCellDef="let request" [class]="'request-row-' + getRequestTypeClass(request.requestType)">
-            <span class="status-badge">{{ request.requestStatus || '-' }}</span>
+            <span class="status-badge">{{ getRequestStatusDisplayName(request.requestStatus) }}</span>
           </td>
         </ng-container>
 

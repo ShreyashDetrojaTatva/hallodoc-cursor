@@ -8,5 +8,6 @@ namespace HalloDoc.Services.Services
         Task<bool> UpdateRequestAsync(UpdateRequestDto updateRequest);
         Task<List<PhysicianDto>> GetPhysiciansAsync();
         Task<bool> AssignRequestAsync(AssignRequestDto assignRequest);
+        Task<bool> CancelRequestAsync(CancelRequestDto cancelRequest);
     }
 } 

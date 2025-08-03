@@ -4,6 +4,7 @@ import { Observable } from 'rxjs';
 import { ADMIN_REQUEST_ENDPOINTS } from '@main/constants/api-endpoints';
 import { RequestDetailsData, UpdateRequestData } from '@main/interfaces/admin/request.interface';
 import { PhysicianData, AssignRequestData } from '@main/interfaces/admin/physician.interface';
+import { CancelRequestData } from '@main/interfaces/admin/cancel-request.interface';
 
 @Injectable({
   providedIn: 'root'
@@ -26,5 +27,9 @@ export class AdminRequestService {
 
   assignRequest(data: AssignRequestData): Observable<any> {
     return this.http.post(ADMIN_REQUEST_ENDPOINTS.ASSIGN_REQUEST, data);
+  }
+
+  cancelRequest(data: CancelRequestData): Observable<any> {
+    return this.http.post(ADMIN_REQUEST_ENDPOINTS.CANCEL_REQUEST, data);
   }
 } 

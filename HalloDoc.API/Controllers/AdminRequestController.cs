@@ -55,5 +55,16 @@ namespace HalloDoc.API.Controllers
             }
             return Ok(new { message = "Request assigned successfully" });
         }
+
+        [HttpPost("cancel")]
+        public async Task<IActionResult> CancelRequest([FromBody] CancelRequestDto cancelRequest)
+        {
+            var result = await _adminRequestService.CancelRequestAsync(cancelRequest);
+            if (!result)
+            {
+                return BadRequest("Failed to cancel request");
+            }
+            return Ok(new { message = "Request cancelled successfully" });
+        }
     }
 } 

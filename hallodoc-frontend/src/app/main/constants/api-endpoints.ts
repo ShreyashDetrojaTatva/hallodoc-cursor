@@ -33,7 +33,8 @@ export const ADMIN_REQUEST_ENDPOINTS = {
   GET_REQUEST_DETAILS: (requestId: number) => `${BASE_URL}/api/adminrequest/details/${requestId}`,
   UPDATE_REQUEST: `${BASE_URL}/api/adminrequest/update`,
   GET_PHYSICIANS: `${BASE_URL}/api/adminrequest/physicians`,
-  ASSIGN_REQUEST: `${BASE_URL}/api/adminrequest/assign`
+  ASSIGN_REQUEST: `${BASE_URL}/api/adminrequest/assign`,
+  CANCEL_REQUEST: `${BASE_URL}/api/adminrequest/cancel`
 };
 
 // Request Forms Endpoints

@@ -24,11 +24,12 @@ import {
   RequestAction 
 } from '@main/interfaces';
 import { PaginationRequest, PaginationResponse, PaginationDashboardFilters } from '@main/interfaces/pagination';
-import { DashboardRequestStatus, RequestType } from '@main/enums';
+import { DashboardRequestStatus, RequestType, RequestStatus } from '@main/enums';
 import { RequestStatusMapper } from '@main/utils/request-status-mapper';
 import { AdminDashboardService } from '@main/services/admin-dashboard.service';
 import { AdminRequestService } from '@main/services/admin-request.service';
 import { AssignRequestComponent } from '@main/components/admin/assign-request/assign-request.component';
+import { CancelRequestComponent } from '@main/components/admin/cancel-request/cancel-request.component';
 
 @Component({
   selector: 'app-dashboard',
@@ -319,8 +320,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
         break;
         
       case 'cancel':
-        // Cancel request (to be implemented)
-        console.log('Cancel request:', request.id);
+        this.openCancelDialog(request);
         break;
         
       case 'send-agreement':
@@ -365,6 +365,27 @@ export class DashboardComponent implements OnInit, OnDestroy {
     dialogRef.afterClosed().subscribe(result => {
       if (result?.success) {
         // Refresh both the requests list and state counts after successful assignment
+        this.loadRequests();
+        this.loadStateCounts();
+      }
+    });
+  }
+
+  openCancelDialog(request: AdminRequestData) {
+    const dialogRef = this.dialog.open(CancelRequestComponent, {
+      width: '500px',
+      maxWidth: '90vw',
+      maxHeight: '90vh',
+      disableClose: false,
+      autoFocus: true,
+      data: {
+        requestId: request.id
+      }
+    });
+
+    dialogRef.afterClosed().subscribe(result => {
+      if (result?.success) {
+        // Refresh both the requests list and state counts after successful cancellation
         this.loadRequests();
         this.loadStateCounts();
       }
@@ -416,6 +437,15 @@ export class DashboardComponent implements OnInit, OnDestroy {
   }
 
   getMenuReference(requestId: number): string {
-    return `actionMenu${requestId}`;
+    return `menu-${requestId}`;
+  }
+
+  getRequestStatusDisplayName(statusValue: string | null): string {
+    if (!statusValue) return '-';
+    
+    const numericStatus = parseInt(statusValue, 10);
+    if (isNaN(numericStatus)) return statusValue;
+    
+    return RequestStatusMapper.getRequestStatusDisplayName(numericStatus as RequestStatus);
   }
 }
