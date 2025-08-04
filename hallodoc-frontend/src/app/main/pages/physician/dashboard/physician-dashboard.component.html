@@ -22,14 +22,10 @@
   <!-- Patients Section -->
   <div class="patients-section">
     <div class="section-header">
-      <h2>Patients ({{ selectedState }})</h2>
+      <h2>My Requests ({{ selectedState }})</h2>
       
       <!-- Action Buttons -->
       <div class="action-buttons">
-        <button mat-raised-button color="primary" class="action-btn">
-          <mat-icon>description</mat-icon>
-          Create Requests
-        </button>
         <button mat-stroked-button class="action-btn" (click)="exportRequests()">
           <mat-icon>file_download</mat-icon>
           Export
@@ -167,22 +163,12 @@
           <td mat-cell *matCellDef="let request" [class]="'request-row-' + getRequestTypeClass(request.requestType)">
             <span class="status-badge">{{ getRequestStatusDisplayName(request.requestStatus) }}</span>
           </td>
-      </ng-container>
+        </ng-container>
 
         <!-- Actions Column -->
         <ng-container matColumnDef="actions">
           <th mat-header-cell *matHeaderCellDef>Actions</th>
           <td mat-cell *matCellDef="let request" [class]="'request-row-' + getRequestTypeClass(request.requestType)">
-            <!-- Test button to verify basic clicks work -->
-            <button 
-              mat-icon-button 
-              class="action-button"
-              (click)="onActionClick('test', request)"
-              style="margin-right: 8px;"
-            >
-              <mat-icon>visibility</mat-icon>
-            </button>
-            
             <button 
               mat-icon-button 
               [matMenuTriggerFor]="actionMenu"
@@ -195,88 +181,65 @@
               <mat-icon>more_vert</mat-icon>
             </button>
             <mat-menu #actionMenu="matMenu">
-              <!-- NEW STATUS ACTIONS -->
-              <button mat-menu-item (click)="onActionClick('assign', currentRequest!)" 
-                      *ngIf="selectedState === DashboardRequestStatus.New && currentRequest">
-                <mat-icon>person_add</mat-icon>
-                <span>Assign Request</span>
-              </button>
-              
-              <button mat-menu-item (click)="onActionClick('cancel', currentRequest!)" 
-                      *ngIf="selectedState === DashboardRequestStatus.New && currentRequest">
-                <mat-icon>cancel</mat-icon>
-                <span>Cancel Request</span>
-              </button>
-              
-              <!-- PENDING STATUS ACTIONS -->
-              <button mat-menu-item (click)="onActionClick('send-agreement', currentRequest!)" 
-                      *ngIf="selectedState === DashboardRequestStatus.Pending && currentRequest">
-                <mat-icon>send</mat-icon>
-                <span>Send Agreement</span>
-              </button>
-              
-              <button mat-menu-item (click)="onActionClick('clear', currentRequest!)" 
-                      *ngIf="selectedState === DashboardRequestStatus.Pending && currentRequest">
-                <mat-icon>check_circle</mat-icon>
-                <span>Clear Case</span>
-              </button>
-              
-              <!-- ACTIVE/CONCLUDE STATUS ACTIONS -->
-              <button mat-menu-item (click)="onActionClick('send-order', currentRequest!)" 
-                      *ngIf="(selectedState === DashboardRequestStatus.Active || selectedState === DashboardRequestStatus.Conclude) && currentRequest">
-                <mat-icon>shopping_cart</mat-icon>
-                <span>Send Order</span>
-              </button>
-              
-              <!-- TO CLOSE STATUS ACTIONS -->
-              <button mat-menu-item (click)="onActionClick('close', currentRequest!)" 
-                      *ngIf="selectedState === DashboardRequestStatus.ToClose && currentRequest">
-                <mat-icon>close</mat-icon>
-                <span>Close Case</span>
-              </button>
-              
-              <!-- COMMON ACTIONS (available for all states) -->
+              <!-- View Request - Always available -->
               <button mat-menu-item (click)="onActionClick('view', currentRequest!)" 
                       *ngIf="currentRequest">
                 <mat-icon>visibility</mat-icon>
                 <span>View Request</span>
               </button>
-              
+
+              <!-- View Documents - Always available -->
               <button mat-menu-item (click)="onActionClick('documents', currentRequest!)" 
                       *ngIf="currentRequest">
                 <mat-icon>description</mat-icon>
                 <span>View Documents</span>
               </button>
-              
-              <button mat-menu-item (click)="onActionClick('notes', currentRequest!)" 
-                      *ngIf="currentRequest && selectedState !== DashboardRequestStatus.New">
-                <mat-icon>note</mat-icon>
-                <span>View Notes</span>
+
+              <!-- Accept Request - Available for NEW, ACTIVE, CONCLUDE -->
+              <button mat-menu-item (click)="onActionClick('accept', currentRequest!)" 
+                      *ngIf="currentRequest && (selectedState === DashboardRequestStatus.New || selectedState === DashboardRequestStatus.Active || selectedState === DashboardRequestStatus.Conclude)">
+                <mat-icon>check_circle</mat-icon>
+                <span>Accept Request</span>
+              </button>
+
+              <!-- Send Agreement - Available for PENDING -->
+              <button mat-menu-item (click)="onActionClick('send-agreement', currentRequest!)" 
+                      *ngIf="currentRequest && selectedState === DashboardRequestStatus.Pending">
+                <mat-icon>send</mat-icon>
+                <span>Send Agreement</span>
+              </button>
+
+              <!-- Create/Update Encounter Form - Available for ACTIVE -->
+              <button mat-menu-item (click)="onActionClick('encounter-form', currentRequest!)" 
+                      *ngIf="currentRequest && selectedState === DashboardRequestStatus.Active">
+                <mat-icon>edit_note</mat-icon>
+                <span>Create/Update Encounter Form</span>
+              </button>
+
+              <!-- Conclude Care - Available for CONCLUDE -->
+              <button mat-menu-item (click)="onActionClick('conclude-care', currentRequest!)" 
+                      *ngIf="currentRequest && selectedState === DashboardRequestStatus.Conclude">
+                <mat-icon>check_circle_outline</mat-icon>
+                <span>Conclude Care</span>
               </button>
             </mat-menu>
           </td>
-      </ng-container>
+        </ng-container>
 
-      <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-      <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
-    </table>
+        <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+        <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+      </table>
 
       <!-- Pagination -->
       <mat-paginator 
         [length]="totalCount"
-        [pageSize]="paginationRequest.pageSize"
-        [pageIndex]="paginationRequest.pageIndex - 1"
+        [pageSize]="pageSize"
+        [pageIndex]="currentPage - 1"
         [pageSizeOptions]="[5, 10, 25, 50]"
         (page)="onPageChange($event)"
-      >
-      </mat-paginator>
-    </div>
-
-    <!-- Empty State -->
-    <div *ngIf="!isLoading && dataSource.length === 0" class="empty-state">
-      <mat-icon class="empty-icon">inbox</mat-icon>
-      <h3>No requests found</h3>
-      <p>No requests match your current filters.</p>
+        showFirstLastButtons
+        class="pagination"
+      ></mat-paginator>
     </div>
   </div>
-</div>
+</div> 

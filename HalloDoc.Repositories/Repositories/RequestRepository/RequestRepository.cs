@@ -262,6 +262,106 @@ namespace HalloDoc.Repositories.Repositories.RequestRepository
                 .CountAsync();
         }
 
+        // Physician Dashboard Methods
+        public async Task<PaginationResponseDto<RequestDataDto>> GetRequestsByStatusIdsForPhysicianAsync(int[] statusIds, PaginationRequestDto<DashboardFiltersDto> request, int physicianId)
+        {
+            var query = _db.Requests
+                .Include(r => r.RequestClients)
+                .Include(r => r.Physician)
+                .Where(r => statusIds.Contains(r.RequestStatus) && r.PhysicianId == physicianId);
+
+            // Apply search filter
+            if (!string.IsNullOrEmpty(request.SearchString))
+            {
+                var search = request.SearchString.ToLower();
+                query = query.Where(r =>
+                    (r.RequestClients.Any() && r.RequestClients.First().FirstName != null && r.RequestClients.First().FirstName.ToLower().Contains(search)) ||
+                    (r.RequestClients.Any() && r.RequestClients.First().LastName != null && r.RequestClients.First().LastName.ToLower().Contains(search)) ||
+                    (r.Symptoms != null && r.Symptoms.ToLower().Contains(search))
+                );
+            }
+
+            // Apply additional filters
+            if (request.Filters != null)
+            {
+                if (!string.IsNullOrEmpty(request.Filters.SearchTerm))
+                {
+                    var search = request.Filters.SearchTerm.ToLower();
+                    query = query.Where(r =>
+                        (r.RequestClients.Any() && r.RequestClients.First().FirstName != null && r.RequestClients.First().FirstName.ToLower().Contains(search)) ||
+                        (r.RequestClients.Any() && r.RequestClients.First().LastName != null && r.RequestClients.First().LastName.ToLower().Contains(search)) ||
+                        (r.Symptoms != null && r.Symptoms.ToLower().Contains(search))
+                    );
+                }
+
+                if (request.Filters.RequestType.HasValue)
+                {
+                    query = query.Where(r => r.RequestType == request.Filters.RequestType.Value);
+                }
+
+                if (request.Filters.FromDate.HasValue)
+                {
+                    query = query.Where(r => r.CreatedAt >= request.Filters.FromDate.Value);
+                }
+
+                if (request.Filters.ToDate.HasValue)
+                {
+                    query = query.Where(r => r.CreatedAt <= request.Filters.ToDate.Value);
+                }
+            }
+
+            // Apply sorting
+            if (!string.IsNullOrEmpty(request.SortColumn))
+            {
+                query = ApplySorting(query, request.SortColumn, request.SortDirection == "asc");
+            }
+            else
+            {
+                query = query.OrderByDescending(r => r.CreatedAt);
+            }
+
+            // Get total count before pagination
+            var totalCount = await query.CountAsync();
+
+            // Apply pagination
+            var results = await query
+                .Skip((request.PageIndex - 1) * request.PageSize)
+                .Take(request.PageSize)
+                .ToListAsync();
+
+            // Map to DTOs
+            var items = results.Select(r => new RequestDataDto
+            {
+                Id = r.RequestId,
+                PatientFullName = r.RequestClients.Any() ? $"{r.RequestClients.First().FirstName} {r.RequestClients.First().LastName}".Trim() : "Unknown",
+                DateOfBirth = r.RequestClients.Any() && r.RequestClients.First().DOB.HasValue ? r.RequestClients.First().DOB.Value.ToString("MMM dd, yyyy") : "Unknown",
+                RequestorName = r.RequestClients.Any() ? $"{r.RequestClients.First().FirstName} {r.RequestClients.First().LastName}".Trim() : "Unknown",
+                PhysicianName = r.Physician != null ? $"{r.Physician.FirstName} {r.Physician.LastName}".Trim() : null,
+                PhysicianId = r.PhysicianId,
+                DateOfService = r.AcceptedDate?.ToString("MMM dd, yyyy") ?? null,
+                Phone = r.RequestClients.Any() ? r.RequestClients.First().Phone ?? "Unknown" : "Unknown",
+                Address = r.RequestClients.Any() ? $"{r.RequestClients.First().Street}, {r.RequestClients.First().City} {r.RequestClients.First().State} {r.RequestClients.First().ZipCode}".Trim() : "Unknown",
+                RequestStatus = r.RequestStatus.ToString(),
+                RequestType = (int)r.RequestType,
+                RequestedDate = r.CreatedAt.ToString("MMM dd, yyyy HH:mm")
+            }).ToList();
+
+            return new PaginationResponseDto<RequestDataDto>
+            {
+                Items = items,
+                TotalCount = totalCount,
+                PageIndex = request.PageIndex,
+                PageSize = request.PageSize
+            };
+        }
+
+        public async Task<int> GetRequestCountByStatusIdsForPhysicianAsync(int[] statusIds, int physicianId)
+        {
+            return await _db.Requests
+                .Where(r => statusIds.Contains(r.RequestStatus) && r.PhysicianId == physicianId)
+                .CountAsync();
+        }
+
         public async Task<bool> UpdateAsync(Request request)
         {
             try

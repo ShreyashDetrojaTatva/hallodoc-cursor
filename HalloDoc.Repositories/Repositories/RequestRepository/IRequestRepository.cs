@@ -17,5 +17,9 @@ namespace HalloDoc.Repositories.Repositories.RequestRepository
         Task<PaginationResponseDto<RequestDataDto>> GetRequestsByStatusIdsAsync(int[] statusIds, PaginationRequestDto<DashboardFiltersDto> request);
         Task<PaginationResponseDto<RequestDataDto>> GetAllRequestsAsync(PaginationRequestDto<DashboardFiltersDto> request);
         Task<int> GetRequestCountByStatusIdsAsync(int[] statusIds);
+        
+        // Physician Dashboard Methods
+        Task<PaginationResponseDto<RequestDataDto>> GetRequestsByStatusIdsForPhysicianAsync(int[] statusIds, PaginationRequestDto<DashboardFiltersDto> request, int physicianId);
+        Task<int> GetRequestCountByStatusIdsForPhysicianAsync(int[] statusIds, int physicianId);
     }
 } 

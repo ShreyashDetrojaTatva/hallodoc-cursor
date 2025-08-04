@@ -56,10 +56,20 @@ export class LoginComponent {
     ).subscribe({
       next: (response) => {
         // Redirect based on account type
-        if (response.user.accountType === AccountType.Admin) {
-          this.router.navigate(['/admin/dashboard']);
-        } else {
-          this.router.navigate(['/patient/dashboard']);
+        switch (response.user.accountType) {
+          case AccountType.Admin:
+            this.router.navigate(['/admin/dashboard']);
+            break;
+          case AccountType.Physician:
+            this.router.navigate(['/physician/dashboard']);
+            break;
+          case AccountType.Patient:
+            this.router.navigate(['/patient/dashboard']);
+            break;
+          default:
+            // Fallback to patient dashboard for unknown account types
+            this.router.navigate(['/patient/dashboard']);
+            break;
         }
       },
       error: (error) => {

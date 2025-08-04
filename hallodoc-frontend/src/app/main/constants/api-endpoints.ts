@@ -1,6 +1,6 @@
 import { environment } from '../../../environments/environment';
 
-const BASE_URL = environment.baseUrl;
+export const BASE_URL = environment.baseUrl;
 
 // Auth Endpoints
 export const AUTH_ENDPOINTS = {

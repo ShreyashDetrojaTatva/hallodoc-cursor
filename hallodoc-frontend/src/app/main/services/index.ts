@@ -1,9 +1,10 @@
 // Auth Services
 export * from './auth/auth.service';
 
-// Request Services
-export * from './request/request.service';
-
-// Admin Services
+// Dashboard Services
 export * from './admin-dashboard.service';
-export * from './admin-request.service'; 
+export * from './physician-dashboard.service';
+export * from './admin-request.service';
+
+// Request Services
+export * from './request/request.service'; 
