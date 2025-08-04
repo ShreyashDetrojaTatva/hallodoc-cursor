@@ -46,4 +46,13 @@ export const REQUEST_FORM_ENDPOINTS = {
 export const COMMON_ENDPOINTS = {
   GET_REGIONS: `${BASE_URL}/api/common/regions`,
   PING: `${BASE_URL}/api/ping`
+};
+
+// Physician Dashboard Endpoints
+export const PHYSICIAN_DASHBOARD_ENDPOINTS = {
+  GET_REQUESTS: `${BASE_URL}/api/physiciandashboard/requests`,
+  GET_STATE_COUNTS: `${BASE_URL}/api/physiciandashboard/state-counts`,
+  EXPORT_REQUESTS: `${BASE_URL}/api/physiciandashboard/export`,
+  EXPORT_ALL_REQUESTS: `${BASE_URL}/api/physiciandashboard/export-all`,
+  ACCEPT_REQUEST: `${BASE_URL}/api/physiciandashboard/accept`
 }; 

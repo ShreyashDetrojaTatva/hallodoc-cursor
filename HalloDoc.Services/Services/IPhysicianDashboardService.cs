@@ -10,5 +10,6 @@ namespace HalloDoc.Services.Services
         Task<List<DashboardStateDto>> GetStateCountsAsync();
         Task<byte[]> ExportRequestsAsync(DashboardRequestStatus state, PaginationRequestDto<DashboardFiltersDto> request);
         Task<byte[]> ExportAllRequestsAsync(PaginationRequestDto<DashboardFiltersDto> request);
+        Task<bool> AcceptRequestAsync(AcceptRequestDto acceptRequest);
     }
 } 

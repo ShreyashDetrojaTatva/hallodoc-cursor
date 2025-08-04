@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using HalloDoc.Services.Services;
+using HalloDoc.Repositories.DTOs;
 using HalloDoc.Repositories.DTOs.Pagination;
 using HalloDoc.Common.Constants;
 
@@ -77,6 +78,28 @@ namespace HalloDoc.API.Controllers
             {
                 var csvData = await _physicianDashboardService.ExportAllRequestsAsync(request);
                 return File(csvData, "text/csv", $"physician-all-requests-{DateTime.Now:yyyyMMdd}.csv");
+            }
+            catch (InvalidOperationException ex)
+            {
+                return BadRequest(ex.Message);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, "Internal server error");
+            }
+        }
+
+        [HttpPost("accept")]
+        public async Task<IActionResult> AcceptRequest([FromBody] AcceptRequestDto acceptRequest)
+        {
+            try
+            {
+                var result = await _physicianDashboardService.AcceptRequestAsync(acceptRequest);
+                if (!result)
+                {
+                    return BadRequest("Failed to accept request");
+                }
+                return Ok(new { message = "Request accepted successfully" });
             }
             catch (InvalidOperationException ex)
             {

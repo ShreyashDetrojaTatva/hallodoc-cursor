@@ -1,6 +1,7 @@
 using HalloDoc.Repositories.DTOs;
 using HalloDoc.Repositories.Repositories.RequestRepository;
 using HalloDoc.Repositories.Repositories.PhysicianRepository;
+using HalloDoc.Services.Helpers;
 using Microsoft.EntityFrameworkCore;
 
 namespace HalloDoc.Services.Services
@@ -9,11 +10,16 @@ namespace HalloDoc.Services.Services
     {
         private readonly IRequestRepository _requestRepository;
         private readonly IPhysicianRepository _physicianRepository;
+        private readonly IWorkContext _workContext;
 
-        public AdminRequestService(IRequestRepository requestRepository, IPhysicianRepository physicianRepository)
+        public AdminRequestService(
+            IRequestRepository requestRepository, 
+            IPhysicianRepository physicianRepository,
+            IWorkContext workContext)
         {
             _requestRepository = requestRepository;
             _physicianRepository = physicianRepository;
+            _workContext = workContext;
         }
 
         public async Task<RequestDetailsDto?> GetRequestDetailsAsync(int requestId)
@@ -22,6 +28,18 @@ namespace HalloDoc.Services.Services
             if (request == null || !request.RequestClients.Any())
             {
                 return null;
+            }
+
+            // Check if current user is a physician and verify ownership
+            var currentUser = _workContext.CurrentUser();
+            if (currentUser != null)
+            {
+                var physician = await _physicianRepository.GetByUserIdAsync(currentUser.UserId);
+                if (physician != null && request.PhysicianId != physician.PhysicianId)
+                {
+                    // Physician can only view their assigned requests
+                    return null;
+                }
             }
 
             var requestClient = request.RequestClients.FirstOrDefault();
@@ -68,6 +86,18 @@ namespace HalloDoc.Services.Services
                 if (request == null || !request.RequestClients.Any())
                 {
                     return false;
+                }
+
+                // Check if current user is a physician and verify ownership
+                var currentUser = _workContext.CurrentUser();
+                if (currentUser != null)
+                {
+                    var physician = await _physicianRepository.GetByUserIdAsync(currentUser.UserId);
+                    if (physician != null && request.PhysicianId != physician.PhysicianId)
+                    {
+                        // Physician can only update their assigned requests
+                        return false;
+                    }
                 }
 
                 var requestClient = request.RequestClients.FirstOrDefault();
@@ -130,6 +160,20 @@ namespace HalloDoc.Services.Services
         {
             try
             {
+                // Only admins can assign requests
+                var currentUser = _workContext.CurrentUser();
+                if (currentUser == null)
+                {
+                    return false;
+                }
+
+                var physician = await _physicianRepository.GetByUserIdAsync(currentUser.UserId);
+                if (physician != null)
+                {
+                    // Physicians cannot assign requests
+                    return false;
+                }
+
                 var request = await _requestRepository.GetByIdAsync(assignRequest.RequestId);
                 if (request == null)
                 {
@@ -152,6 +196,20 @@ namespace HalloDoc.Services.Services
         {
             try
             {
+                // Only admins can cancel requests
+                var currentUser = _workContext.CurrentUser();
+                if (currentUser == null)
+                {
+                    return false;
+                }
+
+                var physician = await _physicianRepository.GetByUserIdAsync(currentUser.UserId);
+                if (physician != null)
+                {
+                    // Physicians cannot cancel requests
+                    return false;
+                }
+
                 var request = await _requestRepository.GetByIdAsync(cancelRequest.RequestId);
                 if (request == null)
                 {

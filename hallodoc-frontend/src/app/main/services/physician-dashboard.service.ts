@@ -1,21 +1,16 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { BASE_URL } from '@main/constants/api-endpoints';
-import { 
-  DashboardState, 
-  AdminRequestData, 
-  PaginationRequest, 
-  PaginationResponse, 
-  PaginationDashboardFilters 
-} from '@main/interfaces';
+import { PHYSICIAN_DASHBOARD_ENDPOINTS } from '@main/constants/api-endpoints';
+import { DashboardResponse, DashboardState, AdminRequestData } from '@main/interfaces';
+import { PaginationRequest, PaginationResponse, PaginationDashboardFilters } from '@main/interfaces/pagination';
 import { DashboardRequestStatus } from '@main/enums';
+import { AcceptRequestData } from '@main/interfaces/physician/accept-request.interface';
 
 @Injectable({
   providedIn: 'root'
 })
 export class PhysicianDashboardService {
-
   constructor(private http: HttpClient) { }
 
   getRequestsByState(state: DashboardRequestStatus, request: PaginationRequest<PaginationDashboardFilters>): Observable<PaginationResponse<AdminRequestData>> {
@@ -45,11 +40,15 @@ export class PhysicianDashboardService {
       }
     }
 
-    return this.http.get<PaginationResponse<AdminRequestData>>(`${BASE_URL}/api/physiciandashboard/requests`, { params });
+    return this.http.get<PaginationResponse<AdminRequestData>>(`${PHYSICIAN_DASHBOARD_ENDPOINTS.GET_REQUESTS}`, { params });
   }
 
   getStateCounts(): Observable<DashboardState[]> {
-    return this.http.get<DashboardState[]>(`${BASE_URL}/api/physiciandashboard/state-counts`);
+    return this.http.get<DashboardState[]>(PHYSICIAN_DASHBOARD_ENDPOINTS.GET_STATE_COUNTS);
+  }
+
+  acceptRequest(acceptRequestData: AcceptRequestData): Observable<any> {
+    return this.http.post(PHYSICIAN_DASHBOARD_ENDPOINTS.ACCEPT_REQUEST, acceptRequestData);
   }
 
   exportRequests(state: DashboardRequestStatus, request: PaginationRequest<PaginationDashboardFilters>): Observable<Blob> {
@@ -79,7 +78,7 @@ export class PhysicianDashboardService {
       }
     }
 
-    return this.http.get(`${BASE_URL}/api/physiciandashboard/export`, { 
+    return this.http.get(PHYSICIAN_DASHBOARD_ENDPOINTS.EXPORT_REQUESTS, { 
       params, 
       responseType: 'blob' 
     });
@@ -111,7 +110,7 @@ export class PhysicianDashboardService {
       }
     }
 
-    return this.http.get(`${BASE_URL}/api/physiciandashboard/export-all`, { 
+    return this.http.get(PHYSICIAN_DASHBOARD_ENDPOINTS.EXPORT_ALL_REQUESTS, { 
       params, 
       responseType: 'blob' 
     });

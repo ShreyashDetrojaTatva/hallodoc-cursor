@@ -28,6 +28,8 @@ import { DashboardRequestStatus, RequestType } from '@main/enums';
 import { RequestStatusMapper } from '@main/utils/request-status-mapper';
 import { PhysicianDashboardService } from '@main/services/physician-dashboard.service';
 import { AdminRequestService } from '@main/services/admin-request.service';
+import { AcceptRequestComponent } from '@main/components/physician/accept-request/accept-request.component';
+import { AcceptRequestData } from '@main/interfaces/physician/accept-request.interface';
 
 @Component({
   selector: 'app-physician-dashboard',
@@ -267,8 +269,7 @@ export class PhysicianDashboardComponent implements OnInit, OnDestroy {
         break;
         
       case 'accept':
-        // Accept request (to be implemented)
-        console.log('Accept request:', request.id);
+        this.openAcceptDialog(request);
         break;
         
       case 'send-agreement':
@@ -290,6 +291,41 @@ export class PhysicianDashboardComponent implements OnInit, OnDestroy {
         console.log('Unknown action:', action, 'for request:', request.id);
         break;
     }
+  }
+
+  openAcceptDialog(request: AdminRequestData) {
+    const dialogRef = this.dialog.open(AcceptRequestComponent, {
+      width: '500px',
+      maxWidth: '90vw',
+      maxHeight: '90vh',
+      disableClose: false,
+      autoFocus: true,
+      data: {
+        requestId: request.id,
+        patientName: request.patientFullName
+      }
+    });
+
+    dialogRef.afterClosed().subscribe(result => {
+      if (result?.success) {
+        const acceptRequestData: AcceptRequestData = {
+          requestId: result.requestId,
+          notes: result.notes
+        };
+
+        this.physicianDashboardService.acceptRequest(acceptRequestData).subscribe({
+          next: (response) => {
+            console.log('Request accepted successfully:', response);
+            // Refresh the data
+            this.loadRequests();
+            this.loadStateCounts();
+          },
+          error: (error) => {
+            console.error('Error accepting request:', error);
+          }
+        });
+      }
+    });
   }
 
   exportRequests() {

@@ -1,0 +1,50 @@
+<div class="accept-request-dialog">
+  <div class="dialog-header">
+    <h2 mat-dialog-title>
+      <mat-icon class="header-icon">check_circle</mat-icon>
+      Accept Request
+    </h2>
+  </div>
+
+  <mat-dialog-content class="dialog-content">
+    <div class="confirmation-message">
+      <p>Are you sure you want to accept this request?</p>
+      <div class="request-details">
+        <strong>Patient:</strong> {{ data.patientName }}
+        <br>
+        <strong>Request ID:</strong> {{ data.requestId }}
+      </div>
+    </div>
+
+    <div class="notes-section">
+      <mat-form-field appearance="outline" class="notes-field">
+        <mat-label>Notes (Optional)</mat-label>
+        <textarea 
+          matInput 
+          [(ngModel)]="notes"
+          placeholder="Add any notes about accepting this request..."
+          rows="3"
+        ></textarea>
+      </mat-form-field>
+    </div>
+  </mat-dialog-content>
+
+  <mat-dialog-actions class="dialog-actions">
+    <button 
+      mat-button 
+      (click)="onCancel()"
+      [disabled]="isLoading"
+    >
+      Cancel
+    </button>
+    <button 
+      mat-raised-button 
+      color="primary"
+      (click)="onAccept()"
+      [disabled]="isLoading"
+    >
+      <mat-spinner *ngIf="isLoading" diameter="16" class="button-spinner"></mat-spinner>
+      <span *ngIf="!isLoading">Accept Request</span>
+    </button>
+  </mat-dialog-actions>
+</div> 

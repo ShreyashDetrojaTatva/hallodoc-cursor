@@ -1,0 +1,80 @@
+.accept-request-dialog {
+  min-width: 400px;
+  max-width: 500px;
+
+  .dialog-header {
+    display: flex;
+    align-items: center;
+    margin-bottom: 1rem;
+
+    h2 {
+      margin: 0;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      color: #1976d2;
+    }
+
+    .header-icon {
+      color: #4caf50;
+    }
+  }
+
+  .dialog-content {
+    .confirmation-message {
+      margin-bottom: 1.5rem;
+
+      p {
+        margin: 0 0 1rem 0;
+        font-size: 16px;
+        color: #333;
+      }
+
+      .request-details {
+        background: #f5f5f5;
+        padding: 1rem;
+        border-radius: 4px;
+        font-size: 14px;
+        line-height: 1.5;
+
+        strong {
+          color: #1976d2;
+        }
+      }
+    }
+
+    .notes-section {
+      .notes-field {
+        width: 100%;
+      }
+    }
+  }
+
+  .dialog-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 1rem;
+    margin-top: 1rem;
+
+    button {
+      min-width: 100px;
+
+      &.mat-raised-button {
+        background-color: #4caf50;
+        color: white;
+
+        &:hover {
+          background-color: #45a049;
+        }
+
+        &:disabled {
+          background-color: #cccccc;
+        }
+      }
+    }
+
+    .button-spinner {
+      margin-right: 0.5rem;
+    }
+  }
+} 

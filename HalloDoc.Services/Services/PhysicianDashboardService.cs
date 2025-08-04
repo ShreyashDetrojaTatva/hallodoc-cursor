@@ -125,6 +125,54 @@ namespace HalloDoc.Services.Services
             return GenerateCsvExport(allRequests, "All Requests");
         }
 
+        public async Task<bool> AcceptRequestAsync(AcceptRequestDto acceptRequest)
+        {
+            try
+            {
+                var physicianId = await GetCurrentPhysicianId();
+                if (physicianId == null)
+                {
+                    throw new InvalidOperationException("User is not a physician");
+                }
+
+                // Get the request to verify it belongs to this physician
+                var request = await _requestRepository.GetByIdAsync(acceptRequest.RequestId);
+                if (request == null)
+                {
+                    return false;
+                }
+
+                // Verify the request is assigned to this physician
+                if (request.PhysicianId != physicianId.Value)
+                {
+                    return false;
+                }
+
+                // Verify the request is in a state that can be accepted (Unassigned)
+                var acceptableStatuses = new[] 
+                { 
+                    (int)RequestStatus.Unassigned
+                };
+
+                if (!acceptableStatuses.Contains(request.RequestStatus))
+                {
+                    return false;
+                }
+
+                // Change the request status to Accepted (which maps to Pending in dashboard)
+                request.RequestStatus = (int)RequestStatus.Accepted;
+                
+                // Note: Notes will be stored in notes table later
+                // For now, we just update the request status
+
+                return await _requestRepository.UpdateAsync(request);
+            }
+            catch
+            {
+                return false;
+            }
+        }
+
         private async Task<int?> GetCurrentPhysicianId()
         {
             var currentUser = _workContext.CurrentUser();
