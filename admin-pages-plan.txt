@@ -132,7 +132,7 @@ PHASE 2: REQUEST ACTIONS
   - Validation for physician availability
   - Assignment history tracking
 
-□ [Pending] Cancel Request functionality
+✅ [Completed] Cancel Request functionality
   - Confirmation dialog with reason
   - Update request status to "Cancelled"
   - Send notification to patient
