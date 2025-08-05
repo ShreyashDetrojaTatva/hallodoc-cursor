@@ -43,6 +43,12 @@ export class HeaderComponent {
       route: '/admin/dashboard',
       icon: 'admin_panel_settings',
       accountTypes: [AccountType.Admin]
+    },
+    {
+      label: 'Dashboard',
+      route: '/physician/dashboard',
+      icon: 'medical_services',
+      accountTypes: [AccountType.Physician]
     }
     // Future navigation items can be added here
     // Example:
