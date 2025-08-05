@@ -35,6 +35,10 @@ export class DocumentService {
   }
 
   downloadMultipleDocuments(documentIds: number[], isAdmin: boolean): Observable<Blob> {
+    if (!documentIds || documentIds.length === 0) {
+      throw new Error('No document IDs provided');
+    }
+    
     const params = new HttpParams()
       .set('documentIds', documentIds.join(','))
       .set('isAdmin', isAdmin.toString());

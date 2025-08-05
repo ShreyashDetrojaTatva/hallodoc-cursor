@@ -127,7 +127,11 @@ export class DocumentsComponent implements OnInit {
   }
 
   goBack() {
-    this.router.navigate(['/admin/dashboard']);
+    if (this.isAdmin) {
+      this.router.navigate(['/admin/dashboard']);
+    } else {
+      this.router.navigate(['/physician/dashboard']);
+    }
   }
 
   uploadDocument() {
@@ -158,15 +162,25 @@ export class DocumentsComponent implements OnInit {
 
   downloadDocument(document: DocumentData) {
     this.documentService.downloadDocument(document.documentId, this.isAdmin)
+      .pipe(
+        catchError(err => {
+          console.error('Error downloading document:', err);
+          this.snackBar.open('Failed to download document', 'Close', { duration: 3000 });
+          return of(null);
+        })
+      )
       .subscribe(blob => {
-        const url = window.URL.createObjectURL(blob);
-        const link = window.document.createElement('a');
-        link.href = url;
-        link.download = document.fileName;
-        window.document.body.appendChild(link);
-        link.click();
-        window.document.body.removeChild(link);
-        window.URL.revokeObjectURL(url);
+        if (blob) {
+          const url = window.URL.createObjectURL(blob);
+          const link = window.document.createElement('a');
+          link.href = url;
+          link.download = document.fileName;
+          window.document.body.appendChild(link);
+          link.click();
+          window.document.body.removeChild(link);
+          window.URL.revokeObjectURL(url);
+          this.snackBar.open('Document downloaded successfully', 'Close', { duration: 3000 });
+        }
       });
   }
 
@@ -177,28 +191,47 @@ export class DocumentsComponent implements OnInit {
     }
 
     this.documentService.downloadMultipleDocuments(Array.from(this.selectedDocuments), this.isAdmin)
+      .pipe(
+        catchError(err => {
+          console.error('Error downloading documents:', err);
+          this.snackBar.open('Failed to download documents', 'Close', { duration: 3000 });
+          return of(null);
+        })
+      )
       .subscribe(blob => {
-        const url = window.URL.createObjectURL(blob);
-        const link = window.document.createElement('a');
-        link.href = url;
-        link.download = 'documents.zip';
-        window.document.body.appendChild(link);
-        link.click();
-        window.document.body.removeChild(link);
-        window.URL.revokeObjectURL(url);
+        if (blob) {
+          const url = window.URL.createObjectURL(blob);
+          const link = window.document.createElement('a');
+          link.href = url;
+          link.download = 'documents.zip';
+          window.document.body.appendChild(link);
+          link.click();
+          window.document.body.removeChild(link);
+          window.URL.revokeObjectURL(url);
+          this.snackBar.open('Documents downloaded successfully', 'Close', { duration: 3000 });
+        }
       });
   }
 
   viewDocument(document: DocumentData) {
     this.documentService.downloadDocument(document.documentId, this.isAdmin)
+      .pipe(
+        catchError(err => {
+          console.error('Error viewing document:', err);
+          this.snackBar.open('Failed to view document', 'Close', { duration: 3000 });
+          return of(null);
+        })
+      )
       .subscribe(blob => {
-        const url = window.URL.createObjectURL(blob);
-        const documentWithBlob = {
-          ...document,
-          filePath: url
-        };
-        
-        this.dialogWrapper.openDocumentViewer(documentWithBlob);
+        if (blob) {
+          const url = window.URL.createObjectURL(blob);
+          const documentWithBlob = {
+            ...document,
+            filePath: url
+          };
+          
+          this.dialogWrapper.openDocumentViewer(documentWithBlob);
+        }
       });
   }
 

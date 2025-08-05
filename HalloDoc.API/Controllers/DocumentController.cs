@@ -70,6 +70,39 @@ namespace HalloDoc.API.Controllers
             }
         }
 
+        [HttpGet("download-multiple")]
+        public async Task<IActionResult> DownloadMultipleDocuments([FromQuery] string documentIds, [FromQuery] bool isAdmin = false)
+        {
+            try
+            {
+                if (string.IsNullOrEmpty(documentIds))
+                {
+                    return BadRequest(new { message = "Document IDs are required." });
+                }
+
+                var documentIdList = documentIds.Split(',')
+                    .Select(id => int.TryParse(id.Trim(), out var docId) ? docId : 0)
+                    .Where(id => id > 0)
+                    .ToList();
+
+                if (!documentIdList.Any())
+                {
+                    return BadRequest(new { message = "No valid document IDs provided." });
+                }
+
+                var zipBytes = await _documentService.DownloadMultipleDocumentsAsync(documentIdList, isAdmin);
+                return File(zipBytes, "application/zip", "documents.zip");
+            }
+            catch (InvalidOperationException ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
+            catch (Exception)
+            {
+                return StatusCode(500, new { message = "An error occurred while downloading the documents." });
+            }
+        }
+
         [HttpPost("upload")]
         public async Task<IActionResult> UploadDocument([FromForm] int requestId, [FromForm] IFormFile file)
         {

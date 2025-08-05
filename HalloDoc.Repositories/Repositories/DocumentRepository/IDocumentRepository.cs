@@ -16,5 +16,6 @@ namespace HalloDoc.Repositories.Repositories.DocumentRepository
         Task<List<DocumentDto>> GetRequestDocumentsForAdminAsync(int requestId);
         Task<List<DocumentDto>> GetRequestDocumentsForPhysicianAsync(int requestId, int physicianId);
         Task<bool> IsDocumentAccessibleByPhysicianAsync(int documentId, int physicianId);
+        Task<List<DocumentDto>> GetDocumentsByIdsAsync(List<int> documentIds);
     }
 } 

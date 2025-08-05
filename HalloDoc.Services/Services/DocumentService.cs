@@ -10,6 +10,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using System.IO;
 using System.Linq;
+using System.IO.Compression;
 using HalloDoc.Services.Helpers;
 
 namespace HalloDoc.Services.Services
@@ -146,6 +147,63 @@ namespace HalloDoc.Services.Services
             // For now, just return true as email functionality will be implemented later
             // This is a placeholder for the email functionality
             return true;
+        }
+
+        public async Task<byte[]> DownloadMultipleDocumentsAsync(List<int> documentIds, bool isAdmin)
+        {
+            var currentUser = _workContext.CurrentUser();
+            var userId = currentUser?.UserId;
+
+            // Get documents
+            var documents = await _documentRepository.GetDocumentsByIdsAsync(documentIds);
+            if (!documents.Any())
+            {
+                throw new InvalidOperationException("No documents found.");
+            }
+
+            // For admin, allow access to any documents
+            if (!isAdmin)
+            {
+                // For physician, check if they have access to all documents
+                var physician = await _physicianRepository.GetByUserIdAsync(userId ?? 0);
+                if (physician == null)
+                {
+                    throw new InvalidOperationException("Access denied.");
+                }
+
+                foreach (var document in documents)
+                {
+                    if (!await _documentRepository.IsDocumentAccessibleByPhysicianAsync(document.DocumentId, physician.PhysicianId))
+                    {
+                        throw new InvalidOperationException($"Access denied to document: {document.FileName}");
+                    }
+                }
+            }
+
+            // Create ZIP file in memory
+            using (var memoryStream = new MemoryStream())
+            {
+                using (var archive = new ZipArchive(memoryStream, ZipArchiveMode.Create, true))
+                {
+                    foreach (var document in documents)
+                    {
+                        var filePath = Path.Combine(Directory.GetCurrentDirectory(), document.FilePath);
+                        if (!File.Exists(filePath))
+                        {
+                            continue; // Skip files that don't exist
+                        }
+
+                        var entry = archive.CreateEntry(document.FileName);
+                        using (var entryStream = entry.Open())
+                        using (var fileStream = File.OpenRead(filePath))
+                        {
+                            await fileStream.CopyToAsync(entryStream);
+                        }
+                    }
+                }
+
+                return memoryStream.ToArray();
+            }
         }
         private string GetContentType(string fileName)
         {

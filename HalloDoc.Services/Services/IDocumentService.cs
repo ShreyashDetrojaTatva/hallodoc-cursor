@@ -13,5 +13,6 @@ namespace HalloDoc.Services.Services
         Task<bool> UploadDocumentAsync(int requestId, IFormFile file);
         Task<bool> DeleteDocumentAsync(int documentId, bool isAdmin);
         Task<bool> EmailDocumentsAsync(EmailDocumentsDto emailDto, bool isAdmin);
+        Task<byte[]> DownloadMultipleDocumentsAsync(List<int> documentIds, bool isAdmin);
     }
 } 

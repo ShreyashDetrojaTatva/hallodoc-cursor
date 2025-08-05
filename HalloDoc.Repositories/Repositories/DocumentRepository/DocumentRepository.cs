@@ -85,5 +85,20 @@ namespace HalloDoc.Repositories.Repositories.DocumentRepository
             return await _db.Documents
                 .AnyAsync(d => d.DocumentId == documentId && d.Request.PhysicianId == physicianId);
         }
+
+        public async Task<List<DocumentDto>> GetDocumentsByIdsAsync(List<int> documentIds)
+        {
+            return await _db.Documents
+                .Where(d => documentIds.Contains(d.DocumentId))
+                .OrderByDescending(d => d.UploadedAt)
+                .Select(d => new DocumentDto
+                {
+                    DocumentId = d.DocumentId,
+                    FileName = d.FileName,
+                    FilePath = d.FilePath,
+                    UploadedAt = d.UploadedAt
+                })
+                .ToListAsync();
+        }
     }
 } 
