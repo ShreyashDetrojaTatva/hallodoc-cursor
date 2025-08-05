@@ -7,4 +7,7 @@ export * from './physician-dashboard.service';
 export * from './admin-request.service';
 
 // Request Services
-export * from './request/request.service'; 
+export * from './request/request.service';
+
+// Document Services
+export * from './document/document.service'; 

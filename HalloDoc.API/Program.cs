@@ -62,6 +62,7 @@ builder.Services.AddScoped<IAdminDashboardService, AdminDashboardService>();
 builder.Services.AddScoped<IAdminRequestService, AdminRequestService>();
 builder.Services.AddScoped<IPhysicianRepository, PhysicianRepository>();
 builder.Services.AddScoped<IPhysicianDashboardService, PhysicianDashboardService>();
+builder.Services.AddScoped<IDocumentService, DocumentService>();
 
 // Register IHttpContextAccessor and WorkContext
 builder.Services.AddHttpContextAccessor();

@@ -1,0 +1,170 @@
+<div class="documents-container">
+  <div class="page-header">
+    <div class="header-content">
+      <button mat-icon-button (click)="goBack()" class="back-button">
+        <mat-icon>arrow_back</mat-icon>
+      </button>
+      <div class="header-title">
+        <h1>View Documents</h1>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- Upload Section -->
+  <mat-card class="upload-section">
+    <mat-card-header class="upload-section-header">
+      <mat-card-title>Upload Document</mat-card-title>
+    </mat-card-header>
+    <mat-card-content>
+      <form [formGroup]="uploadForm" (ngSubmit)="uploadDocument()">
+        <div class="upload-form">
+          <input type="file" #fileInput (change)="onFileSelected($event)" style="display: none;">
+          <button type="button" mat-stroked-button (click)="fileInput.click()">
+            <mat-icon>attach_file</mat-icon>
+            Choose File
+          </button>
+          <span *ngIf="uploadForm.get('file')?.value" class="selected-file">
+            {{ uploadForm.get('file')?.value?.name }}
+          </span>
+          <button type="submit" mat-raised-button color="primary" 
+                  [disabled]="!uploadForm.valid || isUploading">
+            <mat-icon *ngIf="!isUploading">upload</mat-icon>
+            <mat-spinner *ngIf="isUploading" diameter="20"></mat-spinner>
+            {{ isUploading ? 'Uploading...' : 'Upload' }}
+          </button>
+        </div>
+      </form>
+    </mat-card-content>
+  </mat-card>
+
+  <!-- Documents Table -->
+  <mat-card class="documents-table-card">
+    <mat-card-header class="documents-table-header">
+      <mat-card-title>Documents</mat-card-title>
+      <div class="table-actions">
+        <button mat-raised-button color="accent" 
+                (click)="downloadSelectedDocuments()" 
+                [disabled]="selectedDocuments.size === 0">
+          <mat-icon>download</mat-icon>
+          Download Selected
+        </button>
+        <button mat-raised-button color="warn" 
+                (click)="emailDocuments()" 
+                [disabled]="selectedDocuments.size === 0">
+          <mat-icon>email</mat-icon>
+          Email Selected
+        </button>
+      </div>
+    </mat-card-header>
+    <mat-card-content>
+      <div *ngIf="isLoading" class="loading-container">
+        <mat-spinner diameter="50"></mat-spinner>
+        <p>Loading documents...</p>
+      </div>
+
+      <div *ngIf="error" class="error-container">
+        <mat-icon color="warn">error</mat-icon>
+        <p>{{ error }}</p>
+      </div>
+
+      <div *ngIf="!isLoading && !error && documents.length === 0" class="empty-container">
+        <mat-icon>folder_open</mat-icon>
+        <p>No documents found</p>
+      </div>
+
+      <table *ngIf="!isLoading && !error && documents.length > 0" 
+             mat-table [dataSource]="documents" 
+             class="documents-table">
+        
+        <!-- Checkbox Column -->
+        <ng-container matColumnDef="select">
+          <th mat-header-cell *matHeaderCellDef>
+            <mat-checkbox (change)="toggleAllSelection()" 
+                         [checked]="isAllSelected"
+                         [indeterminate]="selectedDocuments.size > 0 && !isAllSelected">
+            </mat-checkbox>
+          </th>
+          <td mat-cell *matCellDef="let document">
+            <mat-checkbox (change)="toggleDocumentSelection(document.documentId)"
+                         [checked]="selectedDocuments.has(document.documentId)">
+            </mat-checkbox>
+          </td>
+        </ng-container>
+
+        <!-- File Name Column -->
+        <ng-container matColumnDef="fileName">
+          <th mat-header-cell *matHeaderCellDef>Document Name</th>
+          <td mat-cell *matCellDef="let document">
+            <div class="file-info">
+              <mat-icon class="file-icon">description</mat-icon>
+              <span class="file-name">{{ document.fileName }}</span>
+            </div>
+          </td>
+        </ng-container>
+
+        <!-- Upload Date Column -->
+        <ng-container matColumnDef="uploadedAt">
+          <th mat-header-cell *matHeaderCellDef>Upload Date</th>
+          <td mat-cell *matCellDef="let document">
+            {{ document.uploadedAt | date:'medium' }}
+          </td>
+        </ng-container>
+
+        <!-- Actions Column -->
+        <ng-container matColumnDef="actions">
+          <th mat-header-cell *matHeaderCellDef>Actions</th>
+          <td mat-cell *matCellDef="let document">
+            <div class="action-buttons">
+              <button mat-icon-button matTooltip="View Document" 
+                      (click)="viewDocument(document)">
+                <mat-icon>visibility</mat-icon>
+              </button>
+              <button mat-icon-button matTooltip="Download Document" 
+                      (click)="downloadDocument(document)">
+                <mat-icon>download</mat-icon>
+              </button>
+              <button mat-icon-button matTooltip="Delete Document" 
+                      (click)="deleteDocument(document)" 
+                      color="warn">
+                <mat-icon>delete</mat-icon>
+              </button>
+            </div>
+          </td>
+        </ng-container>
+
+        <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+        <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+      </table>
+    </mat-card-content>
+  </mat-card>
+
+  <!-- Email Dialog -->
+  <div *ngIf="showEmailDialog" class="email-dialog-overlay" (click)="showEmailDialog = false">
+    <div class="email-dialog" (click)="$event.stopPropagation()">
+      <h3>Send Documents via Email</h3>
+      <form [formGroup]="emailForm" (ngSubmit)="sendEmail()">
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Email Address</mat-label>
+          <input matInput formControlName="email" placeholder="Enter email address">
+          <mat-error *ngIf="emailForm.get('email')?.hasError('required')">
+            Email is required
+          </mat-error>
+          <mat-error *ngIf="emailForm.get('email')?.hasError('email')">
+            Please enter a valid email address
+          </mat-error>
+        </mat-form-field>
+        
+        <div class="dialog-actions">
+          <button type="button" mat-button (click)="showEmailDialog = false">
+            Cancel
+          </button>
+          <button type="submit" mat-raised-button color="primary" 
+                  [disabled]="!emailForm.valid">
+            Send Email
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div> 

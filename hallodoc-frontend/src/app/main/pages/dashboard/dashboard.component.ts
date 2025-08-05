@@ -306,8 +306,8 @@ export class DashboardComponent implements OnInit, OnDestroy {
         break;
         
       case 'documents':
-        // Navigate to documents page (to be implemented)
-        console.log('Navigate to documents page for request:', request.id);
+        // Navigate to documents page
+        this.router.navigate(['/admin/request', request.id, 'documents']);
         break;
         
       case 'notes':

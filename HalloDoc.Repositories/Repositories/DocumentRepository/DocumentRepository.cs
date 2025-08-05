@@ -37,5 +37,53 @@ namespace HalloDoc.Repositories.Repositories.DocumentRepository
         {
             return await _db.Documents.FindAsync(documentId);
         }
+
+        // New methods for admin/physician document management
+        public async Task<bool> DeleteDocumentAsync(int documentId)
+        {
+            var document = await _db.Documents.FindAsync(documentId);
+            if (document == null)
+                return false;
+
+            _db.Documents.Remove(document);
+            await _db.SaveChangesAsync();
+            return true;
+        }
+
+        public async Task<List<DocumentDto>> GetRequestDocumentsForAdminAsync(int requestId)
+        {
+            return await _db.Documents
+                .Where(d => d.RequestId == requestId)
+                .OrderByDescending(d => d.UploadedAt)
+                .Select(d => new DocumentDto
+                {
+                    DocumentId = d.DocumentId,
+                    FileName = d.FileName,
+                    FilePath = d.FilePath,
+                    UploadedAt = d.UploadedAt
+                })
+                .ToListAsync();
+        }
+
+        public async Task<List<DocumentDto>> GetRequestDocumentsForPhysicianAsync(int requestId, int physicianId)
+        {
+            return await _db.Documents
+                .Where(d => d.RequestId == requestId && d.Request.PhysicianId == physicianId)
+                .OrderByDescending(d => d.UploadedAt)
+                .Select(d => new DocumentDto
+                {
+                    DocumentId = d.DocumentId,
+                    FileName = d.FileName,
+                    FilePath = d.FilePath,
+                    UploadedAt = d.UploadedAt
+                })
+                .ToListAsync();
+        }
+
+        public async Task<bool> IsDocumentAccessibleByPhysicianAsync(int documentId, int physicianId)
+        {
+            return await _db.Documents
+                .AnyAsync(d => d.DocumentId == documentId && d.Request.PhysicianId == physicianId);
+        }
     }
 } 

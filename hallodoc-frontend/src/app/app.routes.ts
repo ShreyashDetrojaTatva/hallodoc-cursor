@@ -85,6 +85,11 @@ export const routes: Routes = [
         path: 'request/:id/view', 
         loadComponent: () => import('./main/pages/admin/view-request/view-request.component').then(m => m.ViewRequestComponent), 
         data: { requiresAuth: true, redirectIfLoggedIn: false } 
+      },
+      { 
+        path: 'request/:id/documents', 
+        loadComponent: () => import('./main/pages/shared/documents/documents.component').then(m => m.DocumentsComponent), 
+        data: { requiresAuth: true, redirectIfLoggedIn: false } 
       }
     ]
   },
@@ -103,6 +108,11 @@ export const routes: Routes = [
       { 
         path: 'request/:id/view', 
         loadComponent: () => import('./main/pages/admin/view-request/view-request.component').then(m => m.ViewRequestComponent), 
+        data: { requiresAuth: true, redirectIfLoggedIn: false } 
+      },
+      { 
+        path: 'request/:id/documents', 
+        loadComponent: () => import('./main/pages/shared/documents/documents.component').then(m => m.DocumentsComponent), 
         data: { requiresAuth: true, redirectIfLoggedIn: false } 
       }
     ]
