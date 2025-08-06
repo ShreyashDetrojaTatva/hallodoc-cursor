@@ -108,8 +108,8 @@ namespace HalloDoc.API.Controllers
                     Filters = filters
                 };
 
-                var csvData = await _adminDashboardService.ExportRequestsAsync(state, request);
-                return File(csvData, "text/csv", $"{state.ToString().ToLower()}-requests.csv");
+                var excelData = await _adminDashboardService.ExportRequestsAsync(state, request);
+                return File(excelData, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", $"{state.ToString().ToLower()}-requests.xlsx");
             }
             catch (Exception ex)
             {
@@ -150,8 +150,8 @@ namespace HalloDoc.API.Controllers
                     Filters = filters
                 };
 
-                var csvData = await _adminDashboardService.ExportAllRequestsAsync(request);
-                return File(csvData, "text/csv", "all-requests.csv");
+                var excelData = await _adminDashboardService.ExportAllRequestsAsync(request);
+                return File(excelData, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "all-requests.xlsx");
             }
             catch (Exception ex)
             {

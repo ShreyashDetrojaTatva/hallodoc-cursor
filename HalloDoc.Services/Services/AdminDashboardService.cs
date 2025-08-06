@@ -4,6 +4,7 @@ using HalloDoc.Repositories.DTOs;
 using HalloDoc.Repositories.DTOs.Pagination;
 using HalloDoc.Repositories.Repositories.RequestRepository;
 using Microsoft.EntityFrameworkCore;
+using OfficeOpenXml;
 
 namespace HalloDoc.Services.Services
 {
@@ -45,16 +46,16 @@ namespace HalloDoc.Services.Services
             var statusIds = RequestStatusMapper.GetStatusIdsForState(state);
             var response = await _requestRepository.GetRequestsByStatusIdsAsync(statusIds, request);
             
-            // Convert to CSV format
-            return GenerateCsvData(response.Items);
+            // Convert to Excel format
+            return GenerateExcelData(response.Items, $"Admin Dashboard - {state}");
         }
 
         public async Task<byte[]> ExportAllRequestsAsync(PaginationRequestDto<DashboardFiltersDto> request)
         {
             var response = await _requestRepository.GetAllRequestsAsync(request);
             
-            // Convert to CSV format
-            return GenerateCsvData(response.Items);
+            // Convert to Excel format
+            return GenerateExcelData(response.Items, "Admin Dashboard - All Requests");
         }
 
         private async Task<int> GetRequestCountByStatusIds(int[] statusIds)
@@ -63,30 +64,51 @@ namespace HalloDoc.Services.Services
             return await _requestRepository.GetRequestCountByStatusIdsAsync(statusIds);
         }
 
-        private byte[] GenerateCsvData(List<RequestDataDto> requests)
+        private byte[] GenerateExcelData(List<RequestDataDto> requests, string sheetName)
         {
-            var csvLines = new List<string>
-            {
-                "Patient Full Name,Date of Birth,Requestor Name,Physician Name,Date of Service,Phone,Address,Request Status,Request Type,Requested Date"
-            };
+            // Set EPPlus license context
+            ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
 
-            foreach (var request in requests)
+            using (var package = new ExcelPackage())
             {
-                var line = $"{request.PatientFullName}," +
-                          $"{request.DateOfBirth}," +
-                          $"{request.RequestorName}," +
-                          $"{request.PhysicianName ?? ""}," +
-                          $"{request.DateOfService ?? ""}," +
-                          $"{request.Phone}," +
-                          $"{request.Address}," +
-                          $"{request.RequestStatus ?? ""}," +
-                          $"{request.RequestType}," +
-                          $"{request.RequestedDate}";
-                
-                csvLines.Add(line);
+                var worksheet = package.Workbook.Worksheets.Add(sheetName);
+
+                // Add headers
+                var headers = new[]
+                {
+                    "Patient Full Name", "Date of Birth", "Requestor Name", "Physician Name",
+                    "Date of Service", "Phone", "Address", "Request Status", "Request Type", "Requested Date"
+                };
+
+                for (int i = 0; i < headers.Length; i++)
+                {
+                    worksheet.Cells[1, i + 1].Value = headers[i];
+                    worksheet.Cells[1, i + 1].Style.Font.Bold = true;
+                }
+
+                // Add data rows
+                for (int i = 0; i < requests.Count; i++)
+                {
+                    var request = requests[i];
+                    var row = i + 2;
+
+                    worksheet.Cells[row, 1].Value = request.PatientFullName ?? "";
+                    worksheet.Cells[row, 2].Value = request.DateOfBirth ?? "";
+                    worksheet.Cells[row, 3].Value = request.RequestorName ?? "";
+                    worksheet.Cells[row, 4].Value = request.PhysicianName ?? "";
+                    worksheet.Cells[row, 5].Value = request.DateOfService ?? "";
+                    worksheet.Cells[row, 6].Value = request.Phone ?? "";
+                    worksheet.Cells[row, 7].Value = request.Address ?? "";
+                    worksheet.Cells[row, 8].Value = ((RequestStatus)Convert.ToInt32(request.RequestStatus)).ToString();
+                    worksheet.Cells[row, 9].Value = ((RequestType)request.RequestType).ToString();
+                    worksheet.Cells[row, 10].Value = request.RequestedDate ?? "";
+                }
+
+                // Auto-fit columns
+                worksheet.Cells[worksheet.Dimension.Address].AutoFitColumns();
+
+                return package.GetAsByteArray();
             }
-
-            return System.Text.Encoding.UTF8.GetBytes(string.Join("\n", csvLines));
         }
     }
 } 

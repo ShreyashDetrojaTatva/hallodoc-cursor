@@ -58,8 +58,8 @@ namespace HalloDoc.API.Controllers
         {
             try
             {
-                var csvData = await _physicianDashboardService.ExportRequestsAsync(state, request);
-                return File(csvData, "text/csv", $"physician-requests-{state}-{DateTime.Now:yyyyMMdd}.csv");
+                var excelData = await _physicianDashboardService.ExportRequestsAsync(state, request);
+                return File(excelData, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", $"physician-requests-{state}-{DateTime.Now:yyyyMMdd}.xlsx");
             }
             catch (InvalidOperationException ex)
             {
@@ -76,8 +76,8 @@ namespace HalloDoc.API.Controllers
         {
             try
             {
-                var csvData = await _physicianDashboardService.ExportAllRequestsAsync(request);
-                return File(csvData, "text/csv", $"physician-all-requests-{DateTime.Now:yyyyMMdd}.csv");
+                var excelData = await _physicianDashboardService.ExportAllRequestsAsync(request);
+                return File(excelData, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", $"physician-all-requests-{DateTime.Now:yyyyMMdd}.xlsx");
             }
             catch (InvalidOperationException ex)
             {

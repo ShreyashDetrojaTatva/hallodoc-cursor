@@ -6,6 +6,7 @@ using HalloDoc.Common.Constants;
 using HalloDoc.Services.Helpers;
 using HalloDoc.Common.Utility;
 using System.Text;
+using OfficeOpenXml;
 
 namespace HalloDoc.Services.Services
 {
@@ -95,7 +96,7 @@ namespace HalloDoc.Services.Services
             }
 
             var requests = await GetRequestsByStateAsync(state, request);
-            return GenerateCsvExport(requests.Items, state.ToString());
+            return GenerateExcelExport(requests.Items, $"Physician Dashboard - {state}");
         }
 
         public async Task<byte[]> ExportAllRequestsAsync(PaginationRequestDto<DashboardFiltersDto> request)
@@ -122,7 +123,7 @@ namespace HalloDoc.Services.Services
                 allRequests.AddRange(stateRequests.Items);
             }
 
-            return GenerateCsvExport(allRequests, "All Requests");
+            return GenerateExcelExport(allRequests, "Physician Dashboard - All Requests");
         }
 
         public async Task<bool> AcceptRequestAsync(AcceptRequestDto acceptRequest)
@@ -221,18 +222,50 @@ namespace HalloDoc.Services.Services
             };
         }
 
-        private byte[] GenerateCsvExport(List<RequestDataDto> requests, string stateName)
+        private byte[] GenerateExcelExport(List<RequestDataDto> requests, string sheetName)
         {
-            var csv = new StringBuilder();
-            csv.AppendLine($"Physician Dashboard - {stateName}");
-            csv.AppendLine("Patient Name,Date of Birth,Requestor,Physician,Date of Service,Requested Date,Phone,Address,Status");
-            
-            foreach (var request in requests)
+            // Set EPPlus license context
+            ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
+
+            using (var package = new ExcelPackage())
             {
-                csv.AppendLine($"\"{request.PatientFullName}\",\"{request.DateOfBirth}\",\"{request.RequestorName}\",\"{request.PhysicianName ?? "-"}\",\"{request.DateOfService ?? "-"}\",\"{request.RequestedDate}\",\"{request.Phone}\",\"{request.Address}\",\"{request.RequestStatus}\"");
+                var worksheet = package.Workbook.Worksheets.Add(sheetName);
+
+                // Add headers
+                var headers = new[]
+                {
+                    "Patient Name", "Date of Birth", "Requestor", "Physician",
+                    "Date of Service", "Requested Date", "Phone", "Address", "Status"
+                };
+
+                for (int i = 0; i < headers.Length; i++)
+                {
+                    worksheet.Cells[1, i + 1].Value = headers[i];
+                    worksheet.Cells[1, i + 1].Style.Font.Bold = true;
+                }
+
+                // Add data rows
+                for (int i = 0; i < requests.Count; i++)
+                {
+                    var request = requests[i];
+                    var row = i + 2;
+
+                    worksheet.Cells[row, 1].Value = request.PatientFullName ?? "";
+                    worksheet.Cells[row, 2].Value = request.DateOfBirth ?? "";
+                    worksheet.Cells[row, 3].Value = request.RequestorName ?? "";
+                    worksheet.Cells[row, 4].Value = request.PhysicianName ?? "-";
+                    worksheet.Cells[row, 5].Value = request.DateOfService ?? "-";
+                    worksheet.Cells[row, 6].Value = request.RequestedDate ?? "";
+                    worksheet.Cells[row, 7].Value = request.Phone ?? "";
+                    worksheet.Cells[row, 8].Value = request.Address ?? "";
+                    worksheet.Cells[row, 9].Value = ((RequestStatus)Convert.ToInt32(request.RequestStatus)).ToString();
+                }
+
+                // Auto-fit columns
+                worksheet.Cells[worksheet.Dimension.Address].AutoFitColumns();
+
+                return package.GetAsByteArray();
             }
-            
-            return Encoding.UTF8.GetBytes(csv.ToString());
         }
     }
 } 

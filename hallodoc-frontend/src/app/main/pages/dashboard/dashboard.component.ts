@@ -398,7 +398,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
         const url = window.URL.createObjectURL(blob);
         const link = document.createElement('a');
         link.href = url;
-        link.download = `requests_${RequestStatusMapper.getDashboardStatusDisplayName(this.selectedState).toLowerCase()}_${new Date().toISOString().split('T')[0]}.csv`;
+        link.download = `requests_${RequestStatusMapper.getDashboardStatusDisplayName(this.selectedState).toLowerCase()}_${new Date().toISOString().split('T')[0]}.xlsx`;
         document.body.appendChild(link);
         link.click();
         document.body.removeChild(link);
@@ -416,7 +416,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
         const url = window.URL.createObjectURL(blob);
         const link = document.createElement('a');
         link.href = url;
-        link.download = `all_requests_${new Date().toISOString().split('T')[0]}.csv`;
+        link.download = `all_requests_${new Date().toISOString().split('T')[0]}.xlsx`;
         document.body.appendChild(link);
         link.click();
         document.body.removeChild(link);

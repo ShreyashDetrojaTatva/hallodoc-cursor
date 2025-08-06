@@ -334,7 +334,7 @@ export class PhysicianDashboardComponent implements OnInit, OnDestroy {
         const url = window.URL.createObjectURL(blob);
         const link = document.createElement('a');
         link.href = url;
-        link.download = `physician-requests-${this.selectedState}-${new Date().toISOString().split('T')[0]}.csv`;
+        link.download = `physician-requests-${this.selectedState}-${new Date().toISOString().split('T')[0]}.xlsx`;
         link.click();
         window.URL.revokeObjectURL(url);
       },
@@ -350,7 +350,7 @@ export class PhysicianDashboardComponent implements OnInit, OnDestroy {
         const url = window.URL.createObjectURL(blob);
         const link = document.createElement('a');
         link.href = url;
-        link.download = `physician-all-requests-${new Date().toISOString().split('T')[0]}.csv`;
+        link.download = `physician-all-requests-${new Date().toISOString().split('T')[0]}.xlsx`;
         link.click();
         window.URL.revokeObjectURL(url);
       },
