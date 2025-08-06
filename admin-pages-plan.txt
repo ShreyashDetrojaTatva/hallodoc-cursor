@@ -146,7 +146,7 @@ PHASE 2: REQUEST ACTIONS
   - button to go to view Documents
   - button to assign case
 
-□ [Pending] Document viewer/upload system
+✓ [Completed] Document viewer/upload system
   - Document upload functionality with drag-drop
   - Document list and management interface
   - Integration with existing document viewer

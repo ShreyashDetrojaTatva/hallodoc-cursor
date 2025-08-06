@@ -55,5 +55,6 @@ namespace HalloDoc.Entities.Data.Entities
         // Navigation
         public virtual ICollection<RequestClient> RequestClients { get; set; } = new List<RequestClient>();
         public virtual ICollection<Document>? Documents { get; set; }
+        public virtual ICollection<AgreementToken> AgreementTokens { get; set; } = new List<AgreementToken>();
     }
 } 

@@ -21,6 +21,7 @@ namespace HalloDoc.Entities.Data.Context
         public DbSet<Request> Requests { get; set; }
         public DbSet<RequestClient> RequestClients { get; set; }
         public DbSet<Document> Documents { get; set; }
+        public DbSet<AgreementToken> AgreementTokens { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -78,6 +79,12 @@ namespace HalloDoc.Entities.Data.Context
                 .HasMany(r => r.Documents)
                 .WithOne(d => d.Request)
                 .HasForeignKey(d => d.RequestId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<Request>()
+                .HasMany(r => r.AgreementTokens)
+                .WithOne(a => a.Request)
+                .HasForeignKey(a => a.RequestId)
                 .OnDelete(DeleteBehavior.Cascade);
 
             modelBuilder.Entity<Request>()
