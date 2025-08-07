@@ -2,6 +2,7 @@ using HalloDoc.Repositories.DTOs;
 using HalloDoc.Repositories.Repositories.RequestRepository;
 using HalloDoc.Repositories.Repositories.PhysicianRepository;
 using HalloDoc.Services.Helpers;
+using HalloDoc.Services.Services.AgreementService;
 using Microsoft.EntityFrameworkCore;
 
 namespace HalloDoc.Services.Services
@@ -11,15 +12,18 @@ namespace HalloDoc.Services.Services
         private readonly IRequestRepository _requestRepository;
         private readonly IPhysicianRepository _physicianRepository;
         private readonly IWorkContext _workContext;
+        private readonly IAgreementService _agreementService;
 
         public AdminRequestService(
-            IRequestRepository requestRepository, 
+            IRequestRepository requestRepository,
             IPhysicianRepository physicianRepository,
-            IWorkContext workContext)
+            IWorkContext workContext,
+            IAgreementService agreementService)
         {
             _requestRepository = requestRepository;
             _physicianRepository = physicianRepository;
             _workContext = workContext;
+            _agreementService = agreementService;
         }
 
         public async Task<RequestDetailsDto?> GetRequestDetailsAsync(int requestId)
@@ -51,7 +55,7 @@ namespace HalloDoc.Services.Services
             return new RequestDetailsDto
             {
                 RequestId = request.RequestId,
-                
+
                 // Patient Information (from RequestClient)
                 PatientFirstName = requestClient.FirstName ?? string.Empty,
                 PatientLastName = requestClient.LastName ?? string.Empty,
@@ -62,13 +66,13 @@ namespace HalloDoc.Services.Services
                 PatientCity = requestClient.City ?? string.Empty,
                 PatientState = requestClient.State ?? string.Empty,
                 PatientZipCode = requestClient.ZipCode ?? string.Empty,
-                
+
                 // Request Information
                 RequestType = request.RequestType,
                 RequestStatus = request.RequestStatus,
                 Symptoms = request.Symptoms ?? string.Empty,
                 CreatedAt = request.CreatedAt,
-                
+
                 // Requestor Information (from Request entity)
                 RequestorFirstName = request.RequestorFirstName ?? string.Empty,
                 RequestorLastName = request.RequestorLastName ?? string.Empty,
@@ -227,5 +231,17 @@ namespace HalloDoc.Services.Services
                 return false;
             }
         }
+
+        public async Task<bool> SendAgreementAsync(SendAgreementDto sendAgreementDto)
+        {
+            try
+            {
+                return await _agreementService.SendAgreementAsync(sendAgreementDto);
+            }
+            catch
+            {
+                return false;
+            }
+        }
     }
-} 
+}

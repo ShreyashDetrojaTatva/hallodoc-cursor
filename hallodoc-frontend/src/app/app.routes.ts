@@ -10,7 +10,7 @@ export const routes: Routes = [
     path: '',
     loadComponent: () => import('./main/pages/landing/landing.component').then(m => m.LandingComponent),
     canActivate: [authGuard],
-    data: { 
+    data: {
       requiresAuth: false,
       redirectIfLoggedIn: false 
     }
@@ -76,18 +76,18 @@ export const routes: Routes = [
     canActivate: [authGuard, AdminGuard],
     data: { requiresAuth: true, redirectIfLoggedIn: false },
     children: [
-      { 
-        path: 'dashboard', 
+      {
+        path: 'dashboard',
         loadComponent: () => import('./main/pages/dashboard/dashboard.component').then(m => m.DashboardComponent), 
         data: { requiresAuth: true, redirectIfLoggedIn: false } 
       },
-      { 
-        path: 'request/:id/view', 
+      {
+        path: 'request/:id/view',
         loadComponent: () => import('./main/pages/admin/view-request/view-request.component').then(m => m.ViewRequestComponent), 
         data: { requiresAuth: true, redirectIfLoggedIn: false } 
       },
-      { 
-        path: 'request/:id/documents', 
+      {
+        path: 'request/:id/documents',
         loadComponent: () => import('./main/pages/shared/documents/documents.component').then(m => m.DocumentsComponent), 
         data: { requiresAuth: true, redirectIfLoggedIn: false } 
       }
@@ -100,18 +100,18 @@ export const routes: Routes = [
     canActivate: [authGuard, PhysicianGuard],
     data: { requiresAuth: true, redirectIfLoggedIn: false },
     children: [
-      { 
-        path: 'dashboard', 
+      {
+        path: 'dashboard',
         loadComponent: () => import('./main/pages/physician/dashboard/physician-dashboard.component').then(m => m.PhysicianDashboardComponent), 
         data: { requiresAuth: true, redirectIfLoggedIn: false } 
       },
-      { 
-        path: 'request/:id/view', 
+      {
+        path: 'request/:id/view',
         loadComponent: () => import('./main/pages/admin/view-request/view-request.component').then(m => m.ViewRequestComponent), 
         data: { requiresAuth: true, redirectIfLoggedIn: false } 
       },
-      { 
-        path: 'request/:id/documents', 
+      {
+        path: 'request/:id/documents',
         loadComponent: () => import('./main/pages/shared/documents/documents.component').then(m => m.DocumentsComponent), 
         data: { requiresAuth: true, redirectIfLoggedIn: false } 
       }
@@ -142,6 +142,15 @@ export const routes: Routes = [
     data: {
       requiresAuth: false,
       redirectIfLoggedIn: true
+    }
+  },
+  {
+    path: 'agreement/:token',
+    loadComponent: () => import('./main/pages/agreement/agreement.component').then(m => m.AgreementComponent),
+    canActivate: [authGuard],
+    data: {
+      requiresAuth: false,
+      redirectIfLoggedIn: false
     }
   }
 ];

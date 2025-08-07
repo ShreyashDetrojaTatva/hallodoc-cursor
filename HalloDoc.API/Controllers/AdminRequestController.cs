@@ -66,5 +66,16 @@ namespace HalloDoc.API.Controllers
             }
             return Ok(new { message = "Request cancelled successfully" });
         }
+
+        [HttpPost("send-agreement")]
+        public async Task<IActionResult> SendAgreement([FromBody] SendAgreementDto sendAgreementDto)
+        {
+            var result = await _adminRequestService.SendAgreementAsync(sendAgreementDto);
+            if (!result)
+            {
+                return BadRequest("Failed to send agreement. Request may not be eligible or patient email not found.");
+            }
+            return Ok(new { message = "Agreement sent successfully" });
+        }
     }
-} 
+}

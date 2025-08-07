@@ -38,7 +38,7 @@ namespace HalloDoc.Services.Services
 
         public async Task<List<DocumentDto>> GetRequestDocumentsForAdminAsync(int requestId)
         {
-            return await _documentRepository.GetRequestDocumentsForAdminAsync(requestId);
+            return await _documentRepository.GetRequestDocumentsAsync(requestId);
         }
 
         public async Task<List<DocumentDto>> GetRequestDocumentsForPhysicianAsync(int requestId)
@@ -221,4 +221,4 @@ namespace HalloDoc.Services.Services
             };
         }
     }
-} 
+}

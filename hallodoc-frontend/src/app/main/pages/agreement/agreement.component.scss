@@ -1,0 +1,273 @@
+.agreement-page {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+
+  .agreement-container {
+    width: 100%;
+    max-width: 800px;
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+    overflow: hidden;
+  }
+
+  .loading-state,
+  .error-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 60px 20px;
+    text-align: center;
+
+    p {
+      margin-top: 20px;
+      color: #666;
+      font-size: 16px;
+    }
+  }
+
+  .error-state {
+    .error-icon {
+      font-size: 48px;
+      width: 48px;
+      height: 48px;
+      color: #f44336;
+      margin-bottom: 20px;
+    }
+
+    h2 {
+      color: #f44336;
+      margin-bottom: 10px;
+    }
+
+    p {
+      color: #666;
+      margin-bottom: 30px;
+    }
+  }
+
+  .agreement-content {
+    .agreement-header {
+      background: linear-gradient(135deg, #1976d2 0%, #42a5f5 100%);
+      color: white;
+      padding: 30px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+
+      .logo h1 {
+        margin: 0;
+        font-size: 28px;
+        font-weight: 600;
+      }
+
+      .status-info {
+        display: flex;
+        gap: 15px;
+
+        .status-badge {
+          display: flex;
+          align-items: center;
+          gap: 5px;
+          padding: 8px 12px;
+          border-radius: 20px;
+          font-size: 14px;
+          font-weight: 500;
+
+          &.expired {
+            background-color: rgba(255, 255, 255, 0.2);
+          }
+
+          &.used {
+            background-color: rgba(76, 175, 80, 0.2);
+          }
+
+          mat-icon {
+            font-size: 18px;
+            width: 18px;
+            height: 18px;
+          }
+        }
+      }
+    }
+
+    .agreement-card {
+      margin: 0;
+      border-radius: 0;
+      box-shadow: none;
+
+      mat-card-header {
+        padding: 30px 30px 20px 30px;
+        border-bottom: 1px solid #eee;
+
+        mat-card-title {
+          font-size: 24px;
+          color: #1976d2;
+          margin-bottom: 5px;
+        }
+
+        mat-card-subtitle {
+          color: #666;
+          font-size: 16px;
+        }
+      }
+
+      mat-card-content {
+        padding: 30px;
+
+        .request-details {
+          background-color: #f5f5f5;
+          padding: 20px;
+          border-radius: 8px;
+          margin-bottom: 30px;
+
+          h3 {
+            margin: 0 0 15px 0;
+            color: #333;
+            font-size: 18px;
+          }
+
+          .detail-row {
+            display: flex;
+            margin-bottom: 10px;
+            font-size: 14px;
+
+            .label {
+              font-weight: 600;
+              color: #555;
+              min-width: 120px;
+            }
+
+            .value {
+              color: #333;
+              flex: 1;
+            }
+          }
+        }
+
+        .agreement-text {
+          h3 {
+            color: #1976d2;
+            margin-bottom: 15px;
+            font-size: 18px;
+          }
+
+          p {
+            line-height: 1.6;
+            color: #333;
+            margin-bottom: 15px;
+          }
+
+          ul {
+            margin: 15px 0;
+            padding-left: 20px;
+
+            li {
+              margin-bottom: 8px;
+              line-height: 1.5;
+              color: #333;
+            }
+          }
+        }
+      }
+
+      .agreement-actions {
+        display: flex;
+        justify-content: space-between;
+        padding: 30px;
+        border-top: 1px solid #eee;
+        gap: 20px;
+
+        .action-button {
+          flex: 1;
+          height: 48px;
+          font-size: 16px;
+          font-weight: 500;
+
+          mat-icon {
+            margin-right: 8px;
+          }
+        }
+      }
+
+      .processing-state {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        padding: 30px;
+        border-top: 1px solid #eee;
+
+        p {
+          margin-top: 15px;
+          color: #666;
+          font-size: 16px;
+        }
+      }
+    }
+  }
+}
+
+// Responsive Design
+@media (max-width: 768px) {
+  .agreement-page {
+    padding: 10px;
+
+    .agreement-container {
+      border-radius: 8px;
+    }
+
+    .agreement-content {
+      .agreement-header {
+        padding: 20px;
+        flex-direction: column;
+        gap: 15px;
+        text-align: center;
+
+        .logo h1 {
+          font-size: 24px;
+        }
+
+        .status-info {
+          justify-content: center;
+        }
+      }
+
+      .agreement-card {
+        mat-card-header {
+          padding: 20px;
+        }
+
+        mat-card-content {
+          padding: 20px;
+
+          .request-details {
+            padding: 15px;
+
+            .detail-row {
+              flex-direction: column;
+              gap: 5px;
+
+              .label {
+                min-width: auto;
+              }
+            }
+          }
+        }
+
+        .agreement-actions {
+          padding: 20px;
+          flex-direction: column;
+
+          .action-button {
+            width: 100%;
+          }
+        }
+      }
+    }
+  }
+}

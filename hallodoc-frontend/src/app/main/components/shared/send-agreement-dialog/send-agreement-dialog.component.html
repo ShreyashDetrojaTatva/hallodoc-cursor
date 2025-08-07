@@ -1,0 +1,66 @@
+<div class="send-agreement-dialog">
+  <div class="dialog-header">
+    <h2 mat-dialog-title>Send Agreement</h2>
+    <button mat-icon-button (click)="onCancel()" class="close-button" aria-label="Close">
+      <mat-icon>close</mat-icon>
+    </button>
+  </div>
+
+  <mat-dialog-content>
+    <div class="dialog-content">
+      <div class="request-info">
+        <h3>Request Information</h3>
+        <div class="info-row">
+          <span class="label">Patient:</span>
+          <span class="value">{{ data.request.patientFullName }}</span>
+        </div>
+        <div class="info-row">
+          <span class="label">Request ID:</span>
+          <span class="value">{{ data.request.id }}</span>
+        </div>
+        <div class="info-row">
+          <span class="label">Request Type:</span>
+          <span class="value">{{ data.request.requestType }}</span>
+        </div>
+      </div>
+
+      <form [formGroup]="agreementForm" class="agreement-form">
+        <mat-form-field class="form-field" appearance="outline">
+          <mat-label>Patient Email</mat-label>
+          <input matInput formControlName="patientEmail" placeholder="Enter patient email" type="email">
+          <mat-error *ngIf="agreementForm.get('patientEmail')?.hasError('required')">
+            Email is required
+          </mat-error>
+          <mat-error *ngIf="agreementForm.get('patientEmail')?.hasError('email')">
+            Please enter a valid email address
+          </mat-error>
+        </mat-form-field>
+
+        <div class="info-message">
+          <mat-icon>info</mat-icon>
+          <span>An agreement email will be sent to the patient with a secure link to review and respond to the agreement.</span>
+        </div>
+
+        <div class="error-message" *ngIf="error">
+          <mat-icon>error</mat-icon>
+          <span>{{ error }}</span>
+        </div>
+      </form>
+    </div>
+  </mat-dialog-content>
+
+  <mat-dialog-actions align="end">
+    <button mat-button (click)="onCancel()" [disabled]="isLoading">
+      Cancel
+    </button>
+    <button 
+      mat-raised-button 
+      color="primary" 
+      (click)="onSend()" 
+      [disabled]="!agreementForm.valid || isLoading">
+      <mat-icon *ngIf="!isLoading">send</mat-icon>
+      <mat-spinner *ngIf="isLoading" diameter="20"></mat-spinner>
+      Send Agreement
+    </button>
+  </mat-dialog-actions>
+</div> 

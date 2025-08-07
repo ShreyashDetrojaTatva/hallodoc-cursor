@@ -14,22 +14,28 @@ import { MatMenuModule } from '@angular/material/menu';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
+import { MatSnackBar } from '@angular/material/snack-bar';
 import { Router } from '@angular/router';
 import { MatMenuTrigger } from '@angular/material/menu';
 import { Subject } from 'rxjs';
 import { AuthService } from '@main/services';
-import { 
-  DashboardState, 
-  AdminRequestData, 
-  RequestAction 
+import {
+  DashboardState,
+  AdminRequestData,
+  RequestAction,
 } from '@main/interfaces';
-import { PaginationRequest, PaginationResponse, PaginationDashboardFilters } from '@main/interfaces/pagination';
+import {
+  PaginationRequest,
+  PaginationResponse,
+  PaginationDashboardFilters,
+} from '@main/interfaces/pagination';
 import { DashboardRequestStatus, RequestType } from '@main/enums';
 import { RequestStatusMapper } from '@main/utils/request-status-mapper';
 import { PhysicianDashboardService } from '@main/services/physician-dashboard.service';
 import { AdminRequestService } from '@main/services/admin-request.service';
 import { AcceptRequestComponent } from '@main/components/physician/accept-request/accept-request.component';
 import { AcceptRequestData } from '@main/interfaces/physician/accept-request.interface';
+import { SendAgreementDialogComponent } from '@main/components/shared/send-agreement-dialog/send-agreement-dialog.component';
 
 @Component({
   selector: 'app-physician-dashboard',
@@ -50,10 +56,10 @@ import { AcceptRequestData } from '@main/interfaces/physician/accept-request.int
     MatMenuModule,
     MatProgressSpinnerModule,
     MatTooltipModule,
-    MatDialogModule
+    MatDialogModule,
   ],
   templateUrl: './physician-dashboard.component.html',
-  styleUrl: './physician-dashboard.component.scss'
+  styleUrl: './physician-dashboard.component.scss',
 })
 export class PhysicianDashboardComponent implements OnInit, OnDestroy {
   private destroy$ = new Subject<void>();
@@ -65,15 +71,47 @@ export class PhysicianDashboardComponent implements OnInit, OnDestroy {
 
   // Dashboard states (only for physicians)
   dashboardStates: DashboardState[] = [
-    { id: DashboardRequestStatus.New, name: RequestStatusMapper.getDashboardStatusDisplayName(DashboardRequestStatus.New), count: 0, color: '#1976d2', icon: 'settings' },
-    { id: DashboardRequestStatus.Pending, name: RequestStatusMapper.getDashboardStatusDisplayName(DashboardRequestStatus.Pending), count: 0, color: '#42a5f5', icon: 'notifications' },
-    { id: DashboardRequestStatus.Active, name: RequestStatusMapper.getDashboardStatusDisplayName(DashboardRequestStatus.Active), count: 0, color: '#66bb6a', icon: 'check_circle' },
-    { id: DashboardRequestStatus.Conclude, name: RequestStatusMapper.getDashboardStatusDisplayName(DashboardRequestStatus.Conclude), count: 0, color: '#ec407a', icon: 'schedule' }
+    {
+      id: DashboardRequestStatus.New,
+      name: RequestStatusMapper.getDashboardStatusDisplayName(
+        DashboardRequestStatus.New
+      ),
+      count: 0,
+      color: '#1976d2',
+      icon: 'settings',
+    },
+    {
+      id: DashboardRequestStatus.Pending,
+      name: RequestStatusMapper.getDashboardStatusDisplayName(
+        DashboardRequestStatus.Pending
+      ),
+      count: 0,
+      color: '#42a5f5',
+      icon: 'notifications',
+    },
+    {
+      id: DashboardRequestStatus.Active,
+      name: RequestStatusMapper.getDashboardStatusDisplayName(
+        DashboardRequestStatus.Active
+      ),
+      count: 0,
+      color: '#66bb6a',
+      icon: 'check_circle',
+    },
+    {
+      id: DashboardRequestStatus.Conclude,
+      name: RequestStatusMapper.getDashboardStatusDisplayName(
+        DashboardRequestStatus.Conclude
+      ),
+      count: 0,
+      color: '#ec407a',
+      icon: 'schedule',
+    },
   ];
 
   // Current state
   selectedState = DashboardRequestStatus.New;
-  
+
   // Table data
   displayedColumns: string[] = [];
   dataSource: AdminRequestData[] = [];
@@ -81,7 +119,7 @@ export class PhysicianDashboardComponent implements OnInit, OnDestroy {
   totalPages = 0;
   currentPage = 1;
   pageSize = 10;
-  
+
   // Pagination request
   paginationRequest: PaginationRequest<PaginationDashboardFilters> = {
     pageIndex: 1,
@@ -94,8 +132,8 @@ export class PhysicianDashboardComponent implements OnInit, OnDestroy {
       requestType: undefined,
       regionId: undefined,
       fromDate: undefined,
-      toDate: undefined
-    }
+      toDate: undefined,
+    },
   };
 
   // Loading states
@@ -111,7 +149,7 @@ export class PhysicianDashboardComponent implements OnInit, OnDestroy {
     { value: RequestType.Patient, label: 'Patient' },
     { value: RequestType.Family, label: 'Family/Friend' },
     { value: RequestType.Business, label: 'Business' },
-    { value: RequestType.Concierge, label: 'Concierge' }
+    { value: RequestType.Concierge, label: 'Concierge' },
   ];
 
   constructor(
@@ -119,7 +157,8 @@ export class PhysicianDashboardComponent implements OnInit, OnDestroy {
     private physicianDashboardService: PhysicianDashboardService,
     private adminRequestService: AdminRequestService,
     private router: Router,
-    private dialog: MatDialog
+    private dialog: MatDialog,
+    private snackBar: MatSnackBar
   ) {}
 
   ngOnInit() {
@@ -134,24 +173,24 @@ export class PhysicianDashboardComponent implements OnInit, OnDestroy {
 
   loadStateCounts() {
     this.isLoadingStates = true;
-    this.physicianDashboardService.getStateCounts()
-      .subscribe({
-        next: (states) => {
-          this.dashboardStates = states;
-          this.isLoadingStates = false;
-        },
-        error: (error) => {
-          console.error('Error loading state counts:', error);
-          this.isLoadingStates = false;
-        }
-      });
+    this.physicianDashboardService.getStateCounts().subscribe({
+      next: (states) => {
+        this.dashboardStates = states;
+        this.isLoadingStates = false;
+      },
+      error: (error) => {
+        console.error('Error loading state counts:', error);
+        this.isLoadingStates = false;
+      },
+    });
   }
 
   loadRequests() {
     this.isLoading = true;
     this.updateDisplayedColumns();
 
-    this.physicianDashboardService.getRequestsByState(this.selectedState, this.paginationRequest)
+    this.physicianDashboardService
+      .getRequestsByState(this.selectedState, this.paginationRequest)
       .subscribe({
         next: (response: PaginationResponse<AdminRequestData>) => {
           this.dataSource = response.items;
@@ -164,7 +203,7 @@ export class PhysicianDashboardComponent implements OnInit, OnDestroy {
         error: (error) => {
           console.error('Error loading requests:', error);
           this.isLoading = false;
-        }
+        },
       });
   }
 
@@ -181,7 +220,9 @@ export class PhysicianDashboardComponent implements OnInit, OnDestroy {
   }
 
   onRequestTypeChange(requestType: string) {
-    this.paginationRequest.filters.requestType = requestType ? parseInt(requestType) : undefined;
+    this.paginationRequest.filters.requestType = requestType
+      ? parseInt(requestType)
+      : undefined;
     this.paginationRequest.pageIndex = 1; // Reset to first page
     this.loadRequests();
   }
@@ -195,17 +236,17 @@ export class PhysicianDashboardComponent implements OnInit, OnDestroy {
   private updateDisplayedColumns() {
     this.displayedColumns = [
       'patientFullName',
-      'dateOfBirth', 
+      'dateOfBirth',
       'requestorName',
       'requestedDate',
       'phone',
       'address',
-      'actions'
+      'actions',
     ];
-    
+
     // Add physician name column for all states
     this.displayedColumns.splice(3, 0, 'physicianName');
-    
+
     // Add date of service for non-NEW states
     if (this.selectedState !== DashboardRequestStatus.New) {
       this.displayedColumns.splice(4, 0, 'dateOfService');
@@ -217,26 +258,54 @@ export class PhysicianDashboardComponent implements OnInit, OnDestroy {
 
     // Always available actions
     actions.push({ label: 'View Request', action: 'view', icon: 'visibility' });
-    actions.push({ label: 'View Documents', action: 'documents', icon: 'description' });
+    actions.push({
+      label: 'View Documents',
+      action: 'documents',
+      icon: 'description',
+    });
 
     // State-specific actions
     switch (this.selectedState) {
       case DashboardRequestStatus.New:
-        actions.push({ label: 'Accept Request', action: 'accept', icon: 'check_circle' });
+        actions.push({
+          label: 'Accept Request',
+          action: 'accept',
+          icon: 'check_circle',
+        });
         break;
-      
+
       case DashboardRequestStatus.Pending:
-        actions.push({ label: 'Send Agreement', action: 'send-agreement', icon: 'send' });
+        actions.push({
+          label: 'Send Agreement',
+          action: 'send-agreement',
+          icon: 'send',
+        });
         break;
-      
+
       case DashboardRequestStatus.Active:
-        actions.push({ label: 'Accept Request', action: 'accept', icon: 'check_circle' });
-        actions.push({ label: 'Create/Update Encounter Form', action: 'encounter-form', icon: 'edit_note' });
+        actions.push({
+          label: 'Accept Request',
+          action: 'accept',
+          icon: 'check_circle',
+        });
+        actions.push({
+          label: 'Create/Update Encounter Form',
+          action: 'encounter-form',
+          icon: 'edit_note',
+        });
         break;
-      
+
       case DashboardRequestStatus.Conclude:
-        actions.push({ label: 'Accept Request', action: 'accept', icon: 'check_circle' });
-        actions.push({ label: 'Conclude Care', action: 'conclude-care', icon: 'check_circle_outline' });
+        actions.push({
+          label: 'Accept Request',
+          action: 'accept',
+          icon: 'check_circle',
+        });
+        actions.push({
+          label: 'Conclude Care',
+          action: 'conclude-care',
+          icon: 'check_circle_outline',
+        });
         break;
     }
 
@@ -262,31 +331,30 @@ export class PhysicianDashboardComponent implements OnInit, OnDestroy {
         // Navigate to view request page
         this.router.navigate(['/physician/request', request.id, 'view']);
         break;
-        
+
       case 'documents':
         // Navigate to documents page
         this.router.navigate(['/physician/request', request.id, 'documents']);
         break;
-        
+
       case 'accept':
         this.openAcceptDialog(request);
         break;
-        
+
       case 'send-agreement':
-        // Send agreement (to be implemented)
-        console.log('Send agreement for request:', request.id);
+        this.openSendAgreementDialog(request);
         break;
-        
+
       case 'encounter-form':
         // Create/Update encounter form (to be implemented)
         console.log('Create/Update encounter form for request:', request.id);
         break;
-        
+
       case 'conclude-care':
         // Conclude care (to be implemented)
         console.log('Conclude care for request:', request.id);
         break;
-        
+
       default:
         console.log('Unknown action:', action, 'for request:', request.id);
         break;
@@ -302,62 +370,89 @@ export class PhysicianDashboardComponent implements OnInit, OnDestroy {
       autoFocus: true,
       data: {
         requestId: request.id,
-        patientName: request.patientFullName
-      }
+        patientName: request.patientFullName,
+      },
     });
 
-    dialogRef.afterClosed().subscribe(result => {
+    dialogRef.afterClosed().subscribe((result) => {
       if (result?.success) {
         const acceptRequestData: AcceptRequestData = {
           requestId: result.requestId,
-          notes: result.notes
+          notes: result.notes,
         };
 
-        this.physicianDashboardService.acceptRequest(acceptRequestData).subscribe({
-          next: (response) => {
-            console.log('Request accepted successfully:', response);
-            // Refresh the data
-            this.loadRequests();
-            this.loadStateCounts();
-          },
-          error: (error) => {
-            console.error('Error accepting request:', error);
-          }
-        });
+        this.physicianDashboardService
+          .acceptRequest(acceptRequestData)
+          .subscribe({
+            next: (response) => {
+              console.log('Request accepted successfully:', response);
+              // Refresh the data
+              this.loadRequests();
+              this.loadStateCounts();
+            },
+            error: (error) => {
+              console.error('Error accepting request:', error);
+            },
+          });
+      }
+    });
+  }
+
+  openSendAgreementDialog(request: AdminRequestData) {
+    const dialogRef = this.dialog.open(SendAgreementDialogComponent, {
+      width: '500px',
+      maxWidth: '90vw',
+      maxHeight: '90vh',
+      disableClose: false,
+      autoFocus: true,
+      data: { request },
+    });
+
+    dialogRef.afterClosed().subscribe((result) => {
+      if (result && result.success) {
+        this.snackBar.open(result.message, 'Close', { duration: 3000 });
       }
     });
   }
 
   exportRequests() {
-    this.physicianDashboardService.exportRequests(this.selectedState, this.paginationRequest).subscribe({
-      next: (blob) => {
-        const url = window.URL.createObjectURL(blob);
-        const link = document.createElement('a');
-        link.href = url;
-        link.download = `physician-requests-${this.selectedState}-${new Date().toISOString().split('T')[0]}.xlsx`;
-        link.click();
-        window.URL.revokeObjectURL(url);
-      },
-      error: (error) => {
-        console.error('Error exporting requests:', error);
-      }
-    });
+    this.physicianDashboardService
+      .exportRequests(this.selectedState, this.paginationRequest)
+      .subscribe({
+        next: (blob) => {
+          const url = window.URL.createObjectURL(blob);
+          const link = document.createElement('a');
+          link.href = url;
+          link.download = `physician-requests-${this.selectedState}-${
+            new Date().toISOString().split('T')[0]
+          }.xlsx`;
+          link.click();
+          window.URL.revokeObjectURL(url);
+        },
+        error: (error) => {
+          console.error('Error exporting requests:', error);
+        },
+      });
   }
 
   exportAllRequests() {
-    this.physicianDashboardService.exportAllRequests(this.paginationRequest).subscribe({
-      next: (blob) => {
-        const url = window.URL.createObjectURL(blob);
-        const link = document.createElement('a');
-        link.href = url;
-        link.download = `physician-all-requests-${new Date().toISOString().split('T')[0]}.xlsx`;
-        link.click();
-        window.URL.revokeObjectURL(url);
-      },
-      error: (error) => {
-        console.error('Error exporting all requests:', error);
-      }
-    });
+    this.physicianDashboardService
+      .exportAllRequests(this.paginationRequest)
+      .subscribe({
+        next: (blob) => {
+          const url = window.URL.createObjectURL(blob);
+          const link = document.createElement('a');
+          link.href = url;
+          link.download = `physician-all-requests-${
+            new Date().toISOString().split('T')[0]
+          }.xlsx`;
+          link.click();
+          window.URL.revokeObjectURL(url);
+        },
+        error: (error) => {
+          console.error('Error exporting all requests:', error);
+        },
+      });
   }
 
   logout() {
@@ -374,10 +469,10 @@ export class PhysicianDashboardComponent implements OnInit, OnDestroy {
 
   getRequestStatusDisplayName(statusValue: string | null): string {
     if (!statusValue) return '-';
-    
+
     const numericStatus = parseInt(statusValue, 10);
     if (isNaN(numericStatus)) return statusValue;
-    
+
     return RequestStatusMapper.getRequestStatusDisplayName(numericStatus);
   }
-} 
+}

@@ -14,6 +14,7 @@ import { MatMenuModule } from '@angular/material/menu';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
+import { MatSnackBar } from '@angular/material/snack-bar';
 import { Router } from '@angular/router';
 import { MatMenuTrigger } from '@angular/material/menu';
 import { Subject } from 'rxjs';
@@ -30,6 +31,7 @@ import { AdminDashboardService } from '@main/services/admin-dashboard.service';
 import { AdminRequestService } from '@main/services/admin-request.service';
 import { AssignRequestComponent } from '@main/components/admin/assign-request/assign-request.component';
 import { CancelRequestComponent } from '@main/components/admin/cancel-request/cancel-request.component';
+import { SendAgreementDialogComponent } from '@main/components/shared/send-agreement-dialog/send-agreement-dialog.component';
 
 @Component({
   selector: 'app-dashboard',
@@ -121,7 +123,8 @@ export class DashboardComponent implements OnInit, OnDestroy {
     private adminDashboardService: AdminDashboardService,
     private adminRequestService: AdminRequestService,
     private router: Router,
-    private dialog: MatDialog
+    private dialog: MatDialog,
+    private snackBar: MatSnackBar
   ) {}
 
   ngOnInit() {
@@ -323,10 +326,9 @@ export class DashboardComponent implements OnInit, OnDestroy {
         this.openCancelDialog(request);
         break;
         
-      case 'send-agreement':
-        // Send agreement (to be implemented)
-        console.log('Send agreement for request:', request.id);
-        break;
+              case 'send-agreement':
+          this.openSendAgreementDialog(request);
+          break;
         
       case 'clear':
         // Clear case (to be implemented)
@@ -388,6 +390,23 @@ export class DashboardComponent implements OnInit, OnDestroy {
         // Refresh both the requests list and state counts after successful cancellation
         this.loadRequests();
         this.loadStateCounts();
+      }
+    });
+  }
+
+  openSendAgreementDialog(request: AdminRequestData) {
+    const dialogRef = this.dialog.open(SendAgreementDialogComponent, {
+      width: '500px',
+      maxWidth: '90vw',
+      maxHeight: '90vh',
+      disableClose: false,
+      autoFocus: true,
+      data: { request }
+    });
+
+    dialogRef.afterClosed().subscribe(result => {
+      if (result && result.success) {
+        this.snackBar.open(result.message, 'Close', { duration: 3000 });
       }
     });
   }

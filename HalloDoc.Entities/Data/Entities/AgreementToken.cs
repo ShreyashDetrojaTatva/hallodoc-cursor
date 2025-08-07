@@ -19,14 +19,17 @@ namespace HalloDoc.Entities.Data.Entities
         public string Token { get; set; } = null!;
 
         [Required]
+        [Column(TypeName = "timestamp without time zone")]
         public DateTime Expiry { get; set; }
 
         [Required]
         public bool Used { get; set; } = false;
 
+        [Column(TypeName = "timestamp without time zone")]
         public DateTime? UsedAt { get; set; }
 
         [Required]
+        [Column(TypeName = "timestamp without time zone")]
         public DateTime CreatedAt { get; set; } = DateTime.Now;
     }
 }

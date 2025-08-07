@@ -1,0 +1,128 @@
+<div class="agreement-page">
+  <div class="agreement-container">
+    <!-- Loading State -->
+    <div *ngIf="isLoading" class="loading-state">
+      <mat-spinner diameter="50"></mat-spinner>
+      <p>Loading agreement details...</p>
+    </div>
+
+    <!-- Error State -->
+    <div *ngIf="error && !isLoading" class="error-state">
+      <mat-icon class="error-icon">error</mat-icon>
+      <h2>Error</h2>
+      <p>{{ error }}</p>
+      <button mat-raised-button color="primary" (click)="router.navigate(['/'])">
+        Go to Home
+      </button>
+    </div>
+
+    <!-- Agreement Content -->
+    <div *ngIf="agreementDetails && !isLoading" class="agreement-content">
+      <!-- Header -->
+      <div class="agreement-header">
+        <div class="logo">
+          <h1>HalloDoc</h1>
+        </div>
+        <div class="status-info">
+          <div *ngIf="agreementDetails.isExpired" class="status-badge expired">
+            <mat-icon>schedule</mat-icon>
+            <span>Expired</span>
+          </div>
+          <div *ngIf="agreementDetails.isUsed" class="status-badge used">
+            <mat-icon>check_circle</mat-icon>
+            <span>Already Responded</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Agreement Card -->
+      <mat-card class="agreement-card">
+        <mat-card-header>
+          <mat-card-title>Medical Request Agreement</mat-card-title>
+          <mat-card-subtitle>Please review and respond to this agreement</mat-card-subtitle>
+        </mat-card-header>
+
+        <mat-card-content>
+          <!-- Request Details -->
+          <div class="request-details">
+            <h3>Request Information</h3>
+            <div class="detail-row">
+              <span class="label">Patient:</span>
+              <span class="value">{{ agreementDetails.patientName }}</span>
+            </div>
+            <div class="detail-row">
+              <span class="label">Request ID:</span>
+              <span class="value">{{ agreementDetails.requestId }}</span>
+            </div>
+            <div class="detail-row">
+              <span class="label">Created:</span>
+              <span class="value">{{ agreementDetails.createdAt | date:'mediumDate' }}</span>
+            </div>
+            <div class="detail-row">
+              <span class="label">Requestor:</span>
+              <span class="value">{{ agreementDetails.requestorName }}</span>
+            </div>
+            <div class="detail-row">
+              <span class="label">Contact:</span>
+              <span class="value">{{ agreementDetails.requestorEmail }} | {{ agreementDetails.requestorPhone }}</span>
+            </div>
+            <div *ngIf="agreementDetails.symptoms" class="detail-row">
+              <span class="label">Symptoms:</span>
+              <span class="value">{{ agreementDetails.symptoms }}</span>
+            </div>
+          </div>
+
+          <!-- Agreement Text -->
+          <div class="agreement-text">
+            <h3>Agreement Terms</h3>
+            <p>
+              By accepting this agreement, you acknowledge that you have reviewed the medical request details 
+              and consent to proceed with the medical care as outlined. You understand that:
+            </p>
+            <ul>
+              <li>You have provided accurate information about your medical condition</li>
+              <li>You consent to receive medical care from HalloDoc providers</li>
+              <li>You understand the nature and purpose of the medical services</li>
+              <li>You have the right to ask questions about your care</li>
+              <li>You may withdraw consent at any time</li>
+            </ul>
+            <p>
+              If you have any questions or concerns about this agreement, please contact our support team 
+              before proceeding.
+            </p>
+          </div>
+        </mat-card-content>
+
+        <!-- Action Buttons -->
+        <mat-card-actions *ngIf="canRespond" class="agreement-actions">
+          <button 
+            mat-raised-button 
+            color="warn" 
+            (click)="onCancel()"
+            [disabled]="isProcessing"
+            class="action-button"
+          >
+            <mat-icon>cancel</mat-icon>
+            Cancel Agreement
+          </button>
+          <button 
+            mat-raised-button 
+            color="primary" 
+            (click)="onAccept()"
+            [disabled]="isProcessing"
+            class="action-button"
+          >
+            <mat-icon>check_circle</mat-icon>
+            Accept Agreement
+          </button>
+        </mat-card-actions>
+
+        <!-- Processing State -->
+        <div *ngIf="isProcessing" class="processing-state">
+          <mat-spinner diameter="30"></mat-spinner>
+          <p>Processing your response...</p>
+        </div>
+      </mat-card>
+    </div>
+  </div>
+</div> 

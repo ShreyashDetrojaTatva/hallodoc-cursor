@@ -14,6 +14,8 @@ using HalloDoc.Repositories.Repositories.RequestRepository;
 using HalloDoc.Services.Services.RequestService;
 using HalloDoc.Repositories.Repositories.DocumentRepository;
 using HalloDoc.Repositories.Repositories.PhysicianRepository;
+using HalloDoc.Repositories.Repositories.AgreementRepository;
+using HalloDoc.Services.Services.AgreementService;
 
 var builder = WebApplication.CreateBuilder(args);
 var env = builder.Environment;
@@ -38,7 +40,7 @@ var corsPolicy = "AllowAngular";
 builder.Services.AddCors(options =>
 {
     options.AddPolicy(name: corsPolicy,
-        policy  =>
+        policy =>
         {
             policy.WithOrigins("http://localhost:4300")
                   .AllowAnyHeader()
@@ -63,6 +65,8 @@ builder.Services.AddScoped<IAdminRequestService, AdminRequestService>();
 builder.Services.AddScoped<IPhysicianRepository, PhysicianRepository>();
 builder.Services.AddScoped<IPhysicianDashboardService, PhysicianDashboardService>();
 builder.Services.AddScoped<IDocumentService, DocumentService>();
+builder.Services.AddScoped<IAgreementRepository, AgreementRepository>();
+builder.Services.AddScoped<IAgreementService, AgreementService>();
 
 // Register IHttpContextAccessor and WorkContext
 builder.Services.AddHttpContextAccessor();

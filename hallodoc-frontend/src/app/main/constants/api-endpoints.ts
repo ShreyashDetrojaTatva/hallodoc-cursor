@@ -9,7 +9,7 @@ export const AUTH_ENDPOINTS = {
   RESET_PASSWORD: `${BASE_URL}/api/auth/reset-password`,
   GET_PROFILE: `${BASE_URL}/api/auth/profile`,
   UPDATE_PROFILE: `${BASE_URL}/api/auth/profile`, // Changed to PUT request to same endpoint
-  LOGOUT: `${BASE_URL}/api/auth/logout`
+  LOGOUT: `${BASE_URL}/api/auth/logout`,
 };
 
 // Patient Endpoints (using RequestController)
@@ -34,7 +34,8 @@ export const ADMIN_REQUEST_ENDPOINTS = {
   UPDATE_REQUEST: `${BASE_URL}/api/adminrequest/update`,
   GET_PHYSICIANS: `${BASE_URL}/api/adminrequest/physicians`,
   ASSIGN_REQUEST: `${BASE_URL}/api/adminrequest/assign`,
-  CANCEL_REQUEST: `${BASE_URL}/api/adminrequest/cancel`
+  CANCEL_REQUEST: `${BASE_URL}/api/adminrequest/cancel`,
+  SEND_AGREEMENT: `${BASE_URL}/api/adminrequest/send-agreement`,
 };
 
 // Request Forms Endpoints
@@ -54,5 +55,13 @@ export const PHYSICIAN_DASHBOARD_ENDPOINTS = {
   GET_STATE_COUNTS: `${BASE_URL}/api/physiciandashboard/state-counts`,
   EXPORT_REQUESTS: `${BASE_URL}/api/physiciandashboard/export`,
   EXPORT_ALL_REQUESTS: `${BASE_URL}/api/physiciandashboard/export-all`,
-  ACCEPT_REQUEST: `${BASE_URL}/api/physiciandashboard/accept`
-}; 
+  ACCEPT_REQUEST: `${BASE_URL}/api/physiciandashboard/accept`,
+};
+
+// Agreement Endpoints
+export const AGREEMENT_ENDPOINTS = {
+  SEND_AGREEMENT: `${BASE_URL}/api/agreement/send`,
+  GET_AGREEMENT_DETAILS: (token: string) => `${BASE_URL}/api/agreement/details/${token}`,
+  PROCESS_AGREEMENT_RESPONSE: `${BASE_URL}/api/agreement/respond`,
+  VALIDATE_TOKEN: (token: string) => `${BASE_URL}/api/agreement/validate/${token}`
+};
